@@ -440,5 +440,5 @@ pre-commit install
 | Code métier                                | `src/water_quality_service.py` | Complet |
 | Tests unitaires (4 tests, 2 boucles R-G-R) | `tests/test_water_quality.py`  | Complet |
 | Hooks pre-commit (lint local)              | `.pre-commit-config.yaml`      | Complet |
-| Pipeline CI distant                        | `.github/workflows/ci.yml`     | A créer |
+| Pipeline CI distant                        | `.github/workflows/ci.yml`     | Complet |
 | Rétro Pairing                              | Section ci-dessus              | Complet |
