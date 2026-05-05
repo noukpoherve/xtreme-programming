@@ -15,11 +15,11 @@ Cet atelier s'inscrit dans le projet **UrbanHub**, une plateforme Smart City flu
 
 ### Lien avec le backlog SCRUM
 
-| Story | Description |
-|-------|-------------|
-| SCRUM-8 | Surveiller la qualité de l'eau en temps réel |
-| SCRUM-11 | Détecter les seuils d'anomalie |
-| BF04 | Détecter les situations anormales |
+| Story    | Description                                  |
+| -------- | -------------------------------------------- |
+| SCRUM-8  | Surveiller la qualité de l'eau en temps réel |
+| SCRUM-11 | Détecter les seuils d'anomalie               |
+| BF04     | Détecter les situations anormales            |
 
 ---
 
@@ -31,11 +31,42 @@ Parmi les quatre microservices proposés (Air-Quality, Traffic-Signal, Parking-A
 
 Le service évalue la **turbidité de l'eau** (en NTU) et retourne un statut selon les seuils suivants :
 
-| Plage de turbidité | Statut | Alerte |
-|--------------------|--------|--------|
-| ≤ seuil attention | `NORMAL` | non |
-| > seuil attention et < seuil critique | `WARNING` | oui |
-| ≥ seuil critique | `CRITICAL` | oui |
+La turbidité de l’eau (souvent appelée “eau trouble”) désigne simplement le degré de clarté ou de transparence de l’eau.
+
+## 💧 Définition simple
+
+👉 La turbidité, c’est la présence de particules en suspension dans l’eau qui empêchent la lumière de passer correctement.
+
+Ces particules peuvent être :
+
+boue / argile
+sable
+matières organiques (feuilles, algues)
+micro-organismes (bactéries, plancton)
+👀 Exemple concret
+Eau claire → faible turbidité ✅
+Eau marron après pluie → forte turbidité ❌
+
+👉 Plus l’eau est trouble, plus la turbidité est élevée.
+
+## 📏 Comment on la mesure ?
+
+La turbidité se mesure avec un appareil appelé turbidimètre, en unités :
+👉 NTU (Nephelometric Turbidity Unit)
+
+0–1 NTU → eau très claire
+
+5 NTU → eau déjà trouble
+
+très élevé → eau impropre à la consommation
+
+## Plage de turbidité
+
+| Plage de turbidité                    | Statut     | Alerte |
+| ------------------------------------- | ---------- | ------ |
+| ≤ seuil attention                     | `NORMAL`   | non    |
+| > seuil attention et < seuil critique | `WARNING`  | oui    |
+| ≥ seuil critique                      | `CRITICAL` | oui    |
 
 ---
 
@@ -181,6 +212,7 @@ La structure `if / elif / else` est claire et couvre les trois états. Le refact
 - Supprimer les fichiers inutilisés créés lors de l'initialisation
 
 **Commits associés :**
+
 - `chore: remove flake8, black can manage code format`
 - `refactor: Remove unused files`
 
@@ -207,12 +239,12 @@ def test_turbidite_exactement_au_seuil_critique():
 
 ### Récapitulatif des 4 tests
 
-| Test | Valeur | Statut attendu | Alerte |
-|------|--------|----------------|--------|
-| `test_turbidite_critique` | 75 NTU | `CRITICAL` | `True` |
-| `test_turbidite_attention` | 25 NTU | `WARNING` | `True` |
-| `test_turbidite_normale` | 5 NTU | `NORMAL` | `False` |
-| `test_turbidite_exactement_au_seuil_critique` | 50 NTU | `CRITICAL` | `True` |
+| Test                                          | Valeur | Statut attendu | Alerte  |
+| --------------------------------------------- | ------ | -------------- | ------- |
+| `test_turbidite_critique`                     | 75 NTU | `CRITICAL`     | `True`  |
+| `test_turbidite_attention`                    | 25 NTU | `WARNING`      | `True`  |
+| `test_turbidite_normale`                      | 5 NTU  | `NORMAL`       | `False` |
+| `test_turbidite_exactement_au_seuil_critique` | 50 NTU | `CRITICAL`     | `True`  |
 
 ---
 
@@ -227,15 +259,15 @@ repos:
   - repo: https://github.com/psf/black
     rev: 24.3.0
     hooks:
-      - id: black                   # Formatage automatique du code
+      - id: black # Formatage automatique du code
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
-      - id: trailing-whitespace     # Supprime les espaces en fin de ligne
-      - id: end-of-file-fixer       # Assure une ligne vide en fin de fichier
-      - id: check-yaml              # Valide la syntaxe YAML
-      - id: check-toml              # Valide la syntaxe TOML
+      - id: trailing-whitespace # Supprime les espaces en fin de ligne
+      - id: end-of-file-fixer # Assure une ligne vide en fin de fichier
+      - id: check-yaml # Valide la syntaxe YAML
+      - id: check-toml # Valide la syntaxe TOML
 ```
 
 ### Pipeline GitHub Actions (CI distante)
@@ -251,14 +283,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Install dependencies
         run: pip install pytest black
@@ -404,10 +435,10 @@ pre-commit install
 
 ## Récapitulatif des livrables
 
-| Livrable | Fichier | Statut |
-|----------|---------|--------|
-| Code métier | `src/water_quality_service.py` | Complet |
-| Tests unitaires (4 tests, 2 boucles R-G-R) | `tests/test_water_quality.py` | Complet |
-| Hooks pre-commit (lint local) | `.pre-commit-config.yaml` | Complet |
-| Pipeline CI distant | `.github/workflows/ci.yml` | A créer |
-| Rétro Pairing | Section ci-dessus | Complet |
+| Livrable                                   | Fichier                        | Statut  |
+| ------------------------------------------ | ------------------------------ | ------- |
+| Code métier                                | `src/water_quality_service.py` | Complet |
+| Tests unitaires (4 tests, 2 boucles R-G-R) | `tests/test_water_quality.py`  | Complet |
+| Hooks pre-commit (lint local)              | `.pre-commit-config.yaml`      | Complet |
+| Pipeline CI distant                        | `.github/workflows/ci.yml`     | A créer |
+| Rétro Pairing                              | Section ci-dessus              | Complet |
