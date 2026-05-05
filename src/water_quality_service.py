@@ -13,6 +13,9 @@ class WaterQualityService:
         self.critical_threshold = critical_threshold
 
     def evaluate_turbidity(self, value: float) -> Result:
-        if value > self.critical_threshold:
+        if value >= self.critical_threshold:
             return Result(status="CRITICAL", alert=True)
-        return Result(status="NORMAL", alert=False)
+        elif value > self.warning_threshold:
+            return Result(status="WARNING", alert=True)
+        else:
+            return Result(status="NORMAL", alert=False)
