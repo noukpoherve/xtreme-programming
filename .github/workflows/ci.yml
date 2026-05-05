@@ -55,9 +55,13 @@ jobs:
         # échoue si le code n'est pas bien formaté
         # en local black corrige, en CI black vérifie seulement
 
-      # ─────────────────────────────────────────
-      # ÉTAPE 6 — Lancer les tests
-      # ─────────────────────────────────────────
+  # ─────────────────────────────────────────
+  # ÉTAPE 6 — Lancer les tests
+  # ─────────────────────────────────────────
+  test:
+    runs-on: ubuntu-latest
+    needs: ci # s'assure que l'étape "ci" a réussi avant de
+    steps:
       - name: Lancer les tests (pytest)
         run: uv run pytest tests/ -v
         # tests/ = cherche dans le dossier tests/
