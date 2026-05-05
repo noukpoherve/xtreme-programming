@@ -71,13 +71,13 @@ jobs:
   # ─────────────────────────────────────────
   ci-success:
     runs-on: ubuntu-latest
-    needs: [ci] # s'assure que l'étape "ci" a réussi avant de continuer
+    needs: [ci]
     if: always()
     steps:
       - name: Check all jobs passed
         run: |
-          if [[ "${{ needs.ci.result }}" == "failure" ||; then
-            echo "One or more tests failed."
+          if [[ "${{ needs.ci.result }}" == "failure" || "${{ needs.ci.result }}" == "cancelled" ]]; then
+            echo "❌ One or more tests failed."
             exit 1
           fi
-          echo "All tests passed."
+          echo "✅ All tests passed."
