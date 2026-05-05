@@ -1,7 +1,11 @@
 name: CI - WaterQuality UrbanHub
 
 # Déclencher la CI à chaque push et pull request
-on: [push, pull_request]
+on:
+  push:
+    branches: ["**"] # Every push on any branch
+  pull_request:
+    branches: [master] # Every PR targeting master
 
 jobs:
   ci:
@@ -48,7 +52,7 @@ jobs:
       - name: Vérifier le formatage (black)
         run: uv run black --check src/ tests/
         # --check = ne modifie PAS les fichiers
-        #           échoue si le code n'est pas bien formaté
+        # échoue si le code n'est pas bien formaté
         # en local black corrige, en CI black vérifie seulement
 
       # ─────────────────────────────────────────
@@ -63,9 +67,4 @@ jobs:
       # ÉTAPE 7 — Vérifier que le module s'importe
       # ─────────────────────────────────────────
       - name: Build check
-        run: uv run python -c "
-          import sys
-          sys.path.insert(0, 'src')
-          from water_quality_service import WaterQualityService
-          print('Build OK ✅')
-          "
+        run: uv run python -c "import sys; sys.path.insert(0, 'src'); from water_quality_service import WaterQualityService; print('Build OK ✅')"
