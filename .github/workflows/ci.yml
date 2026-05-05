@@ -69,5 +69,3 @@ jobs:
           from water_quality_service import WaterQualityService
           print('Build OK ✅')
           "
-        # vérifie que votre code s'importe sans erreur
-        # sys.path.insert = dit à Python où chercher src/
