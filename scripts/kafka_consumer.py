@@ -1,6 +1,7 @@
 import json
 import sys
 from pathlib import Path
+from time import monotonic
 
 from confluent_kafka import Consumer, KafkaException
 
@@ -9,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from kafka_settings import (
     KAFKA_BOOTSTRAP_SERVERS,
     KAFKA_CONSUMER_GROUP,
+    KAFKA_CONSUMER_TIMEOUT_SECONDS,
     WATER_QUALITY_TOPIC,
 )
 
@@ -34,10 +36,14 @@ def main() -> None:
     )
     consumer.subscribe([WATER_QUALITY_TOPIC])
 
-    print(f"waiting for one event on topic={WATER_QUALITY_TOPIC}")
+    print(
+        f"waiting for one event on topic={WATER_QUALITY_TOPIC} "
+        f"group={KAFKA_CONSUMER_GROUP}"
+    )
+    deadline = monotonic() + KAFKA_CONSUMER_TIMEOUT_SECONDS
 
     try:
-        while True:
+        while monotonic() < deadline:
             message = consumer.poll(1.0)
             if message is None:
                 continue
@@ -56,6 +62,11 @@ def main() -> None:
 
             consumer.commit(message=message)
             break
+        else:
+            raise TimeoutError(
+                "no Kafka message received "
+                f"within {KAFKA_CONSUMER_TIMEOUT_SECONDS} seconds"
+            )
     finally:
         consumer.close()
 

@@ -109,9 +109,14 @@ Les valeurs par defaut sont dans `src/kafka_settings.py`.
 | --- | --- |
 | `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9094` |
 | `WATER_QUALITY_TOPIC` | `mesure.qualite.eau` |
-| `WATER_QUALITY_DLQ_TOPIC` | `mesure.qualite.eau.dlq` |
-| `POLLUTION_ALERT_TOPIC` | `alerte.pollution.detectee` |
 | `KAFKA_CONSUMER_GROUP` | `urbanhub-water-quality-local` |
+| `KAFKA_CONSUMER_TIMEOUT_SECONDS` | `30` |
+
+Si le consumer ne lit rien, verifier le groupe de consommation. Un groupe Kafka qui a deja consomme tous les messages ne relit pas les memes offsets. Pour un smoke test qui relit depuis le debut, utiliser un nouveau groupe :
+
+```bash
+KAFKA_CONSUMER_GROUP=urbanhub-smoke-1 uv run python scripts/kafka_consumer.py
+```
 
 ## Integration avec les autres branches
 

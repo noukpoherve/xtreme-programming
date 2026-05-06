@@ -30,5 +30,30 @@ services:
       KAFKA_CLUSTERS_0_NAME: urbanhub-local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
 
+  alert-service:
+    build: ./alert-service
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  iot-service:
+    build: ./iot-service
+    ports:
+      - "8001:8001"
+    environment:
+      ALERT_SERVICE_URL: http://alert-service:8000
+    depends_on:
+      alert-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 volumes:
   kafka_data:

@@ -1,7 +1,7 @@
 [project]
-name = "urbanhub-water-quality"
+name = "urbanhub"
 version = "0.1.0"
-description = "Add your description here"
+description = "UrbanHub Smart City platform"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -14,3 +14,6 @@ dev = [
     "pre-commit>=4.6.0",
     "pytest>=9.0.3",
 ]
+
+[tool.black]
+target-version = ["py313"]

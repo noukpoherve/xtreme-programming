@@ -282,7 +282,7 @@ wheels = [
 ]
 
 [[package]]
-name = "urbanhub-water-quality"
+name = "urbanhub"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
