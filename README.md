@@ -433,6 +433,66 @@ pre-commit install
 
 ---
 
+## Acces API IoT (Hub'Eau) et connexion du client
+
+Le client IoT du projet (`src/hubeau_client.py`) se connecte a l'API Hub'Eau Hydrometrie pour recuperer les mesures de la Seine.
+
+### 1) Endpoint utilise
+
+- URL de base : `https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr`
+- Station Seine configuree dans le projet : `code_entite=F700000103`
+- Grandeurs interrogees :
+  - `H` : niveau d'eau (retourne en mm, converti en metres dans le code)
+  - `Q` : debit (retourne en L/s, converti en m3/s dans le code)
+
+Exemple d'appel manuel :
+
+```bash
+curl "https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr?code_entite=F700000103&grandeur_hydro=H&size=5&pretty"
+```
+
+### 2) Verifier l'acces API depuis votre machine
+
+Test niveau (H) :
+
+```bash
+curl "https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr?code_entite=F700000103&grandeur_hydro=H&size=1&pretty"
+```
+
+Test debit (Q) :
+
+```bash
+curl "https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr?code_entite=F700000103&grandeur_hydro=Q&size=1&pretty"
+```
+
+Si la cle `data` contient des elements, le client pourra recuperer les donnees.
+
+### 3) Lancer le client pour recuperer les donnees
+
+```bash
+uv run python main.py
+```
+
+Le script :
+- appelle Hub'Eau via `HubEauSensorClient`
+- construit une mesure capteur (`SensorMeasurement`)
+- envoie la mesure au `WaterQualityService` pour analyse
+- affiche le statut global et les alertes eventuelles
+
+### 4) Changer la station fluviale
+
+Dans `main.py`, modifier le parametre `code_entite` :
+
+```python
+client = HubEauSensorClient(code_entite="F700000103")
+```
+
+Vous pouvez remplacer cette valeur par un autre code station Hub'Eau pour pointer une autre zone.
+
+> Note : l'endpoint hydrometrie ne fournit pas le pH ni la turbidite. Dans la version actuelle, ces deux valeurs sont des valeurs par defaut configurees dans le client.
+
+---
+
 ## Récapitulatif des livrables
 
 | Livrable                                   | Fichier                        | Statut  |
