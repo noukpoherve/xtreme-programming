@@ -23,7 +23,6 @@ import pytest
 
 from iot_service.hubeau_client import HubEauSensorClient
 
-
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
 

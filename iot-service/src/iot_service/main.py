@@ -82,6 +82,7 @@ async def ingest():
 
 from iot_service.sensor_service import IoTSensorSimulator
 
+
 @app.post("/simulate")
 async def simulate(ph: float = 7.0, turbidity: float = 75.0):
     quality_service: WaterQualityService = app.state.quality_service
@@ -98,7 +99,10 @@ async def simulate(ph: float = 7.0, turbidity: float = 75.0):
     return {
         "analysis": {
             "overall_status": analysis.overall_status,
-            "alerts": [{"parameter": a.parameter, "status": a.status, "message": a.message} for a in analysis.alerts],
+            "alerts": [
+                {"parameter": a.parameter, "status": a.status, "message": a.message}
+                for a in analysis.alerts
+            ],
         },
         "alerts_sent": len(alert_responses),
         "alert_responses": alert_responses,
