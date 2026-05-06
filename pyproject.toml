@@ -1,13 +1,10 @@
 [project]
-name = "urbanhub-water-quality"
+name = "urbanhub"
 version = "0.1.0"
-description = "Add your description here"
+description = "UrbanHub Smart City platform"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = []
-
-[tool.pytest.ini_options]
-pythonpath = ["src"]
 
 [dependency-groups]
 dev = [
@@ -15,6 +12,3 @@ dev = [
     "pre-commit>=4.6.0",
     "pytest>=9.0.3",
 ]
-
-[tool.uv.workspace]
-members = ["alert-service", "iot-service"]
