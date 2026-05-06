@@ -15,7 +15,7 @@ def sample_payload():
     return AlertPayload(
         alert_id="alert-123",
         event_id="event-123",
-        capteur_id="SEINE-001",
+        sensor_id="SEINE-001",
         timestamp=datetime.now(timezone.utc),
         severity="CRITICAL",
         type="ph_critique",

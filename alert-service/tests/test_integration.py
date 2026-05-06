@@ -18,7 +18,7 @@ async def test_end_to_end_alert_publish(client):
     payload = {
         "alert_id": "alert-int-001",
         "event_id": "event-int-001",
-        "capteur_id": "SEINE-PONT-ALMA-001",
+        "sensor_id": "SEINE-PONT-ALMA-001",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "severity": "CRITICAL",
         "type": "ph_critique",

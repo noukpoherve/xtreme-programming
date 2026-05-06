@@ -12,12 +12,12 @@ class Localisation(BaseModel):
 class AlertPayload(BaseModel):
     alert_id: str = Field(..., description="UUID v4 unique de l'alerte")
     event_id: str = Field(..., description="UUID v4 de l'evenement source")
-    capteur_id: str
+    sensor_id: str
     timestamp: datetime
     severity: str = Field(..., pattern="^(WARNING|CRITICAL)$")
     type: str
     message: str
-    localisation: Localisation
+    localisation: Localisation | None = None
     trace_id: str
     metadata: dict[str, Any] = Field(default_factory=dict)
 

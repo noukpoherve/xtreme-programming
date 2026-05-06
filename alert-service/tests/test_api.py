@@ -18,7 +18,7 @@ async def test_create_alert_success(client):
     payload = {
         "alert_id": "alert-001",
         "event_id": "event-001",
-        "capteur_id": "SEINE-PONT-ALMA-001",
+        "sensor_id": "SEINE-PONT-ALMA-001",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "severity": "CRITICAL",
         "type": "ph_critique",
