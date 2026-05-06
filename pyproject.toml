@@ -17,4 +17,4 @@ dev = [
 ]
 
 [tool.uv.workspace]
-members = ["alert-service"]
+members = ["alert-service", "iot-service"]
