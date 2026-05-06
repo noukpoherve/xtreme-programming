@@ -32,8 +32,16 @@ services:
 
   alert-service:
     build: ./alert-service
+    depends_on:
+      - kafka
     ports:
       - "8000:8000"
+    environment:
+      ALERT_ENABLE_KAFKA_BRIDGE: "true"
+      ALERT_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ALERT_WATER_QUALITY_TOPIC: mesure.qualite.eau
+      ALERT_POLLUTION_ALERT_TOPIC: alerte.pollution.detectee
+      ALERT_KAFKA_CONSUMER_GROUP: alert-service-consumer
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -42,13 +50,14 @@ services:
 
   iot-service:
     build: ./iot-service
+    depends_on:
+      - kafka
     ports:
       - "8001:8001"
     environment:
-      ALERT_SERVICE_URL: http://alert-service:8000
-    depends_on:
-      alert-service:
-        condition: service_healthy
+      IOT_ENABLE_KAFKA: "true"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      WATER_QUALITY_TOPIC: mesure.qualite.eau
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 10s

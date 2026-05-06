@@ -1,15 +1,15 @@
 # Alert Service
 
-REST API microservice for receiving and processing water quality alerts from the IoT ingestion service.
+REST API microservice for receiving and processing water quality alerts.
 
 ## Overview
 
-The Alert Service exposes a single REST endpoint that receives alert payloads and responds with a confirmation. In the future, each received alert will be published to a Kafka topic (`alerte.pollution.detectee`) for downstream notification services.
+The Alert Service exposes a single REST endpoint that receives alert payloads and responds with a confirmation. It also consumes the Kafka topic `mesure.qualite.eau`, builds alert payloads from measurements, and republishes them to `alerte.pollution.detectee`.
 
 ## Architecture
 
 ```
-IoT Ingestion Service  --HTTP POST /alertes-->  Alert Service  --(future: Kafka)-->  Notification Service
+IoT Ingestion Service  --Kafka topic mesure.qualite.eau-->  Alert Service  --Kafka topic alerte.pollution.detectee-->  Notification Service
 ```
 
 ## Endpoints
@@ -79,6 +79,11 @@ docker build -t alert-service .
 docker run -p 8000:8000 alert-service
 ```
 
-## Future: Kafka integration
+## Kafka integration
 
-When the Kafka broker is ready, the service will be extended with an `aiokafka` producer that publishes validated alerts to the `alerte.pollution.detectee` topic. The producer will be idempotent and resilient (retry + DLQ).
+Kafka bridge is enabled in Docker Compose with:
+
+- `ALERT_ENABLE_KAFKA_BRIDGE=true`
+- `ALERT_KAFKA_BOOTSTRAP_SERVERS=kafka:9092`
+- `ALERT_WATER_QUALITY_TOPIC=mesure.qualite.eau`
+- `ALERT_POLLUTION_ALERT_TOPIC=alerte.pollution.detectee`

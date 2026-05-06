@@ -1,17 +1,15 @@
 # IoT Ingestion Service
 
-Microservice that collects sensor data, analyses water quality thresholds, and forwards alerts to the Alert Service.
+Microservice that collects sensor data and publishes water quality measurements to Kafka.
 
 ## Overview
 
-The IoT Ingestion Service fetches real-time hydrometric data from the French **Hub'Eau** API (Seine river, Paris station), enriches it with default pH and turbidity values, and analyses the measurements against configured thresholds. When an anomaly is detected, it calls the Alert Service synchronously via `POST /alertes`.
+The IoT Ingestion Service fetches real-time hydrometric data from the French **Hub'Eau** API (Seine river, Paris station), enriches it with default pH and turbidity values, and publishes the measurement to the Kafka topic `mesure.qualite.eau`.
 
 ## Architecture
 
 ```
-Hub'Eau API  -->  IoT Ingestion Service  --HTTP POST /alertes-->  Alert Service
-                      |
-                      +-- Analyse pH / turbidity / level / flow
+Hub'Eau API  -->  IoT Ingestion Service  -->  Kafka topic mesure.qualite.eau  -->  Alert Service
 ```
 
 ## Endpoints
@@ -28,14 +26,13 @@ Health check.
 ```
 
 ### `POST /ingest`
-Fetch the latest real sensor data from Hub'Eau, analyse it, and forward any alerts to the Alert Service.
+Fetch the latest real sensor data from Hub'Eau and publish it to Kafka.
 
 **Response:**
 ```json
 {
   "measurement": { "sensor_id": "...", "ph": 7.4, "turbidity": 8.0, ... },
-  "analysis": { "overall_status": "NORMAL", "alerts": [] },
-  "alerts_sent": 0
+  "publication": { "topic": "mesure.qualite.eau", "published": true, ... }
 }
 ```
 
@@ -55,7 +52,7 @@ cd iot-service
 PYTHONPATH=src uv run uvicorn iot_service.main:app --host 0.0.0.0 --port 8001
 ```
 
-The service expects the Alert Service at `http://localhost:8000`. You can override this with the environment variable `ALERT_SERVICE_URL`.
+The service publishes to Kafka when `IOT_ENABLE_KAFKA=true` and `KAFKA_BOOTSTRAP_SERVERS` is set.
 
 ## Run tests
 
@@ -72,6 +69,9 @@ docker build -t iot-service .
 docker run -p 8001:8001 -e ALERT_SERVICE_URL=http://host.docker.internal:8000 iot-service
 ```
 
-## Future: Kafka integration
+## Kafka
 
-When the event bus is introduced, the synchronous `POST /alertes` call will be replaced (or complemented) by an **async event** published to a Kafka topic (`mesure.qualite.eau`). The Alert Service will then consume this topic instead of (or in addition to) receiving direct REST calls.
+Kafka publishing is enabled in Docker Compose and can be controlled with:
+
+- `IOT_ENABLE_KAFKA=true`
+- `KAFKA_BOOTSTRAP_SERVERS=kafka:9092`

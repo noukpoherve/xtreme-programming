@@ -5,6 +5,7 @@ description = "UrbanHub IoT Ingestion Service"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "confluent-kafka>=2.13.0",
     "fastapi>=0.136.1",
     "requests>=2.33.1",
     "uvicorn>=0.46.0",

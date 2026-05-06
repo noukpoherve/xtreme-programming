@@ -1,8 +1,14 @@
 # Kafka local avec Docker
 
-Ce fichier documente la partie Kafka de la branche `hans-kafka`.
+Ce fichier documente la partie Kafka de la branche `master` apres fusion de `hans-kafka`.
 
-L'objectif est de préparer un vrai broker Kafka local pour UrbanHub sans prendre en charge les regles metier des autres services. Cette branche fournit l'infrastructure, les topics cibles et un smoke test Python qui prouve qu'un evenement capteur peut etre publie puis consomme.
+Le flux metier est maintenant branche sur Kafka :
+
+```text
+IoT Service -> topic mesure.qualite.eau -> Alert Service -> topic alerte.pollution.detectee
+```
+
+Le service IoT publie les mesures dans Kafka, et le service Alert consomme ce topic, construit les alertes, les traite via son endpoint interne, puis republie les alertes sur le topic de sortie.
 
 ## Role de Kafka
 
@@ -14,13 +20,13 @@ Flux cible du livrable :
 Capteur IoT -> Kafka -> Service qualite eau -> Service alertes -> Kafka -> Service notifications
 ```
 
-Notre perimetre actuel :
+Perimetre actuel :
 
 ```text
-Producer Python -> topic mesure.qualite.eau -> Consumer Python
+Producer Python -> topic mesure.qualite.eau -> Alert Service Kafka bridge -> topic alerte.pollution.detectee
 ```
 
-Les services ingestion, alertes et notifications pourront ensuite remplacer ces scripts de test.
+Le service notifications n'est pas encore present dans le depot, mais le topic de sortie est deja prepare pour lui.
 
 ## Services Docker
 
@@ -42,9 +48,9 @@ Kafka ecoute sur deux adresses :
 
 | Topic | Role |
 | --- | --- |
-| `mesure.qualite.eau` | Evenements publies par les capteurs ou le service ingestion |
-| `mesure.qualite.eau.dlq` | Dead Letter Queue pour messages non traitables |
-| `alerte.pollution.detectee` | Evenements d'alerte publies apres detection |
+| `mesure.qualite.eau` | Evenements publies par le service IoT |
+| `alerte.pollution.detectee` | Evenements d'alerte republies par le service Alert |
+| `mesure.qualite.eau.dlq` | Dead Letter Queue reservee pour une evolution future |
 
 Le topic principal est partitionne par cle Kafka `capteur_id`. Cela permettra de conserver l'ordre des mesures pour un meme capteur.
 
@@ -103,7 +109,7 @@ Le consumer lit un message depuis `mesure.qualite.eau`, affiche les headers et l
 
 ## Variables d'environnement
 
-Les valeurs par defaut sont dans `src/kafka_settings.py`.
+Les valeurs par defaut sont dans `src/kafka_settings.py` et dans les settings du service Alert.
 
 | Variable | Defaut |
 | --- | --- |
@@ -111,6 +117,10 @@ Les valeurs par defaut sont dans `src/kafka_settings.py`.
 | `WATER_QUALITY_TOPIC` | `mesure.qualite.eau` |
 | `KAFKA_CONSUMER_GROUP` | `urbanhub-water-quality-local` |
 | `KAFKA_CONSUMER_TIMEOUT_SECONDS` | `30` |
+
+Pour le service IoT, activer le publish Kafka avec `IOT_ENABLE_KAFKA=true`.
+
+Pour le service Alert, activer le bridge Kafka avec `ALERT_ENABLE_KAFKA_BRIDGE=true`.
 
 Si le consumer ne lit rien, verifier le groupe de consommation. Un groupe Kafka qui a deja consomme tous les messages ne relit pas les memes offsets. Pour un smoke test qui relit depuis le debut, utiliser un nouveau groupe :
 
@@ -120,15 +130,7 @@ KAFKA_CONSUMER_GROUP=urbanhub-smoke-1 uv run python scripts/kafka_consumer.py
 
 ## Integration avec les autres branches
 
-Quand les autres developpeurs auront termine :
-
-- le service ingestion publiera sur `mesure.qualite.eau`
-- le service qualite eau consommera ce topic
-- le service alertes exposera `POST /alertes`
-- le service alertes pourra publier `alerte.pollution.detectee`
-- le service notifications consommera `alerte.pollution.detectee`
-
-Cette branche ne fige pas les regles metier. Elle prepare uniquement le transport Kafka et les conventions communes.
+Le service `alertes` conserve son endpoint `POST /alertes`, mais son flux reel passe maintenant par Kafka.
 
 ## Arret
 
