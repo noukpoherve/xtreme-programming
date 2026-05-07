@@ -72,8 +72,8 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          # Extrait la version du pyproject.toml racine
-          VERSION=$(grep -m 1 "version =" pyproject.toml | cut -d '"' -f 2)
+          # Extrait la version du service principal
+          VERSION=$(grep -m 1 "version =" iot-service/pyproject.toml | cut -d '"' -f 2)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
