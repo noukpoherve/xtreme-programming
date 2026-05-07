@@ -5,6 +5,7 @@ description = "UrbanHub IoT Ingestion Service"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "aiokafka>=0.14.0",
     "fastapi>=0.136.1",
     "requests>=2.33.1",
     "uvicorn>=0.46.0",

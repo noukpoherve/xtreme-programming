@@ -1,13 +1,36 @@
+import asyncio
+import logging
 import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from iot_service.hubeau_client import HubEauSensorClient
-from iot_service.water_quality_service import WaterQualityService
-from iot_service.alert_client import AlertServiceClient
+logging.basicConfig(level=logging.INFO)
 
-_ALERT_SERVICE_URL = os.getenv("ALERT_SERVICE_URL", "http://localhost:8000")
+from iot_service.hubeau_client import HubEauSensorClient
+from iot_service.kafka_producer import MeasurementProducer
+from iot_service.sensor_service import IoTSensorSimulator
+
+_KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+_POLL_INTERVAL = int(os.getenv("POLL_INTERVAL_SECONDS", "300"))
+
+
+async def _poll_loop(
+    sensor_client: HubEauSensorClient, kafka_producer: MeasurementProducer
+):
+    while True:
+        try:
+            measurement = sensor_client.capture()
+            await kafka_producer.send(measurement)
+            logging.info(
+                "Scheduled ingest: sensor=%s level=%.2f flow=%.2f",
+                measurement.sensor_id,
+                measurement.level,
+                measurement.flow,
+            )
+        except Exception:
+            logging.exception("Scheduled ingest failed")
+        await asyncio.sleep(_POLL_INTERVAL)
 
 
 @asynccontextmanager
@@ -17,12 +40,21 @@ async def lifespan(app: FastAPI):
         default_ph=7.4,
         default_turbidity=8.0,
     )
-    app.state.quality_service = WaterQualityService(
-        warning_threshold=10,
-        critical_threshold=50,
+    app.state.kafka_producer = MeasurementProducer(bootstrap_servers=_KAFKA_BOOTSTRAP)
+    await app.state.kafka_producer.start()
+
+    task = asyncio.create_task(
+        _poll_loop(app.state.sensor_client, app.state.kafka_producer)
     )
-    app.state.alert_client = AlertServiceClient(base_url=_ALERT_SERVICE_URL)
+
     yield
+
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
+    await app.state.kafka_producer.stop()
 
 
 app = FastAPI(
@@ -40,15 +72,10 @@ async def health():
 @app.post("/ingest")
 async def ingest():
     sensor_client: HubEauSensorClient = app.state.sensor_client
-    quality_service: WaterQualityService = app.state.quality_service
-    alert_client: AlertServiceClient = app.state.alert_client
+    kafka_producer: MeasurementProducer = app.state.kafka_producer
 
     measurement = sensor_client.capture()
-    analysis = quality_service.analyze(measurement)
-
-    alert_responses = []
-    if analysis.has_alert:
-        alert_responses = alert_client.send_alerts(analysis, measurement)
+    await kafka_producer.send(measurement)
 
     return {
         "measurement": {
@@ -62,48 +89,29 @@ async def ingest():
             "latitude": measurement.latitude,
             "longitude": measurement.longitude,
         },
-        "analysis": {
-            "trace_id": analysis.trace_id,
-            "overall_status": analysis.overall_status,
-            "alerts": [
-                {
-                    "parameter": a.parameter,
-                    "value": a.value,
-                    "status": a.status,
-                    "message": a.message,
-                }
-                for a in analysis.alerts
-            ],
-        },
-        "alerts_sent": len(alert_responses),
-        "alert_responses": alert_responses,
+        "published": True,
     }
-
-
-from iot_service.sensor_service import IoTSensorSimulator
 
 
 @app.post("/simulate")
 async def simulate(ph: float = 7.0, turbidity: float = 75.0):
-    quality_service: WaterQualityService = app.state.quality_service
-    alert_client: AlertServiceClient = app.state.alert_client
+    kafka_producer: MeasurementProducer = app.state.kafka_producer
 
     sensor = IoTSensorSimulator(sensor_id="SIM-001")
     measurement = sensor.capture(ph=ph, turbidity=turbidity, level=1.5, flow=0.8)
-    analysis = quality_service.analyze(measurement)
-
-    alert_responses = []
-    if analysis.has_alert:
-        alert_responses = alert_client.send_alerts(analysis, measurement)
+    await kafka_producer.send(measurement)
 
     return {
-        "analysis": {
-            "overall_status": analysis.overall_status,
-            "alerts": [
-                {"parameter": a.parameter, "status": a.status, "message": a.message}
-                for a in analysis.alerts
-            ],
+        "measurement": {
+            "sensor_id": measurement.sensor_id,
+            "uuid": measurement.uuid,
+            "timestamp": measurement.timestamp.isoformat(),
+            "ph": measurement.ph,
+            "turbidity": measurement.turbidity,
+            "level": measurement.level,
+            "flow": measurement.flow,
+            "latitude": measurement.latitude,
+            "longitude": measurement.longitude,
         },
-        "alerts_sent": len(alert_responses),
-        "alert_responses": alert_responses,
+        "published": True,
     }

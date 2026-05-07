@@ -1,16 +1,29 @@
 # Alert Service
 
-REST API microservice for receiving and processing water quality alerts from the IoT ingestion service.
+REST API and Kafka consumer that analyses water quality thresholds and publishes alerts.
 
 ## Overview
 
-The Alert Service exposes a single REST endpoint that receives alert payloads and responds with a confirmation. In the future, each received alert will be published to a Kafka topic (`alerte.pollution.detectee`) for downstream notification services.
+The Alert Service:
+1. **Consumes** raw `WaterMeasurementEvent` messages from the `mesure.qualite.eau` Kafka topic
+2. **Analyses** pH and turbidity against configurable thresholds
+3. **Publishes** generated alerts to the `alerte.pollution.detectee` Kafka topic
+4. **Exposes** a REST endpoint `POST /alertes` for direct alert creation
 
 ## Architecture
 
 ```
-IoT Ingestion Service  --HTTP POST /alertes-->  Alert Service  --(future: Kafka)-->  Notification Service
+Kafka (mesure.qualite.eau)  -->  Alert Service  -->  Kafka (alerte.pollution.detectee)
+                                         |
+                                         +-- REST POST /alertes
 ```
+
+## Thresholds
+
+| Parameter | Warning | Critical |
+|-----------|---------|----------|
+| pH | < 6.5 or > 8.5 | < 6.0 or > 9.0 |
+| Turbidity | > 10 NTU | > 50 NTU |
 
 ## Endpoints
 
@@ -26,7 +39,7 @@ Health check.
 ```
 
 ### `POST /alertes`
-Create a new alert.
+Create a new alert directly via REST.
 
 **Request body:**
 ```json
@@ -57,6 +70,22 @@ Create a new alert.
 }
 ```
 
+## Kafka consumer
+
+The consumer uses `aiokafka` with:
+- **Manual commit** (`enable_auto_commit=False`) for at-least-once processing
+- **Structured events** parsed as `WaterMeasurementEvent` Pydantic models
+- **Headers** (`trace_id`) and keyed messages (`sensor_id`)
+
+## Environment variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka broker address |
+| `WATER_QUALITY_TOPIC` | `mesure.qualite.eau` | Input topic for measurements |
+| `POLLUTION_ALERT_TOPIC` | `alerte.pollution.detectee` | Output topic for alerts |
+| `KAFKA_CONSUMER_GROUP` | `alert-service-group` | Consumer group ID |
+
 ## Run locally
 
 ```bash
@@ -76,9 +105,7 @@ uv run pytest tests/ -v
 ```bash
 cd alert-service
 docker build -t alert-service .
-docker run -p 8000:8000 alert-service
+docker run -p 8000:8000 \
+  -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092 \
+  alert-service
 ```
-
-## Future: Kafka integration
-
-When the Kafka broker is ready, the service will be extended with an `aiokafka` producer that publishes validated alerts to the `alerte.pollution.detectee` topic. The producer will be idempotent and resilient (retry + DLQ).

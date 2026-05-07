@@ -6,6 +6,11 @@ class Settings(BaseSettings):
 
     app_name: str = "alert-service"
     app_version: str = "0.1.0"
+    kafka_bootstrap_servers: str = "localhost:9092"
+    water_quality_topic: str = "mesure.qualite.eau"
+    pollution_alert_topic: str = "alerte.pollution.detectee"
+    kafka_consumer_group: str = "alert-service-group"
+    kafka_enabled: bool = True
 
 
 settings = Settings()

@@ -1,18 +1,29 @@
 # IoT Ingestion Service
 
-Microservice that collects sensor data, analyses water quality thresholds, and forwards alerts to the Alert Service.
+Microservice that continuously collects sensor data from the French **Hub'Eau** API and streams raw measurements to Kafka.
 
 ## Overview
 
-The IoT Ingestion Service fetches real-time hydrometric data from the French **Hub'Eau** API (Seine river, Paris station), enriches it with default pH and turbidity values, and analyses the measurements against configured thresholds. When an anomaly is detected, it calls the Alert Service synchronously via `POST /alertes`.
+The IoT Ingestion Service runs a **background polling loop** that fetches real-time hydrometric data every 5 minutes (configurable), enriches it with default pH and turbidity values, and publishes structured `WaterMeasurementEvent` messages to the `mesure.qualite.eau` Kafka topic.
+
+This service **only produces raw measurements** — threshold analysis and alert generation are handled entirely by the **Alert Service** via Kafka consumption.
 
 ## Architecture
 
 ```
-Hub'Eau API  -->  IoT Ingestion Service  --HTTP POST /alertes-->  Alert Service
+Hub'Eau API  -->  IoT Ingestion Service  --Kafka-->  mesure.qualite.eau
                       |
-                      +-- Analyse pH / turbidity / level / flow
+                      +-- background poll loop (every 5 min)
 ```
+
+## Streaming behaviour
+
+On startup, a background `asyncio` task begins polling Hub'Eau automatically:
+
+- Fetches latest level (m) and flow (m³/s) from the Seine river station
+- Enriches with default pH and turbidity
+- Publishes a `WaterMeasurementEvent` to Kafka
+- Sleeps for `POLL_INTERVAL_SECONDS` (default: 300s)
 
 ## Endpoints
 
@@ -28,25 +39,40 @@ Health check.
 ```
 
 ### `POST /ingest`
-Fetch the latest real sensor data from Hub'Eau, analyse it, and forward any alerts to the Alert Service.
+Manual trigger — fetches the latest real sensor data from Hub'Eau and publishes it to Kafka immediately.
 
 **Response:**
 ```json
 {
-  "measurement": { "sensor_id": "...", "ph": 7.4, "turbidity": 8.0, ... },
-  "analysis": { "overall_status": "NORMAL", "alerts": [] },
-  "alerts_sent": 0
+  "measurement": {
+    "sensor_id": "F700000103",
+    "ph": 7.4,
+    "turbidity": 8.0,
+    "level": 0.93,
+    "flow": 252.0,
+    "latitude": 48.8447,
+    "longitude": 2.3655
+  },
+  "published": true
 }
 ```
 
 ### `POST /simulate`
-Simulate a sensor measurement with custom parameters (useful for testing alert propagation without hitting the external API).
+Simulate a sensor measurement with custom parameters (useful for testing the Kafka pipeline without hitting the external API).
 
 **Query params:**
 - `ph` (float, default 7.0)
 - `turbidity` (float, default 75.0)
 
-**Response:** same shape as `/ingest`.
+The simulated measurement is published to Kafka as a raw event. The Alert Service will analyse it and generate alerts if thresholds are exceeded.
+
+## Environment variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka broker address |
+| `WATER_QUALITY_TOPIC` | `mesure.qualite.eau` | Kafka topic for raw measurements |
+| `POLL_INTERVAL_SECONDS` | `300` | Hub'Eau polling interval |
 
 ## Run locally
 
@@ -54,8 +80,6 @@ Simulate a sensor measurement with custom parameters (useful for testing alert p
 cd iot-service
 PYTHONPATH=src uv run uvicorn iot_service.main:app --host 0.0.0.0 --port 8001
 ```
-
-The service expects the Alert Service at `http://localhost:8000`. You can override this with the environment variable `ALERT_SERVICE_URL`.
 
 ## Run tests
 
@@ -69,9 +93,8 @@ uv run pytest tests/ -v
 ```bash
 cd iot-service
 docker build -t iot-service .
-docker run -p 8001:8001 -e ALERT_SERVICE_URL=http://host.docker.internal:8000 iot-service
+docker run -p 8001:8001 \
+  -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092 \
+  -e WATER_QUALITY_TOPIC=mesure.qualite.eau \
+  iot-service
 ```
-
-## Future: Kafka integration
-
-When the event bus is introduced, the synchronous `POST /alertes` call will be replaced (or complemented) by an **async event** published to a Kafka topic (`mesure.qualite.eau`). The Alert Service will then consume this topic instead of (or in addition to) receiving direct REST calls.
