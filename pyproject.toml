@@ -1,6 +1,6 @@
 [project]
 name = "urbanhub"
-version = "0.1.0"
+version = "0.1.1"
 description = "UrbanHub Smart City platform"
 readme = "README.md"
 requires-python = ">=3.13"
