@@ -77,17 +77,16 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Create Git Tag
+      - name: Create GitHub Release
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
           TAG="v${{ env.VERSION }}"
-          
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists. Skipping."
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists. Skipping."
           else
-            echo "Creating tag $TAG"
-            git tag "$TAG"
-            git push origin "$TAG"
+            echo "Creating release $TAG"
+            gh release create "$TAG" \
+              --title "UrbanHub $TAG" \
+              --generate-notes
           fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
