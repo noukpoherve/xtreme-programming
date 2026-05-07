@@ -14,10 +14,10 @@ class SensorMeasurement:
     timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     latitude: float = 0.0
     longitude: float = 0.0
-    temperature_c: float = 0.0
-    oxygene_dissous_mgl: float = 0.0
-    qualite_signal: str | None = None
-    firmware_version: str | None = None
+    temperature_c: float = 14.3
+    oxygene_dissous_mgl: float = 7.1
+    qualite_signal: str = "GOOD"
+    firmware_version: str = "2.4.1"
 
 
 class IoTSensorSimulator:

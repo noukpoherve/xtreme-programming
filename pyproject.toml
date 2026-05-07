@@ -1,10 +1,12 @@
 [project]
 name = "urbanhub"
-version = "0.1.0"
+version = "0.1.1"
 description = "UrbanHub Smart City platform"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "confluent-kafka>=2.13.0",
+]
 
 [dependency-groups]
 dev = [
@@ -12,3 +14,6 @@ dev = [
     "pre-commit>=4.6.0",
     "pytest>=9.0.3",
 ]
+
+[tool.black]
+target-version = ["py313"]
