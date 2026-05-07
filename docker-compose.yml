@@ -39,13 +39,16 @@ services:
     image: apache/kafka:3.7.1
     ports:
       - "9092:9092"
+      - "9094:9094"
     environment:
       KAFKA_NODE_ID: 0
       KAFKA_PROCESS_ROLES: controller,broker
       KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
-      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
@@ -94,7 +97,6 @@ services:
   promtail:
     image: grafana/promtail:latest
     volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./monitoring/promtail.yml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
