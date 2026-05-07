@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -6,13 +7,14 @@ from aiokafka import AIOKafkaConsumer
 from aiokafka.errors import KafkaConnectionError
 
 from alert_service.kafka_producer import AlertProducer
-from alert_service.models import AlertPayload, WaterMeasurementEvent
+from alert_service.models import WaterMeasurementEvent
 from alert_service.service import alert_service
 
 logger = logging.getLogger(__name__)
 
 _KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 _INPUT_TOPIC = os.getenv("WATER_QUALITY_TOPIC", "mesure.qualite.eau")
+_MAX_RETRIES = 3
 
 
 class MeasurementConsumer:
@@ -57,10 +59,24 @@ class MeasurementConsumer:
         async for msg in self._consumer:
             if not self._running:
                 break
-            try:
-                await self._process(msg)
-            except Exception:
-                logger.exception("Failed to process Kafka message")
+            for attempt in range(_MAX_RETRIES):
+                try:
+                    await self._process(msg)
+                    break
+                except Exception:
+                    logger.exception(
+                        "Failed to process Kafka message (attempt %d/%d)",
+                        attempt + 1,
+                        _MAX_RETRIES,
+                    )
+                    if attempt < _MAX_RETRIES - 1:
+                        await asyncio.sleep(2**attempt)
+            else:
+                logger.error(
+                    "Giving up on message after %d attempts, committing offset",
+                    _MAX_RETRIES,
+                )
+                await self._consumer.commit()
 
     async def _process(self, msg):
         payload = json.loads(msg.value.decode("utf-8"))
