@@ -7,7 +7,8 @@ from datetime import UTC
 from aiokafka import AIOKafkaProducer
 from aiokafka.errors import KafkaConnectionError
 
-from iot_service.sensor_service import SensorMeasurement
+from iot_service.domain.models import SensorMeasurement
+from iot_service.domain.ports import MeasurementWriter
 
 _KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 _TOPIC = os.getenv("WATER_QUALITY_TOPIC", "mesure.qualite.eau")
@@ -41,17 +42,17 @@ def build_measurement_event(measurement: SensorMeasurement) -> dict:
     }
 
 
-class MeasurementProducer:
+class MeasurementProducer(MeasurementWriter):
+    """Implémentation Kafka du port MeasurementWriter."""
+
     def __init__(self, bootstrap_servers: str = _KAFKA_BOOTSTRAP, topic: str = _TOPIC):
         self._bootstrap = bootstrap_servers
         self._topic = topic
         self._producer: AIOKafkaProducer | None = None
         self._ready = False
 
-    async def start(self):
-        self._producer = AIOKafkaProducer(
-            bootstrap_servers=self._bootstrap,
-        )
+    async def start(self) -> None:
+        self._producer = AIOKafkaProducer(bootstrap_servers=self._bootstrap)
         try:
             await self._producer.start()
             self._ready = True
@@ -60,13 +61,13 @@ class MeasurementProducer:
             logger.warning("Kafka not available, producer will not send messages")
             self._ready = False
 
-    async def stop(self):
+    async def stop(self) -> None:
         if self._producer:
             await self._producer.stop()
 
-    async def send(self, measurement: SensorMeasurement):
+    async def write(self, measurement: SensorMeasurement) -> None:
         if not self._ready or not self._producer:
-            logger.debug("Kafka producer not ready, skipping send")
+            logger.debug("Kafka producer not ready, skipping write")
             return
         event = build_measurement_event(measurement)
         payload = json.dumps(event, ensure_ascii=False).encode("utf-8")

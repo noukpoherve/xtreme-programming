@@ -18,7 +18,8 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Optional
 
-from iot_service.sensor_service import SensorMeasurement
+from iot_service.domain.models import SensorMeasurement
+from iot_service.sensor_service import Sensor
 
 _BASE_URL = "https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr"
 
@@ -60,6 +61,9 @@ class HubEauSensorClient:
     """
     Adaptateur entre l'API Hub'eau et le modèle SensorMeasurement.
 
+    Délègue la production de la mesure à un Sensor, qui est le seul
+    responsable de l'état du capteur (SRP).
+
     Usage :
         client = HubEauSensorClient(code_entite="F700000103")
         measurement = client.capture()
@@ -71,9 +75,10 @@ class HubEauSensorClient:
         default_ph: float = 7.4,
         default_turbidity: float = 5.0,
     ):
-        self.code_entite = code_entite
+        self._sensor = Sensor(sensor_id=code_entite)
         self.default_ph = default_ph
         self.default_turbidity = default_turbidity
+        self.code_entite = code_entite
 
     def capture(self) -> SensorMeasurement:
         h_obs = _fetch_latest(self.code_entite, "H")
@@ -84,12 +89,11 @@ class HubEauSensorClient:
         level = (h_obs.resultat_obs / 1000.0) if h_obs else 0.0
         flow = (q_obs.resultat_obs / 1000.0) if q_obs else 0.0
 
-        return SensorMeasurement(
-            sensor_id=self.code_entite,
+        return self._sensor.capture(
             ph=self.default_ph,
             turbidity=self.default_turbidity,
             level=level,
             flow=flow,
-            latitude=(h_obs.latitude if h_obs else 0.0),
-            longitude=(h_obs.longitude if h_obs else 0.0),
+            latitude=h_obs.latitude if h_obs else None,
+            longitude=h_obs.longitude if h_obs else None,
         )
