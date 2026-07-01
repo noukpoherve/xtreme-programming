@@ -1,16 +1,23 @@
 import logging
 import uuid
+from typing import Optional, Protocol
 
 from alert_service.models import (
     AlertPayload,
     Localisation,
     WaterMeasurementEvent,
 )
+from alert_service.repository import AlertRepository
 
 logger = logging.getLogger(__name__)
 
 
-class AlertService:
+class AlertRule(Protocol):
+    def evaluate(self, measurement: WaterMeasurementEvent) -> list[AlertPayload]:
+        ...
+
+
+class DefaultAlertRule:
     PH_WARNING_LOW = 6.5
     PH_WARNING_HIGH = 8.5
     PH_CRITICAL_LOW = 6.0
@@ -18,19 +25,8 @@ class AlertService:
     TURBIDITY_WARNING = 10.0
     TURBIDITY_CRITICAL = 50.0
 
-    async def process_alert(self, payload: AlertPayload) -> dict:
-        logger.info(f"Alert received: {payload.alert_id} (trace_id={payload.trace_id})")
-        return {
-            "alert_id": payload.alert_id,
-            "status": "CREATED",
-            "trace_id": payload.trace_id,
-        }
-
-    def build_alerts_from_measurement(
-        self, measurement: WaterMeasurementEvent
-    ) -> list[AlertPayload]:
+    def evaluate(self, measurement: WaterMeasurementEvent) -> list[AlertPayload]:
         alerts: list[AlertPayload] = []
-
         ph = measurement.mesures.ph
         if ph < self.PH_CRITICAL_LOW or ph > self.PH_CRITICAL_HIGH:
             alerts.append(
@@ -70,7 +66,6 @@ class AlertService:
                     message=f"Turbidite en attention: {turbidity} NTU",
                 )
             )
-
         return alerts
 
     def _build_alert(
@@ -99,6 +94,47 @@ class AlertService:
                 "source_event_type": measurement.event_type,
             },
         )
+
+
+class AlertService:
+    def __init__(self, rules: list[AlertRule] | None = None, repository: AlertRepository | None = None):
+        self._rules = rules or [DefaultAlertRule()]
+        self._repository = repository or AlertRepository()
+
+    async def process_alert(self, payload: AlertPayload) -> dict:
+        logger.info("Alert received: %s (trace_id=%s)", payload.alert_id, payload.trace_id)
+        await self._repository.save(payload)
+        return {
+            "alert_id": payload.alert_id,
+            "status": "CREATED",
+            "trace_id": payload.trace_id,
+        }
+
+    def build_alerts_from_measurement(
+        self, measurement: WaterMeasurementEvent
+    ) -> list[AlertPayload]:
+        alerts: list[AlertPayload] = []
+        for rule in self._rules:
+            alerts.extend(rule.evaluate(measurement))
+        return alerts
+
+    async def get_alert(self, alert_id: str) -> Optional[AlertPayload]:
+        return await self._repository.get(alert_id)
+
+    async def get_all_alerts(self, limit: int = 100, offset: int = 0) -> list[AlertPayload]:
+        return await self._repository.get_all(limit, offset)
+
+    async def get_alerts_by_sensor(self, sensor_id: str) -> list[AlertPayload]:
+        return await self._repository.get_by_sensor(sensor_id)
+
+    async def update_alert(self, alert_id: str, payload: AlertPayload) -> bool:
+        return await self._repository.update(alert_id, payload)
+
+    async def delete_alert(self, alert_id: str) -> bool:
+        return await self._repository.delete(alert_id)
+
+    async def count_alerts(self) -> int:
+        return await self._repository.count()
 
 
 alert_service = AlertService()

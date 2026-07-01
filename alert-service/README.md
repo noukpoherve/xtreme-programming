@@ -8,14 +8,14 @@ The Alert Service:
 1. **Consumes** raw `WaterMeasurementEvent` messages from the `mesure.qualite.eau` Kafka topic
 2. **Analyses** pH and turbidity against configurable thresholds
 3. **Publishes** generated alerts to the `alerte.pollution.detectee` Kafka topic
-4. **Exposes** a REST endpoint `POST /alertes` for direct alert creation
+4. **Exposes** REST endpoints under `POST /alerts` and the legacy alias `POST /alertes`
 
 ## Architecture
 
 ```
 Kafka (mesure.qualite.eau)  -->  Alert Service  -->  Kafka (alerte.pollution.detectee)
                                          |
-                                         +-- REST POST /alertes
+                                         +-- REST POST /alerts
 ```
 
 ## Thresholds
@@ -38,8 +38,10 @@ Health check.
 }
 ```
 
-### `POST /alertes`
+### `POST /alerts`
 Create a new alert directly via REST.
+
+Legacy alias: `POST /alertes`
 
 **Request body:**
 ```json
@@ -85,6 +87,9 @@ The consumer uses `aiokafka` with:
 | `WATER_QUALITY_TOPIC` | `mesure.qualite.eau` | Input topic for measurements |
 | `POLLUTION_ALERT_TOPIC` | `alerte.pollution.detectee` | Output topic for alerts |
 | `KAFKA_CONSUMER_GROUP` | `alert-service-group` | Consumer group ID |
+| `REDIS_URL` | `redis://localhost:6379` | Redis persistence endpoint |
+| `REDIS_STRICT` | `0` | Set to `1` to fail on Redis errors instead of falling back to memory |
+| `DISABLE_BACKGROUND_CONSUMER` | `0` | Set to `1` to skip the Kafka consumer in tests/local runs |
 
 ## Run locally
 

@@ -2,6 +2,16 @@
 
 > Master project — Distributed architecture, event-driven microservices & Extreme Programming practices
 
+## 🎯 Statut : Améliorations Complètes (30 Juin 2026)
+
+✅ **Patterns de conception** implémentés  
+✅ **API REST CRUD complète**  
+✅ **Contrats API formalisés** (Pydantic)  
+✅ **Persistance Redis**  
+✅ **Swagger documenté**
+
+---
+
 ## Architecture
 
 UrbanHub is composed of independent microservices that communicate via REST and Kafka events.
@@ -35,55 +45,171 @@ UrbanHub is composed of independent microservices that communicate via REST and 
 
 | Service | Role | Port | Tech |
 |---------|------|------|------|
-| **iot-service** | Ingestion & raw measurement publisher | `8001` | FastAPI, aiokafka, Hub'Eau client |
-| **alert-service** | Threshold analysis & alert publisher | `8000` | FastAPI, aiokafka |
+| **iot-service** | Ingestion & measurement publisher + Sensor CRUD | `8001` | FastAPI, aiokafka, Hub'Eau client, Redis |
+| **alert-service** | Threshold analysis, alert publisher + Alert CRUD | `8000` | FastAPI, aiokafka, Strategy pattern, Redis |
 | **kafka** | Event bus (KRaft mode, no ZooKeeper) | `9092` | apache/kafka:3.7.1 |
+| **redis** | Alerts & Sensors persistence | `6379` | redis:latest |
 | **kafka-ui** | Topic inspection | `8080` | kafbat/kafka-ui |
 | **prometheus** | Metrics collection | `9090` | prom/prometheus |
 | **grafana** | Logs & metrics dashboards | `3000` | grafana/grafana |
 | **loki** | Log aggregation | `3100` | grafana/loki |
 | **promtail** | Docker log shipping | — | grafana/promtail |
 
-## Quick start (Docker Compose)
+## 🚀 Quick Start
+
+### Services actuellement lancés
 
 ```bash
-# Build and run the full stack
-docker compose up --build -d
+# Terminal 1 - Alert Service
+cd alert-service
+$env:PYTHONPATH='D:\...\alert-service\src'
+python -m uvicorn alert_service.main:app --reload --port 8000
 
-# The IoT service now polls Hub'Eau automatically every 5 minutes.
-# Manual trigger if you want an immediate fetch:
-curl -X POST http://localhost:8001/ingest
-
-# Simulate a critical alert for testing
-curl -X POST "http://localhost:8001/simulate?ph=5.5&turbidity=75.0"
-
-# Inspect Kafka topics
-open http://localhost:8080  # Kafka UI
-
-# View dashboards
-open http://localhost:3000  # Grafana (admin / admin)
+# Terminal 2 - IoT Service  
+cd iot-service
+$env:PYTHONPATH='D:\...\iot-service\src'
+python -m uvicorn iot_service.main:app --reload --port 8001
 ```
+
+### Accès aux APIs
+
+- **Alert Service Swagger** : http://localhost:8000/docs
+- **IoT Service Swagger** : http://localhost:8001/docs
+
+---
+
+## 📚 Documentation Complète
+
+### Rapports & Guides
+- **[RAPPORT_AMELIORATIONS.md](RAPPORT_AMELIORATIONS.md)** - Compte rendu détaillé des améliorations
+- **[FICHIERS_MODIFICATIONS.md](FICHIERS_MODIFICATIONS.md)** - Liste des fichiers créés/modifiés
+
+### Contrats API
+- **Alert Service** : [alert-service/src/alert_service/contracts.py](alert-service/src/alert_service/contracts.py)
+- **IoT Service** : [iot-service/src/iot_service/sensor_contracts.py](iot-service/src/iot_service/sensor_contracts.py)
+
+### Architecture
+- **Alert Service** : [alert-service/README.md](alert-service/README.md)
+- **IoT Service** : [iot-service/README.md](iot-service/README.md)
+
+---
+
+## 🏗️ Patterns de Conception Utilisés
+
+### ✅ Strategy Pattern
+Permettre des règles d'alerte extensibles sans modifier le service
+```python
+class AlertRule(Protocol):
+    def evaluate(self, measurement: WaterMeasurementEvent) -> list[AlertPayload]:
+        ...
+```
+
+### ✅ Repository Pattern
+Abstraction complète de la persistance (Redis)
+```python
+class AlertRepository:
+    async def save(self, alert: AlertPayload) -> None
+    async def get(self, alert_id: str) -> Optional[AlertPayload]
+    async def get_all(self, limit: int, offset: int) -> list[AlertPayload]
+```
+
+### ✅ Dependency Injection
+Services reçoivent leurs dépendances
+```python
+service = AlertService(rules=custom_rules, repository=custom_repo)
+```
+
+### ✅ State Management
+Cycle de vie explicite du composant
+```python
+class ProducerState(str, Enum):
+    STOPPED = "STOPPED"
+    STARTING = "STARTING"
+    RUNNING = "RUNNING"
+    FAILED = "FAILED"
+```
+
+---
+
+## 📊 Endpoints de l'API
+
+### Alert Service (Port 8000)
+
+#### Créer une alerte
+```bash
+POST /alerts
+Content-Type: application/json
+
+{
+  "alert_id": "a1b2c3d4",
+  "event_id": "e1e2e3e4",
+  "sensor_id": "SEINE-001",
+  "timestamp": "2026-06-30T12:00:00Z",
+  "severity": "CRITICAL",
+  "type": "ph",
+---
+
+## 📊 API Endpoints
+
+Legacy alias: `POST /alertes`
+
+### Alert Service (Port 8000)
+
+```
+POST   /alerts                      # Create alert
+GET    /alerts?limit=10&offset=0    # List alerts
+GET    /alerts?option=stats         # Get statistics
+GET    /alerts/{alert_id}           # Get alert details
+GET    /alerts/sensor/{sensor_id}   # Get alerts by sensor
+PUT    /alerts/{alert_id}           # Update alert
+DELETE /alerts/{alert_id}           # Delete alert
+```
+
+### IoT Service (Port 8001)
+
+```
+POST   /sensors                     # Register sensor
+GET    /sensors                     # List sensors
+GET    /sensors?option=stats        # Get statistics
+GET    /sensors/{sensor_id}         # Get sensor details
+PUT    /sensors/{sensor_id}         # Update sensor
+DELETE /sensors/{sensor_id}         # Delete sensor
+POST   /ingest                      # Fetch from Hub'eau
+POST   /simulate?ph=7.0&turbidity=75.0  # Simulate measurement
+```
+
+Legacy aliases: `/capteurs`, `/capteurs/{id}`, `/capteurs-stats`.
+
+---
+
+## 🗄️ Persistence
+
+### Redis
+- **Alerts** : Key `alert:{alert_id}`, Index `alerts:index`
+- **Sensors** : Key `sensor:{sensor_id}`, Set `sensors:all`
+
+---
 
 ## Development
 
-Each service is fully autonomous with its own `pyproject.toml`, `uv.lock`, `Dockerfile` and test suite.
+Each service is fully autonomous with its own `pyproject.toml`, tests and configuration.
 
 ```bash
 cd alert-service
-uv run pytest tests/ -v
+python -m pytest tests/ -v
 
 cd ../iot-service
-uv run pytest tests/ -v
+python -m pytest tests/ -v
 ```
 
-## Kafka topics
+## Kafka Topics
 
 | Topic | Producer | Consumer | Purpose |
 |-------|----------|----------|---------|
 | `mesure.qualite.eau` | iot-service | alert-service | Raw water quality measurements |
 | `alerte.pollution.detectee` | alert-service | (future) | Generated alerts after threshold analysis |
 
-## Event format
+## Event Format
 
 Raw measurements use a structured `WaterMeasurementEvent`:
 
