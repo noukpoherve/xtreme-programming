@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException, Query, status
 
 logging.basicConfig(level=logging.INFO)
 
-from alert_service.api_errors import register_exception_handlers
+from alert_service.api_errors import register_exception_handlers, register_error_middleware
 from alert_service.config import settings
 from alert_service.kafka_consumer import MeasurementConsumer
 from alert_service.models import AlertPayload, AlertResponse
@@ -44,6 +44,7 @@ app = FastAPI(
     version=settings.app_version,
     lifespan=lifespan,
 )
+register_error_middleware(app)
 register_exception_handlers(app)
 
 ERROR_RESPONSES = {

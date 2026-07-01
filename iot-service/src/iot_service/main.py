@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException, Query, status
 
 logging.basicConfig(level=logging.INFO)
 
-from iot_service.api_errors import register_exception_handlers
+from iot_service.api_errors import register_exception_handlers, register_error_middleware
 from iot_service.hubeau_client import HubEauSensorClient
 from iot_service.kafka_producer import MeasurementProducer
 from iot_service.sensor_service import IoTSensorSimulator
@@ -99,6 +99,7 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+register_error_middleware(app)
 register_exception_handlers(app)
 
 
