@@ -60,6 +60,8 @@ Manual trigger — fetches the latest real sensor data from Hub'Eau and publishe
 ### `POST /simulate`
 Simulate a sensor measurement with custom parameters (useful for testing the Kafka pipeline without hitting the external API).
 
+Legacy aliases kept for compatibility: `POST /capteurs`, `GET /capteurs`, `GET /capteurs/{sensor_id}`, `PUT /capteurs/{sensor_id}`, `DELETE /capteurs/{sensor_id}`, `GET /capteurs-stats`.
+
 **Query params:**
 - `ph` (float, default 7.0)
 - `turbidity` (float, default 75.0)
@@ -73,6 +75,9 @@ The simulated measurement is published to Kafka as a raw event. The Alert Servic
 | `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka broker address |
 | `WATER_QUALITY_TOPIC` | `mesure.qualite.eau` | Kafka topic for raw measurements |
 | `POLL_INTERVAL_SECONDS` | `300` | Hub'Eau polling interval |
+| `REDIS_URL` | `redis://localhost:6379` | Redis persistence endpoint |
+| `REDIS_STRICT` | `0` | Set to `1` to fail on Redis errors instead of falling back to memory |
+| `DISABLE_BACKGROUND_POLL` | `0` | Set to `1` to skip the scheduled Hub'Eau poller in tests/local runs |
 
 ## Run locally
 

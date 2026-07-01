@@ -59,23 +59,34 @@ class MeasurementProducer:
         except KafkaConnectionError:
             logger.warning("Kafka not available, producer will not send messages")
             self._ready = False
+        except Exception:
+            logger.exception("Unexpected error while starting Kafka producer")
+            self._ready = False
 
     async def stop(self):
         if self._producer:
             await self._producer.stop()
 
-    async def send(self, measurement: SensorMeasurement):
+    async def send(self, measurement: SensorMeasurement) -> bool:
         if not self._ready or not self._producer:
             logger.debug("Kafka producer not ready, skipping send")
-            return
-        event = build_measurement_event(measurement)
-        payload = json.dumps(event, ensure_ascii=False).encode("utf-8")
-        key = event["capteur_id"].encode("utf-8")
-        headers = [("trace_id", event["trace_id"].encode("utf-8"))]
-        await self._producer.send(self._topic, value=payload, key=key, headers=headers)
-        logger.info(
-            "Published measurement event_id=%s trace_id=%s capteur=%s",
-            event["event_id"],
-            event["trace_id"],
-            event["capteur_id"],
-        )
+            return False
+        try:
+            event = build_measurement_event(measurement)
+            payload = json.dumps(event, ensure_ascii=False).encode("utf-8")
+            key = event["capteur_id"].encode("utf-8")
+            headers = [("trace_id", event["trace_id"].encode("utf-8"))]
+            await self._producer.send(self._topic, value=payload, key=key, headers=headers)
+            logger.info(
+                "Published measurement event_id=%s trace_id=%s capteur=%s",
+                event["event_id"],
+                event["trace_id"],
+                event["capteur_id"],
+            )
+            return True
+        except Exception:
+            logger.exception(
+                "Failed to publish measurement event_id=%s", measurement.uuid
+            )
+            self._ready = False
+            return False

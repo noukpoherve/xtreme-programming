@@ -7,7 +7,10 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       WATER_QUALITY_TOPIC: mesure.qualite.eau
       POLLUTION_ALERT_TOPIC: alerte.pollution.detectee
+      REDIS_URL: redis://redis:6379
     depends_on:
+      redis:
+        condition: service_started
       kafka:
         condition: service_healthy
     healthcheck:
@@ -24,9 +27,12 @@ services:
       ALERT_SERVICE_URL: http://alert-service:8000
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       WATER_QUALITY_TOPIC: mesure.qualite.eau
+      REDIS_URL: redis://redis:6379
     depends_on:
       alert-service:
         condition: service_healthy
+      redis:
+        condition: service_started
       kafka:
         condition: service_healthy
     healthcheck:
@@ -69,6 +75,11 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
 
   prometheus:
     image: prom/prometheus:latest
