@@ -29,10 +29,8 @@ class AlertResponse(BaseModel):
     trace_id: str
 
 
-class MeasurementLocalisation(BaseModel):
-    latitude: float
-    longitude: float
-    point_reference: str
+# DRY: MeasurementLocalisation était identique à Localisation — supprimé.
+# Tous les usages internes utilisent désormais Localisation.
 
 
 class MeasurementValues(BaseModel):
@@ -50,7 +48,7 @@ class WaterMeasurementEvent(BaseModel):
     trace_id: str
     capteur_id: str
     timestamp: datetime
-    localisation: MeasurementLocalisation
+    localisation: Localisation
     mesures: MeasurementValues
     qualite_signal: str | None = None
     firmware_version: str | None = None
