@@ -8,6 +8,7 @@ from aiokafka.errors import KafkaConnectionError
 
 from alert_service.kafka_producer import AlertProducer
 from alert_service.models import WaterMeasurementEvent
+from alert_service.ports import AlertSender
 from alert_service.service import alert_service
 
 logger = logging.getLogger(__name__)
@@ -22,11 +23,13 @@ class MeasurementConsumer:
         self,
         bootstrap_servers: str = _KAFKA_BOOTSTRAP,
         input_topic: str = _INPUT_TOPIC,
-        producer: AlertProducer | None = None,
+        producer: AlertSender | None = None,
     ):
         self._bootstrap = bootstrap_servers
         self._input_topic = input_topic
-        self._producer = producer or AlertProducer(bootstrap_servers=bootstrap_servers)
+        self._producer: AlertSender = producer or AlertProducer(
+            bootstrap_servers=bootstrap_servers
+        )
         self._consumer: AIOKafkaConsumer | None = None
         self._running = False
 

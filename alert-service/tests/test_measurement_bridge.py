@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from alert_service.models import (
-    MeasurementLocalisation,
+    Localisation,
     MeasurementValues,
     WaterMeasurementEvent,
 )
@@ -15,7 +15,7 @@ def _measurement(**overrides):
         "trace_id": "trace-001",
         "capteur_id": "SEINE-001",
         "timestamp": datetime.now(timezone.utc),
-        "localisation": MeasurementLocalisation(
+        "localisation": Localisation(
             latitude=48.8637,
             longitude=2.3017,
             point_reference="Pont de l'Alma",
