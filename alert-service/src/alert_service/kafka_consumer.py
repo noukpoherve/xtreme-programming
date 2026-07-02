@@ -8,7 +8,7 @@ from aiokafka.errors import KafkaConnectionError
 
 from alert_service.kafka_producer import AlertProducer
 from alert_service.models import WaterMeasurementEvent
-from alert_service.service import alert_service
+from alert_service.service import AlertService, alert_service
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +23,12 @@ class MeasurementConsumer:
         bootstrap_servers: str = _KAFKA_BOOTSTRAP,
         input_topic: str = _INPUT_TOPIC,
         producer: AlertProducer | None = None,
+        service: AlertService | None = None,
     ):
         self._bootstrap = bootstrap_servers
         self._input_topic = input_topic
         self._producer = producer or AlertProducer(bootstrap_servers=bootstrap_servers)
+        self._service = service or alert_service
         self._consumer: AIOKafkaConsumer | None = None
         self._running = False
 
@@ -45,6 +47,9 @@ class MeasurementConsumer:
             logger.info("Kafka consumer started on topic %s", self._input_topic)
         except KafkaConnectionError:
             logger.warning("Kafka not available, consumer will not run")
+            self._running = False
+        except Exception:
+            logger.exception("Unexpected error while starting Kafka consumer")
             self._running = False
 
     async def stop(self):
@@ -81,11 +86,18 @@ class MeasurementConsumer:
     async def _process(self, msg):
         payload = json.loads(msg.value.decode("utf-8"))
         measurement = WaterMeasurementEvent.model_validate(payload)
-        alerts = alert_service.build_alerts_from_measurement(measurement)
+        alerts = self._service.build_alerts_from_measurement(measurement)
 
         for alert in alerts:
-            result = await alert_service.process_alert(alert)
-            await self._producer.send(alert)
+            result = await self._service.process_alert(alert)
+            published = await self._producer.send(alert)
+            if not published:
+                logger.warning(
+                    "Alert persisted but not published to Kafka alert_id=%s trace_id=%s",
+                    result["alert_id"],
+                    result["trace_id"],
+                )
+                continue
             logger.info(
                 "Alert processed from Kafka alert_id=%s trace_id=%s status=%s",
                 result["alert_id"],

@@ -7,7 +7,8 @@ from alert_service.main import app
 
 
 @pytest_asyncio.fixture
-async def client():
+async def client(monkeypatch):
+    monkeypatch.setenv("DISABLE_BACKGROUND_CONSUMER", "1")
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
@@ -31,7 +32,7 @@ async def test_end_to_end_alert_publish(client):
         "trace_id": "trace-int-001",
         "metadata": {"ph": 5.2},
     }
-    response = await client.post("/alertes", json=payload)
+    response = await client.post("/alerts", json=payload)
     assert response.status_code == 201
     data = response.json()
     assert data["alert_id"] == "alert-int-001"

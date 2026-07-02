@@ -1,0 +1,106 @@
+{
+  "info": {
+    "name": "UrbanHub API",
+    "description": "Collection Postman pour tester les microservices UrbanHub (Alert, IoT, Supervision).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "alert_base", "value": "http://localhost:8000"},
+    {"key": "iot_base", "value": "http://localhost:8001"},
+    {"key": "supervision_base", "value": "http://localhost:8002"},
+    {"key": "sensor_id", "value": "SEINE-001"}
+  ],
+  "item": [
+    {
+      "name": "Alert Service",
+      "item": [
+        {
+          "name": "Health",
+          "request": {"method": "GET", "url": "{{alert_base}}/health"}
+        },
+        {
+          "name": "Create Alert",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alert_id\": \"alert-demo-001\",\n  \"event_id\": \"event-demo-001\",\n  \"sensor_id\": \"SEINE-001\",\n  \"timestamp\": \"2026-07-02T10:00:00Z\",\n  \"severity\": \"WARNING\",\n  \"type\": \"ph\",\n  \"message\": \"pH en attention\",\n  \"trace_id\": \"trace-demo-001\"\n}"
+            },
+            "url": "{{alert_base}}/alerts"
+          }
+        },
+        {
+          "name": "List Alerts",
+          "request": {"method": "GET", "url": "{{alert_base}}/alerts"}
+        },
+        {
+          "name": "Alert Stats",
+          "request": {"method": "GET", "url": "{{alert_base}}/alerts?option=stats"}
+        }
+      ]
+    },
+    {
+      "name": "IoT Service",
+      "item": [
+        {
+          "name": "Health",
+          "request": {"method": "GET", "url": "{{iot_base}}/health"}
+        },
+        {
+          "name": "Register Sensor",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sensor_id\": \"{{sensor_id}}\",\n  \"name\": \"Seine Sensor Pont Alma\",\n  \"location\": \"Paris\",\n  \"latitude\": 48.8637,\n  \"longitude\": 2.3017,\n  \"active\": true,\n  \"metadata\": {\"model\": \"WaterPro3000\"}\n}"
+            },
+            "url": "{{iot_base}}/sensors"
+          }
+        },
+        {
+          "name": "List Sensors",
+          "request": {"method": "GET", "url": "{{iot_base}}/sensors"}
+        },
+        {
+          "name": "Simulate Measurement",
+          "request": {"method": "POST", "url": "{{iot_base}}/simulate?ph=7.0&turbidity=12.0"}
+        },
+        {
+          "name": "Put Sensor In Maintenance",
+          "request": {"method": "POST", "url": "{{iot_base}}/sensors/{{sensor_id}}/maintenance"}
+        },
+        {
+          "name": "Activate Sensor",
+          "request": {"method": "POST", "url": "{{iot_base}}/sensors/{{sensor_id}}/activer"}
+        }
+      ]
+    },
+    {
+      "name": "Supervision Service",
+      "item": [
+        {
+          "name": "Health",
+          "request": {"method": "GET", "url": "{{supervision_base}}/sante"}
+        },
+        {
+          "name": "List Bornes",
+          "request": {"method": "GET", "url": "{{supervision_base}}/bornes"}
+        },
+        {
+          "name": "Dashboard Resume",
+          "request": {"method": "GET", "url": "{{supervision_base}}/tableau-de-bord/resume"}
+        },
+        {
+          "name": "Dashboard Carte",
+          "request": {"method": "GET", "url": "{{supervision_base}}/tableau-de-bord/carte"}
+        },
+        {
+          "name": "List Incidents",
+          "request": {"method": "GET", "url": "{{supervision_base}}/incidents"}
+        }
+      ]
+    }
+  ]
+}
