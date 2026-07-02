@@ -164,3 +164,31 @@ async def test_ingest_succeeds_with_stubbed_producer(client):
     data = response.json()
     assert data["sensor_id"] == "F700000103"
     assert data["published"] is True
+
+
+@pytest.mark.asyncio
+async def test_capteur_transition_maintenance(client):
+    await client.post("/sensors", json=_sensor_payload("STATE-001"))
+    response = await client.post("/sensors/STATE-001/maintenance")
+    assert response.status_code == 200
+    assert response.json()["etat"] == "maintenance"
+
+    detail = await client.get("/sensors/STATE-001")
+    assert detail.json()["etat"] == "maintenance"
+    assert detail.json()["active"] is False
+
+
+@pytest.mark.asyncio
+async def test_capteur_transition_activer_apres_maintenance(client):
+    await client.post("/sensors", json=_sensor_payload("STATE-002"))
+    await client.post("/sensors/STATE-002/maintenance")
+    response = await client.post("/sensors/STATE-002/activer")
+    assert response.status_code == 200
+    assert response.json()["etat"] == "actif"
+
+
+@pytest.mark.asyncio
+async def test_capteur_transition_invalide_retourne_409(client):
+    await client.post("/sensors", json=_sensor_payload("STATE-003"))
+    response = await client.post("/sensors/STATE-003/activer")
+    assert response.status_code == 409

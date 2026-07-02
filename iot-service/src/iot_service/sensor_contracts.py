@@ -95,6 +95,7 @@ class SensorDetail(BaseModel):
                 "latitude": 48.8637,
                 "longitude": 2.3017,
                 "active": True,
+                "etat": "actif",
                 "metadata": {"model": "WaterPro3000"}
             }
         }
@@ -106,7 +107,25 @@ class SensorDetail(BaseModel):
     latitude: float
     longitude: float
     active: bool
+    etat: str = Field(..., description="Etat du capteur: actif, inactif, maintenance, en_panne")
     metadata: dict
+
+
+class CapteurTransitionResponse(BaseModel):
+    """Reponse apres une transition d'etat du capteur."""
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "sensor_id": "SEINE-001",
+                "etat": "maintenance",
+                "status": "transition_applied"
+            }
+        }
+    )
+
+    sensor_id: str
+    etat: str
+    status: str = "transition_applied"
 
 
 class SensorListResponse(BaseModel):

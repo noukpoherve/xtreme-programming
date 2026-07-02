@@ -25,6 +25,19 @@ On startup, a background `asyncio` task begins polling Hub'Eau automatically:
 - Publishes a `WaterMeasurementEvent` to Kafka
 - Sleeps for `POLL_INTERVAL_SECONDS` (default: 300s)
 
+## Capteur — Pattern State
+
+La classe `Capteur` (`capteur.py` + `capteur_state.py`) encapsule les états métier :
+
+| État | Capture | Transitions REST |
+|------|---------|------------------|
+| `actif` | Oui | `/desactiver`, `/maintenance`, `/panne` |
+| `inactif` | Non | `/activer`, `/maintenance` |
+| `maintenance` | Non | `/activer`, `/desactiver`, `/panne` |
+| `en_panne` | Non | `/activer`, `/maintenance`, `/desactiver` |
+
+Tests : `tests/test_capteur_state.py`
+
 ## Endpoints
 
 ### `GET /health`

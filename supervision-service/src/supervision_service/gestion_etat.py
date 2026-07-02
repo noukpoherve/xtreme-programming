@@ -2,7 +2,7 @@
 
 from typing import Dict, List, Optional
 from datetime import datetime
-from .contrats import BorneRecharge, SessionCharge, EvenementBorne, Incident
+from .contrats import BorneRecharge, SessionCharge, EvenementBorne, Incident, EtatBorne, EtatSession
 
 
 class GestionnaireEtat:
@@ -32,11 +32,15 @@ class GestionnaireEtat:
         """Récupère toutes les bornes."""
         return list(self.bornes.values())
     
-    def mettre_a_jour_etat_borne(self, borne_id: str, nouvel_etat: str) -> Optional[BorneRecharge]:
+    def mettre_a_jour_etat_borne(
+        self, borne_id: str, nouvel_etat: EtatBorne | str
+    ) -> Optional[BorneRecharge]:
         """Met à jour l'état d'une borne."""
         borne = self.bornes.get(borne_id)
         if borne:
             ancien_etat = borne.etat
+            if isinstance(nouvel_etat, str):
+                nouvel_etat = EtatBorne(nouvel_etat)
             borne.etat = nouvel_etat
             borne.date_dernier_maj = datetime.utcnow()
             self._notifier("etat_borne_change", {
@@ -65,13 +69,13 @@ class GestionnaireEtat:
     
     def obtenir_sessions_actives(self) -> List[SessionCharge]:
         """Récupère toutes les sessions en cours."""
-        return [s for s in self.sessions.values() if s.etat == "en_cours"]
+        return [s for s in self.sessions.values() if s.etat == EtatSession.EN_COURS]
     
     def terminer_session(self, session_id: str) -> Optional[SessionCharge]:
         """Termine une session de charge."""
         session = self.sessions.get(session_id)
         if session:
-            session.etat = "terminee"
+            session.etat = EtatSession.TERMINEE
             session.date_fin = datetime.utcnow()
             
             borne = self.bornes.get(session.borne_id)

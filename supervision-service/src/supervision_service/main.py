@@ -1,10 +1,15 @@
 """Point d'entrée du Service de Supervision."""
 
 import asyncio
+import os
 from fastapi import FastAPI
 from .gestion_etat import GestionnaireEtat
 from .consommateur_kafka import ConsommateurEvenementsBorne
 from .api import creer_app
+
+
+def _kafka_consumer_enabled() -> bool:
+    return os.getenv("DISABLE_KAFKA_CONSUMER", "0") != "1"
 
 
 # Gestionnaire d'état global
@@ -22,11 +27,14 @@ def creer_service(
     global consommateur
     
     if serveurs_kafka is None:
-        serveurs_kafka = ["localhost:9092"]
+        serveurs_kafka = [os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")]
     
     # Créer l'app FastAPI
     app = creer_app(gestionnaire)
     
+    if not _kafka_consumer_enabled():
+        return app
+
     # Initialiser le consommateur Kafka
     consommateur = ConsommateurEvenementsBorne(
         serveurs_kafka=serveurs_kafka,

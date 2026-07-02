@@ -269,8 +269,86 @@ curl http://localhost:8001/sensors
 # Get stats
 curl http://localhost:8001/sensors?option=stats
 
-# Simulate measurement
-curl -X POST "http://localhost:8001/simulate?ph=7.0&turbidity=10.0"
+# Delete sensor
+curl -X DELETE http://localhost:8001/sensors/SEINE-001
+
+# Capteur state transitions (pattern State)
+curl -X POST http://localhost:8001/sensors/SEINE-001/maintenance
+curl -X POST http://localhost:8001/sensors/SEINE-001/activer
+curl -X POST http://localhost:8001/sensors/SEINE-001/panne
+curl -X POST http://localhost:8001/sensors/SEINE-001/desactiver
+```
+
+---
+
+## Supervision Service (Port 8002)
+
+### Endpoints REST
+
+```
+GET    /bornes                         # Liste des bornes
+GET    /bornes/{borne_id}              # Détail borne
+GET    /sessions                       # Liste sessions
+GET    /sessions/{session_id}          # Détail session
+GET    /tableau-de-bord/resume         # Résumé dashboard
+GET    /tableau-de-bord/carte          # Carte bornes
+GET    /incidents                      # Incidents récents
+GET    /sante                          # Healthcheck
+GET    /metriques                      # Métriques réseau
+WS     /ws/supervision/direct          # Mises à jour temps réel
+```
+
+### Exemple — Résumé dashboard
+
+```json
+{
+  "timestamp": "2026-07-02T10:00:00Z",
+  "nombre_bornes_total": 12,
+  "bornes_disponibles": 8,
+  "bornes_reservees": 1,
+  "bornes_en_charge": 2,
+  "bornes_maintenance": 1,
+  "sessions_actives": 2,
+  "energie_total_kwh": 45.5,
+  "chiffre_affaires_eur": 18.2,
+  "nombre_incidents": 0,
+  "sante_reseau": 95.0
+}
+```
+
+### Topic Kafka
+
+- `charge.station.events` — événements OCPP (consommé par supervision-service)
+
+### cURL
+
+```bash
+curl http://localhost:8002/sante
+curl http://localhost:8002/bornes
+curl http://localhost:8002/tableau-de-bord/resume
+```
+
+---
+
+## Capteur — États (pattern State)
+
+| État | Valeur API | Capture autorisée |
+|------|------------|-------------------|
+| Actif | `actif` | Oui |
+| Inactif | `inactif` | Non |
+| Maintenance | `maintenance` | Non |
+| En panne | `en_panne` | Non |
+
+Transitions via `POST /sensors/{id}/activer|desactiver|maintenance|panne`.
+
+Réponse :
+
+```json
+{
+  "sensor_id": "SEINE-001",
+  "etat": "maintenance",
+  "status": "transition_applied"
+}
 ```
 
 ---
@@ -296,11 +374,14 @@ curl -X POST "http://localhost:8001/simulate?ph=7.0&turbidity=10.0"
 
 - **Swagger Alert Service** : http://localhost:8000/docs
 - **Swagger IoT Service** : http://localhost:8001/docs
+- **Swagger Supervision Service** : http://localhost:8002/docs
 - **OpenAPI JSON Alert** : http://localhost:8000/openapi.json
 - **OpenAPI JSON IoT** : http://localhost:8001/openapi.json
+- **OpenAPI JSON Supervision** : http://localhost:8002/openapi.json
+- **Collection Postman** : `docs/postman/UrbanHub.postman_collection.json`
 
 ---
 
-**Date** : 30 June 2026  
-**Version** : 2.0 (English)  
-**Status** : Complete ✅
+**Date** : 2 July 2026  
+**Version** : 3.0  
+**Status** : Complete (Alert + IoT + Supervision)

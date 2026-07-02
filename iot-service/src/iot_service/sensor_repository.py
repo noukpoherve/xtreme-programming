@@ -18,6 +18,7 @@ class Sensor:
     latitude: float
     longitude: float
     active: bool = True
+    etat: str = "actif"
     metadata: dict = field(default_factory=dict)
 
 
@@ -49,6 +50,7 @@ class SensorRepository:
             "latitude": sensor.latitude,
             "longitude": sensor.longitude,
             "active": sensor.active,
+            "etat": sensor.etat,
             "metadata": sensor.metadata,
         })
 
@@ -84,6 +86,7 @@ class SensorRepository:
                         latitude=data["latitude"],
                         longitude=data["longitude"],
                         active=data["active"],
+                        etat=data.get("etat", "actif" if data.get("active", True) else "inactif"),
                         metadata=data.get("metadata", {}),
                     )
                 return None
@@ -99,6 +102,7 @@ class SensorRepository:
                     latitude=data["latitude"],
                     longitude=data["longitude"],
                     active=data["active"],
+                    etat=data.get("etat", "actif" if data.get("active", True) else "inactif"),
                     metadata=data.get("metadata", {}),
                 )
             return None
@@ -145,6 +149,7 @@ class SensorRepository:
                 "latitude": sensor.latitude,
                 "longitude": sensor.longitude,
                 "active": sensor.active,
+                "etat": sensor.etat,
                 "metadata": sensor.metadata,
             })
             self.redis_client.set(key, payload)

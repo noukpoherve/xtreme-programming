@@ -13,6 +13,8 @@ from iot_service.hubeau_client import HubEauSensorClient
 from iot_service.kafka_producer import MeasurementProducer
 from iot_service.sensor_service import IoTSensorSimulator
 from iot_service.sensor_repository import SensorRepository, Sensor
+from iot_service.capteur import Capteur
+from iot_service.capteur_state import TransitionCapteurInvalide, CapteurEtat
 from iot_service.sensor_contracts import (
     ErrorResponse,
     SensorCreate,
@@ -22,6 +24,7 @@ from iot_service.sensor_contracts import (
     SensorStatsResponse,
     MeasurementResponse,
     SensorActionResponse,
+    CapteurTransitionResponse,
 )
 
 _KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
@@ -104,14 +107,16 @@ register_exception_handlers(app)
 
 
 def _sensor_detail(sensor: Sensor) -> SensorDetail:
+    capteur = Capteur.from_sensor(sensor)
     return SensorDetail(
-        sensor_id=sensor.sensor_id,
-        name=sensor.name,
-        location=sensor.location,
-        latitude=sensor.latitude,
-        longitude=sensor.longitude,
-        active=sensor.active,
-        metadata=sensor.metadata,
+        sensor_id=capteur.sensor_id,
+        name=capteur.name,
+        location=capteur.location,
+        latitude=capteur.latitude,
+        longitude=capteur.longitude,
+        active=capteur.active,
+        etat=capteur.etat_nom.value,
+        metadata=capteur.metadata,
     )
 
 
@@ -158,13 +163,38 @@ def _sensor_repository() -> SensorRepository:
 
 def _sensor_stats_response(sensor_repo: SensorRepository) -> SensorStatsResponse:
     sensors = sensor_repo.get_all()
-    active = sum(1 for s in sensors if s.active)
+    active = sum(1 for s in sensors if Capteur.from_sensor(s).etat_nom == CapteurEtat.ACTIF)
     return SensorStatsResponse(
         total_sensors=len(sensors),
         active_sensors=active,
         inactive_sensors=len(sensors) - active,
         last_update=datetime.now(timezone.utc),
     )
+
+
+def _load_capteur(sensor_repo: SensorRepository, sensor_id: str) -> Capteur:
+    sensor = sensor_repo.get(sensor_id)
+    if not sensor:
+        raise HTTPException(status_code=404, detail="Sensor not found")
+    return Capteur.from_sensor(sensor)
+
+
+def _save_capteur(sensor_repo: SensorRepository, capteur: Capteur) -> None:
+    updated = sensor_repo.update(capteur.sensor_id, capteur.to_sensor())
+    if not updated:
+        raise HTTPException(status_code=500, detail="Update failed")
+
+
+def _apply_transition(
+    sensor_repo: SensorRepository, sensor_id: str, action: str
+) -> CapteurTransitionResponse:
+    capteur = _load_capteur(sensor_repo, sensor_id)
+    try:
+        getattr(capteur, action)()
+    except TransitionCapteurInvalide as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    _save_capteur(sensor_repo, capteur)
+    return CapteurTransitionResponse(sensor_id=sensor_id, etat=capteur.etat_nom.value)
 
 
 @app.get("/health", tags=["Health"])
@@ -232,16 +262,17 @@ async def register_sensor(sensor: SensorCreate):
     sensor_repo = _sensor_repository()
     if sensor_repo.get(sensor.sensor_id):
         raise HTTPException(status_code=409, detail="Sensor already exists")
-    new_sensor = Sensor(
+    capteur = Capteur(
         sensor_id=sensor.sensor_id,
         name=sensor.name,
         location=sensor.location,
         latitude=sensor.latitude,
         longitude=sensor.longitude,
-        active=sensor.active,
         metadata=sensor.metadata,
     )
-    sensor_repo.save(new_sensor)
+    if not sensor.active:
+        capteur.desactiver()
+    sensor_repo.save(capteur.to_sensor())
     return _sensor_action_response(sensor.sensor_id, "registered")
 
 
@@ -332,10 +363,7 @@ async def get_sensor(sensor_id: str):
 async def update_sensor(sensor_id: str, sensor_data: SensorUpdate):
     """Update a sensor"""
     sensor_repo = _sensor_repository()
-    current = sensor_repo.get(sensor_id)
-    if not current:
-        raise HTTPException(status_code=404, detail="Sensor not found")
-
+    capteur = _load_capteur(sensor_repo, sensor_id)
     if (
         sensor_data.name is None
         and sensor_data.location is None
@@ -344,18 +372,25 @@ async def update_sensor(sensor_id: str, sensor_data: SensorUpdate):
     ):
         raise HTTPException(status_code=400, detail="No sensor fields provided")
 
-    sensor = Sensor(
-        sensor_id=sensor_id,
-        name=sensor_data.name if sensor_data.name is not None else current.name,
-        location=sensor_data.location if sensor_data.location is not None else current.location,
-        latitude=current.latitude,
-        longitude=current.longitude,
-        active=sensor_data.active if sensor_data.active is not None else current.active,
-        metadata=sensor_data.metadata if sensor_data.metadata is not None else current.metadata,
-    )
-    updated = sensor_repo.update(sensor_id, sensor)
-    if not updated:
-        raise HTTPException(status_code=500, detail="Update failed")
+    if sensor_data.name is not None:
+        capteur.name = sensor_data.name
+    if sensor_data.location is not None:
+        capteur.location = sensor_data.location
+    if sensor_data.metadata is not None:
+        capteur.metadata = sensor_data.metadata
+    if sensor_data.active is not None:
+        if sensor_data.active:
+            try:
+                capteur.activer()
+            except TransitionCapteurInvalide:
+                pass
+        else:
+            try:
+                capteur.desactiver()
+            except TransitionCapteurInvalide:
+                pass
+
+    _save_capteur(sensor_repo, capteur)
     return _sensor_action_response(sensor_id, "updated")
 
 
@@ -379,3 +414,77 @@ async def delete_sensor(sensor_id: str):
     if not deleted:
         raise HTTPException(status_code=404, detail="Sensor not found")
     return _sensor_action_response(sensor_id, "deleted")
+
+
+# ===== Capteur State Transitions =====
+
+@app.post(
+    "/sensors/{sensor_id}/activer",
+    response_model=CapteurTransitionResponse,
+    tags=["Sensors"],
+    responses=ERROR_RESPONSES,
+)
+@app.post(
+    "/capteurs/{sensor_id}/activer",
+    response_model=CapteurTransitionResponse,
+    tags=["Sensors"],
+    include_in_schema=False,
+    responses=ERROR_RESPONSES,
+)
+async def activer_capteur(sensor_id: str):
+    """Active un capteur (transition d'etat)."""
+    return _apply_transition(_sensor_repository(), sensor_id, "activer")
+
+
+@app.post(
+    "/sensors/{sensor_id}/desactiver",
+    response_model=CapteurTransitionResponse,
+    tags=["Sensors"],
+    responses=ERROR_RESPONSES,
+)
+@app.post(
+    "/capteurs/{sensor_id}/desactiver",
+    response_model=CapteurTransitionResponse,
+    tags=["Sensors"],
+    include_in_schema=False,
+    responses=ERROR_RESPONSES,
+)
+async def desactiver_capteur(sensor_id: str):
+    """Desactive un capteur."""
+    return _apply_transition(_sensor_repository(), sensor_id, "desactiver")
+
+
+@app.post(
+    "/sensors/{sensor_id}/maintenance",
+    response_model=CapteurTransitionResponse,
+    tags=["Sensors"],
+    responses=ERROR_RESPONSES,
+)
+@app.post(
+    "/capteurs/{sensor_id}/maintenance",
+    response_model=CapteurTransitionResponse,
+    tags=["Sensors"],
+    include_in_schema=False,
+    responses=ERROR_RESPONSES,
+)
+async def maintenance_capteur(sensor_id: str):
+    """Met un capteur en maintenance."""
+    return _apply_transition(_sensor_repository(), sensor_id, "mettre_en_maintenance")
+
+
+@app.post(
+    "/sensors/{sensor_id}/panne",
+    response_model=CapteurTransitionResponse,
+    tags=["Sensors"],
+    responses=ERROR_RESPONSES,
+)
+@app.post(
+    "/capteurs/{sensor_id}/panne",
+    response_model=CapteurTransitionResponse,
+    tags=["Sensors"],
+    include_in_schema=False,
+    responses=ERROR_RESPONSES,
+)
+async def panne_capteur(sensor_id: str):
+    """Signale une panne sur le capteur."""
+    return _apply_transition(_sensor_repository(), sensor_id, "signaler_panne")

@@ -41,6 +41,21 @@ services:
       timeout: 5s
       retries: 3
 
+  supervision-service:
+    build: ./supervision-service
+    ports:
+      - "8002:8002"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/sante"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   kafka:
     image: apache/kafka:3.7.1
     ports:

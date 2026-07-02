@@ -2,13 +2,14 @@
 
 > Master project — Distributed architecture, event-driven microservices & Extreme Programming practices
 
-## 🎯 Statut : Améliorations Complètes (30 Juin 2026)
+## 🎯 Statut : Prêt évaluation (2 Juillet 2026)
 
-✅ **Patterns de conception** implémentés  
-✅ **API REST CRUD complète**  
-✅ **Contrats API formalisés** (Pydantic)  
-✅ **Persistance Redis**  
-✅ **Swagger documenté**
+✅ **Patterns de conception** (Strategy, Repository, State, Adapter)  
+✅ **API REST CRUD complète** (3 microservices)  
+✅ **Contrats API formalisés** (Pydantic + `CONTRATS_API.md`)  
+✅ **Tests unitaires, mocks/stubs, CI GitHub Actions**  
+✅ **Message bus Kafka** + persistance Redis  
+✅ **Changelog** + documentation par service
 
 ---
 
@@ -41,12 +42,20 @@ UrbanHub is composed of independent microservices that communicate via REST and 
                     +------------------+
 ```
 
+UrbanHub IRVE (bornes électriques) — branche supervision :
+
+```
+OCPP Gateway (futur) → Kafka: charge.station.events → supervision-service (8002)
+                                                      → Dashboard WebSocket / REST
+```
+
 ## Services
 
 | Service | Role | Port | Tech |
 |---------|------|------|------|
 | **iot-service** | Ingestion & measurement publisher + Sensor CRUD | `8001` | FastAPI, aiokafka, Hub'Eau client, Redis |
 | **alert-service** | Threshold analysis, alert publisher + Alert CRUD | `8000` | FastAPI, aiokafka, Strategy pattern, Redis |
+| **supervision-service** | IRVE supervision, dashboard, WebSocket | `8002` | FastAPI, Kafka consumer, pattern Observer |
 | **kafka** | Event bus (KRaft mode, no ZooKeeper) | `9092` | apache/kafka:3.7.1 |
 | **redis** | Alerts & Sensors persistence | `6379` | redis:latest |
 | **kafka-ui** | Topic inspection | `8080` | kafbat/kafka-ui |
@@ -75,6 +84,7 @@ python -m uvicorn iot_service.main:app --reload --port 8001
 
 - **Alert Service Swagger** : http://localhost:8000/docs
 - **IoT Service Swagger** : http://localhost:8001/docs
+- **Supervision Service Swagger** : http://localhost:8002/docs
 
 ---
 
@@ -83,6 +93,11 @@ python -m uvicorn iot_service.main:app --reload --port 8001
 ### Rapports & Guides
 - **[RAPPORT_AMELIORATIONS.md](RAPPORT_AMELIORATIONS.md)** - Compte rendu détaillé des améliorations
 - **[FICHIERS_MODIFICATIONS.md](FICHIERS_MODIFICATIONS.md)** - Liste des fichiers créés/modifiés
+- **[docs/OUTILS.md](docs/OUTILS.md)** - Stack outillage (Docker, pytest, Swagger, CI…)
+- **[docs/REFACTOR_EXAMPLES.md](docs/REFACTOR_EXAMPLES.md)** - Exemples de refactor avant/après
+- **[docs/COMMUNICATION.md](docs/COMMUNICATION.md)** - Communication technique vs fonctionnelle
+- **[docs/postman/](docs/postman/)** - Collection Postman pour tests API
+- **[changelog.md](changelog.md)** - Historique des versions (Keep a Changelog)
 
 ### Contrats API
 - **Alert Service** : [alert-service/src/alert_service/contracts.py](alert-service/src/alert_service/contracts.py)
@@ -91,10 +106,20 @@ python -m uvicorn iot_service.main:app --reload --port 8001
 ### Architecture
 - **Alert Service** : [alert-service/README.md](alert-service/README.md)
 - **IoT Service** : [iot-service/README.md](iot-service/README.md)
+- **Supervision Service** : [supervision-service/README.md](supervision-service/README.md)
 
 ---
 
 ## 🏗️ Patterns de Conception Utilisés
+
+### ✅ State Pattern (Capteur)
+Comportement et transitions d'état encapsulés (`actif`, `maintenance`, `en_panne`, `inactif`)
+```python
+capteur = Capteur.from_sensor(sensor)
+capteur.mettre_en_maintenance()  # capture bloquée tant que non réactivé
+capteur.activer()
+```
+Fichiers : `iot-service/src/iot_service/capteur.py`, `capteur_state.py`
 
 ### ✅ Strategy Pattern
 Permettre des règles d'alerte extensibles sans modifier le service
@@ -176,6 +201,23 @@ PUT    /sensors/{sensor_id}         # Update sensor
 DELETE /sensors/{sensor_id}         # Delete sensor
 POST   /ingest                      # Fetch from Hub'eau
 POST   /simulate?ph=7.0&turbidity=75.0  # Simulate measurement
+POST   /sensors/{id}/activer            # State: activer capteur
+POST   /sensors/{id}/maintenance        # State: maintenance
+POST   /sensors/{id}/panne              # State: panne
+POST   /sensors/{id}/desactiver         # State: désactiver
+```
+
+### Supervision Service (Port 8002)
+
+```
+GET    /bornes
+GET    /bornes/{borne_id}
+GET    /sessions
+GET    /tableau-de-bord/resume
+GET    /tableau-de-bord/carte
+GET    /incidents
+GET    /sante
+WS     /ws/supervision/direct
 ```
 
 Legacy aliases: `/capteurs`, `/capteurs/{id}`, `/capteurs-stats`.
@@ -246,17 +288,21 @@ Raw measurements use a structured `WaterMeasurementEvent`:
 ## CI / Tests
 
 - `black` for formatting
-- `pytest` for unit and integration tests
-- GitHub Actions matrix CI for both services
-- Docker build check
+- `pytest` for unit and integration tests (~40 tests)
+- `unittest.mock` for mocks/stubs (Hub'Eau client, DummyRule, DummyProducer)
+- GitHub Actions matrix CI (alert, iot, supervision) + Docker build
+- Collection Postman : `docs/postman/UrbanHub.postman_collection.json`
 
 ## Project structure
 
 ```
 urbanhub/
 ├── alert-service/          # Alert REST API + Kafka consumer/producer
-├── iot-service/            # Ingestion + Kafka producer
+├── iot-service/            # Ingestion + Capteur State pattern + Kafka producer
+├── supervision-service/    # IRVE supervision + WebSocket + Kafka consumer
+├── docs/                   # Postman, outils, refactors, communication
 ├── monitoring/             # Prometheus, Grafana, Loki, Promtail configs
-├── docker-compose.yml      # Local orchestration
+├── docker-compose.yml      # Local orchestration (3 services + infra)
+├── changelog.md            # Keep a Changelog
 └── README.md               # This file
 ```
