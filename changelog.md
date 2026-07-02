@@ -1,16 +1,26 @@
 # Changelog
 
-## Version 0.1.1 (YYYY-MM-DD)
+Toutes les modifications notables de ce projet sont documentees dans ce fichier.
 
-- **Added**: WebSocket endpoint `/ws/supervision/direct` for real-time dashboard updates.
-- **Refactored**: Moved WebSocket handling to its own section in `api.py`.
-- **Updated**: Added error handling and logging for WebSocket connections.
-- **Improved**: Enhanced the `/tableau-de-bord/carte` endpoint to include more detailed information about each borne.
+Le format s'inspire de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et applique le versioning semantique.
 
-## Version 0.1.0 (YYYY-MM-DD)
+## [0.1.1] - YYYY-MM-DD
 
-- **Initial Release**:
-  - Created the `main.py` file to serve as the entry point of the Service de Supervision.
-  - Implemented endpoints for managing bornes, sessions, and incidents.
-  - Added a health check endpoint `/sante`.
-  - Integrated Kafka consumer for real-time event processing.
+### Added
+- Endpoint WebSocket `/ws/supervision/direct` pour des mises a jour temps reel du dashboard.
+
+### Changed
+- Reorganisation de la gestion WebSocket dans une section dediee de `api.py`.
+- Amelioration de l'endpoint `/tableau-de-bord/carte` avec des informations plus detaillees pour chaque borne.
+
+### Fixed
+- Ajout de la gestion d'erreurs et de logs pour les connexions WebSocket.
+
+## [0.1.0] - YYYY-MM-DD
+
+### Added
+- Version initiale du service de supervision.
+- Creation de `main.py` comme point d'entree principal.
+- Mise en place des endpoints de gestion des bornes, sessions et incidents.
+- Ajout de l'endpoint de sante `/sante`.
+- Integration d'un consommateur Kafka pour le traitement des evenements en temps reel.
