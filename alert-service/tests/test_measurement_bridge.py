@@ -40,6 +40,12 @@ def test_build_alerts_from_measurement_no_alert():
 
 
 def test_build_alerts_from_measurement_ph_and_turbidity():
+    """
+    A single measurement can only trigger ONE state transition.
+    Even if both pH and turbidity are abnormal, the state machine advances
+    by one step (NORMAL → WARNING). The severity hint is ignored by the
+    transition logic; only the anomaly count matters.
+    """
     service = AlertService()
     measurement = _measurement(
         mesures=MeasurementValues(
@@ -54,6 +60,33 @@ def test_build_alerts_from_measurement_ph_and_turbidity():
 
     alerts = service.build_alerts_from_measurement(measurement)
 
-    assert len(alerts) == 2
-    assert {alert.type for alert in alerts} == {"ph", "turbidity"}
-    assert any(alert.severity == "CRITICAL" for alert in alerts)
+    # One measurement → one transition → one alert
+    assert len(alerts) == 1
+    assert alerts[0].severity.value == "WARNING"
+    assert alerts[0].type == "state_transition"
+
+
+def test_build_alerts_from_measurement_reaches_critical_after_three_anomalies():
+    """
+    Send three consecutive anomalous measurements for the same sensor
+    to verify the progression NORMAL → WARNING → CRITICAL.
+    """
+    service = AlertService()
+    measurement = _measurement(
+        mesures=MeasurementValues(
+            ph=5.2,
+            turbidite_ntu=145.0,
+            temperature_c=14.3,
+            niveau_m=1.5,
+            debit_m3s=0.8,
+            oxygene_dissous_mgl=7.1,
+        )
+    )
+
+    first = service.build_alerts_from_measurement(measurement)
+    second = service.build_alerts_from_measurement(measurement)
+    third = service.build_alerts_from_measurement(measurement)
+
+    assert len(first) == 1 and first[0].severity.value == "WARNING"
+    assert len(second) == 0  # still WARNING, no transition
+    assert len(third) == 1 and third[0].severity.value == "CRITICAL"

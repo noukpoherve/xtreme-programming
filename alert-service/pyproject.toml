@@ -6,10 +6,11 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "aiokafka>=0.14.0",
+    "asyncpg>=0.30.0",
     "fastapi>=0.136.1",
     "pydantic-settings>=2.14.0",
     "redis>=7.4.0",
-    "uvicorn>=0.46.0",
+    "uvicorn[standard]>=0.46.0",
 ]
 
 [dependency-groups]

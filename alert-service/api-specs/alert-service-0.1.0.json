@@ -1,0 +1,1174 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "UrbanHub Alert Service",
+    "description": "\n## Water Quality Alert Service\n\n**UrbanHub** is an event-driven platform that ingests water quality\nmeasurements, analyzes them against configurable thresholds, and\npublishes pollution alerts.\n\nThis service is the **alerting component**. It:\n\n* **Consumes** raw `WaterMeasurementEvent` messages from the\n  `mesure.qualite.eau` Kafka topic.\n* **Maintains** a per-sensor state machine (NORMAL / WARNING / CRITICAL)\n  that requires 3 consecutive anomalies before declaring CRITICAL.\n* **Publishes** generated alerts to the `alerte.pollution.detectee`\n  Kafka topic.\n* **Exposes** a small REST surface for health checks, manual alert\n  creation, and state inspection.\n\n### Error contract\n\nEvery error response — regardless of the endpoint — follows the same\nshape defined by `ErrorResponse`. Clients SHOULD branch on the\nmachine-readable `error` field rather than on `message`.\n\n### Correlation\n\nEvery response carries an `X-Trace-Id` header. Clients can supply their\nown `X-Trace-Id` request header to propagate a correlation id end to\nend. The same value appears in error payloads and in structured logs.\n",
+    "contact": {
+      "name": "UrbanHub Platform Team",
+      "url": "https://github.com/urbanhub/urbanhub",
+      "email": "platform@urbanhub.example.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    },
+    "version": "0.1.0",
+    "x-exported-at": "2026-07-02T13:37:36.683793+00:00",
+    "x-exported-from": "alert-service"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local development"
+    },
+    {
+      "url": "http://alert-service:8000",
+      "description": "Docker compose network"
+    },
+    {
+      "url": "https://staging.alerts.urbanhub.example.com",
+      "description": "Staging"
+    },
+    {
+      "url": "https://alerts.urbanhub.example.com",
+      "description": "Production"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Liveness probe",
+        "description": "Returns the service health. Used by Kubernetes / Docker Compose healthchecks and by external monitoring.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A downstream dependency (Kafka) is unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "kafka": {
+                    "summary": "KAFKA_PUBLISH_FAILED",
+                    "value": {
+                      "error": "KAFKA_PUBLISH_FAILED",
+                      "message": "Alert could not be published to Kafka.",
+                      "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "timestamp": "2026-06-29T10:30:00Z",
+                      "path": "/alertes"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "List every sensor tracked by the service",
+        "description": "Returns the public view of every sensor currently in memory.",
+        "operationId": "list_sensors_sensors_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorStateListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "internal": {
+                    "summary": "INTERNAL_ERROR",
+                    "value": {
+                      "error": "INTERNAL_ERROR",
+                      "message": "An unexpected error occurred. Please contact support with the trace_id.",
+                      "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "timestamp": "2026-06-29T10:30:00Z",
+                      "path": "/alertes"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Aggregated KPIs for the dashboard",
+        "description": "Returns aggregated statistics: sensor count by state, alert counts (open / 24h / 7d), and the top 5 most alerting sensors.",
+        "operationId": "get_stats_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "internal": {
+                    "summary": "INTERNAL_ERROR",
+                    "value": {
+                      "error": "INTERNAL_ERROR",
+                      "message": "An unexpected error occurred. Please contact support with the trace_id.",
+                      "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "timestamp": "2026-06-29T10:30:00Z",
+                      "path": "/alertes"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alerts": {
+      "get": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "List currently open alerts",
+        "description": "Returns the most recent open alerts (status OPEN or ACK).",
+        "operationId": "list_alerts_alerts_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "internal": {
+                    "summary": "INTERNAL_ERROR",
+                    "value": {
+                      "error": "INTERNAL_ERROR",
+                      "message": "An unexpected error occurred. Please contact support with the trace_id.",
+                      "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "timestamp": "2026-06-29T10:30:00Z",
+                      "path": "/alertes"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/metadata": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get full sensor metadata (drill-down)",
+        "description": "Returns the catalogue row + live state + last measurement timestamp for one sensor. Used by the dashboard drawer.",
+        "operationId": "get_sensor_metadata_sensors__sensor_id__metadata_get",
+        "parameters": [
+          {
+            "name": "sensor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Sensor Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorMetadataView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sensor not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A downstream dependency (Kafka) is unavailable.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "kafka": {
+                    "summary": "KAFKA_PUBLISH_FAILED",
+                    "value": {
+                      "error": "KAFKA_PUBLISH_FAILED",
+                      "message": "Alert could not be published to Kafka.",
+                      "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "timestamp": "2026-06-29T10:30:00Z",
+                      "path": "/alertes"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/measurements": {
+      "get": {
+        "tags": [
+          "measurements"
+        ],
+        "summary": "Get recent measurements for one sensor (chart data)",
+        "description": "Returns the time-series of measurements for one sensor over the last `hours` hours, ordered oldest-first (chart-friendly). Capped at 2000 points.",
+        "operationId": "get_sensor_measurements_sensors__sensor_id__measurements_get",
+        "parameters": [
+          {
+            "name": "sensor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Sensor Id"
+            }
+          },
+          {
+            "name": "hours",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 168,
+              "minimum": 1,
+              "description": "Lookback window in hours (max 7 days).",
+              "default": 24,
+              "title": "Hours"
+            },
+            "description": "Lookback window in hours (max 7 days)."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 2000,
+              "minimum": 1,
+              "description": "Max points returned.",
+              "default": 500,
+              "title": "Limit"
+            },
+            "description": "Max points returned."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeasurementSeriesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sensor not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A downstream dependency (Kafka) is unavailable.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "kafka": {
+                    "summary": "KAFKA_PUBLISH_FAILED",
+                    "value": {
+                      "error": "KAFKA_PUBLISH_FAILED",
+                      "message": "Alert could not be published to Kafka.",
+                      "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "timestamp": "2026-06-29T10:30:00Z",
+                      "path": "/alertes"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/alerts": {
+      "get": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Get alerts scoped to a single sensor",
+        "description": "Returns recent alerts for one sensor (newest first). Use `only_open=true` to filter out resolved ones.",
+        "operationId": "get_sensor_alerts_sensors__sensor_id__alerts_get",
+        "parameters": [
+          {
+            "name": "sensor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Sensor Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Max alerts returned.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Max alerts returned."
+          },
+          {
+            "name": "only_open",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "If true, only return OPEN/ACK alerts.",
+              "default": false,
+              "title": "Only Open"
+            },
+            "description": "If true, only return OPEN/ACK alerts."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sensor not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A downstream dependency (Kafka) is unavailable.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "kafka": {
+                    "summary": "KAFKA_PUBLISH_FAILED",
+                    "value": {
+                      "error": "KAFKA_PUBLISH_FAILED",
+                      "message": "Alert could not be published to Kafka.",
+                      "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "timestamp": "2026-06-29T10:30:00Z",
+                      "path": "/alertes"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get a sensor by ID",
+        "description": "Returns the current state, anomaly count and previous state.",
+        "operationId": "get_sensor_sensors__sensor_id__get",
+        "parameters": [
+          {
+            "name": "sensor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Sensor identifier.",
+              "title": "Sensor Id"
+            },
+            "description": "Sensor identifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorStateView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sensor not found.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "not_found": {
+                    "summary": "SENSOR_NOT_FOUND",
+                    "value": {
+                      "error": "SENSOR_NOT_FOUND",
+                      "message": "Sensor 'UNKNOWN-001' is not tracked by this service.",
+                      "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "timestamp": "2026-06-29T10:30:00Z",
+                      "path": "/alertes"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "internal": {
+                    "summary": "INTERNAL_ERROR",
+                    "value": {
+                      "error": "INTERNAL_ERROR",
+                      "message": "An unexpected error occurred. Please contact support with the trace_id.",
+                      "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "timestamp": "2026-06-29T10:30:00Z",
+                      "path": "/alertes"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Reset a sensor's state machine",
+        "description": "Removes the sensor from the registry. The next measurement for this sensor will start a fresh processor in NORMAL state.",
+        "operationId": "reset_sensor_sensors__sensor_id__delete",
+        "parameters": [
+          {
+            "name": "sensor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Sensor identifier.",
+              "title": "Sensor Id"
+            },
+            "description": "Sensor identifier."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sensor reset."
+          },
+          "404": {
+            "description": "Sensor not found.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "not_found": {
+                    "summary": "SENSOR_NOT_FOUND",
+                    "value": {
+                      "error": "SENSOR_NOT_FOUND",
+                      "message": "Sensor 'UNKNOWN-001' is not tracked by this service.",
+                      "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "timestamp": "2026-06-29T10:30:00Z",
+                      "path": "/alertes"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AlertListItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "opened_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opened At"
+          },
+          "sensor_id": {
+            "type": "string",
+            "title": "Sensor Id"
+          },
+          "sensor_name": {
+            "type": "string",
+            "title": "Sensor Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "severity",
+          "message",
+          "opened_at",
+          "sensor_id",
+          "sensor_name"
+        ],
+        "title": "AlertListItem",
+        "description": "Single alert in the alert list response."
+      },
+      "AlertListResponse": {
+        "properties": {
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/AlertListItem"
+            },
+            "type": "array",
+            "title": "Alerts"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "alerts",
+          "count"
+        ],
+        "title": "AlertListResponse",
+        "description": "List of currently open alerts."
+      },
+      "ErrorCode": {
+        "type": "string",
+        "enum": [
+          "INVALID_MEASUREMENT",
+          "INVALID_ALERT_PAYLOAD",
+          "SENSOR_NOT_FOUND",
+          "SENSOR_ALREADY_REGISTERED",
+          "INVALID_STATE_TRANSITION",
+          "KAFKA_PUBLISH_FAILED",
+          "KAFKA_CONSUME_FAILED",
+          "DEPENDENCY_UNAVAILABLE",
+          "VALIDATION_ERROR",
+          "INTERNAL_ERROR"
+        ],
+        "title": "ErrorCode",
+        "description": "Machine-readable identifiers used in the `error` field of responses."
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorCode",
+            "description": "Machine-readable error identifier."
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Human-readable description of the error."
+          },
+          "trace_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace Id",
+            "description": "Correlation ID for log lookup."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp",
+            "description": "Server-side timestamp when the error was generated."
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path",
+            "description": "URL path that produced the error."
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details",
+            "description": "Optional context (invalid field, offending value, etc.)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "error",
+          "message"
+        ],
+        "title": "ErrorResponse",
+        "description": "Standardized error payload returned by every endpoint on failure.\n\nClients SHOULD rely on `error` (machine-readable code) rather than\n`message` to drive behavior. `trace_id` allows support teams to\ncorrelate the error with logs and traces.",
+        "example": {
+          "details": {
+            "field": "mesures.ph"
+          },
+          "error": "INVALID_MEASUREMENT",
+          "message": "pH value -2.0 is outside the valid range [0.0, 14.0]",
+          "path": "/alertes",
+          "timestamp": "2026-06-29T10:30:00Z",
+          "trace_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+        }
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "'healthy' or 'degraded'."
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "components": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Components",
+            "description": "Status of each critical component."
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version"
+        ],
+        "title": "HealthResponse",
+        "example": {
+          "components": {
+            "kafka_consumer": "up",
+            "sensor_registry": "ok"
+          },
+          "status": "healthy",
+          "version": "0.1.0"
+        }
+      },
+      "MeasurementPoint": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "ph": {
+            "type": "number",
+            "title": "Ph"
+          },
+          "temperature_c": {
+            "type": "number",
+            "title": "Temperature C"
+          },
+          "turbidity_ntu": {
+            "type": "number",
+            "title": "Turbidity Ntu"
+          },
+          "dissolved_oxygen_mgl": {
+            "type": "number",
+            "title": "Dissolved Oxygen Mgl"
+          },
+          "signal_quality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signal Quality"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "ph",
+          "temperature_c",
+          "turbidity_ntu",
+          "dissolved_oxygen_mgl"
+        ],
+        "title": "MeasurementPoint",
+        "description": "A single time-series measurement point."
+      },
+      "MeasurementSeriesResponse": {
+        "properties": {
+          "sensor_id": {
+            "type": "string",
+            "title": "Sensor Id"
+          },
+          "hours": {
+            "type": "integer",
+            "title": "Hours"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/MeasurementPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sensor_id",
+          "hours",
+          "count",
+          "points"
+        ],
+        "title": "MeasurementSeriesResponse",
+        "description": "Time-series of measurements for a sensor (chart + table)."
+      },
+      "SensorMetadataView": {
+        "properties": {
+          "sensor_id": {
+            "type": "string",
+            "title": "Sensor Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "point_reference": {
+            "type": "string",
+            "title": "Point Reference"
+          },
+          "state": {
+            "$ref": "#/components/schemas/SensorState"
+          },
+          "anomaly_count": {
+            "type": "integer",
+            "title": "Anomaly Count"
+          },
+          "previous_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SensorState"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data_source": {
+            "type": "string",
+            "title": "Data Source",
+            "description": "'real' (Hub'Eau) ou 'simulated' (sensor-simulator).",
+            "default": "simulated"
+          },
+          "firmware_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Firmware Version"
+          },
+          "last_measurement_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Measurement At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sensor_id",
+          "name",
+          "latitude",
+          "longitude",
+          "point_reference",
+          "state",
+          "anomaly_count"
+        ],
+        "title": "SensorMetadataView",
+        "description": "Full metadata for one sensor: catalogue + state + last seen.\n\nUsed by the dashboard drill-down drawer.",
+        "example": {
+          "anomaly_count": 0,
+          "data_source": "real",
+          "firmware_version": "Hub'Eau v2",
+          "last_measurement_at": "2026-07-01T09:54:23Z",
+          "latitude": 48.7876,
+          "longitude": 2.3926,
+          "name": "Vitry-sur-Seine",
+          "point_reference": "Pont de Vitry",
+          "sensor_id": "SEINE-VITRY-001",
+          "state": "NORMAL"
+        }
+      },
+      "SensorState": {
+        "type": "string",
+        "enum": [
+          "NORMAL",
+          "WARNING",
+          "CRITICAL"
+        ],
+        "title": "SensorState",
+        "description": "Possible states of a water quality sensor."
+      },
+      "SensorStateListResponse": {
+        "properties": {
+          "sensors": {
+            "items": {
+              "$ref": "#/components/schemas/SensorStateView"
+            },
+            "type": "array",
+            "title": "Sensors"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sensors",
+          "count"
+        ],
+        "title": "SensorStateListResponse",
+        "description": "List of every sensor currently tracked by the service."
+      },
+      "SensorStateView": {
+        "properties": {
+          "sensor_id": {
+            "type": "string",
+            "title": "Sensor Id"
+          },
+          "state": {
+            "$ref": "#/components/schemas/SensorState"
+          },
+          "anomaly_count": {
+            "type": "integer",
+            "title": "Anomaly Count"
+          },
+          "previous_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SensorState"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "sensor_id",
+          "state",
+          "anomaly_count"
+        ],
+        "title": "SensorStateView",
+        "description": "Public view of a sensor's current state."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "alerts",
+      "description": "Create and inspect alerts.",
+      "externalDocs": {
+        "description": "Alert payload specification",
+        "url": "https://github.com/urbanhub/urbanhub/blob/main/docs/events.md"
+      }
+    },
+    {
+      "name": "measurements",
+      "description": "Submit measurements and observe state transitions."
+    },
+    {
+      "name": "sensors",
+      "description": "Inspect the state of tracked sensors."
+    },
+    {
+      "name": "health",
+      "description": "Liveness and readiness probes."
+    }
+  ]
+}
