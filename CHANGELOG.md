@@ -1,123 +1,211 @@
-# Changelog
+# Changelog — UrbanHub
 
-All notable changes to this project will be documented in this file.
+Toutes les modifications notables du projet sont documentées dans ce fichier.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et du [versionnement sémantique](https://semver.org/lang/fr/).
+
+---
+
+## Comment lire ce document
+
+| Section | Public visé | Contenu |
+|---------|-------------|---------|
+| **Synthèse dirigeants** | équipes de direction, encadrement, jury | impacts métier, valeur livrée, risques réduits |
+| **Détail technique** | développeurs, ops, architectes | changements précis par version |
+
+---
+
+## Synthèse dirigeants (vue d'ensemble)
+
+### Version 0.5.0 — Juillet 2026 *(en cours)*
+
+**En une phrase :** la plateforme dispose désormais de routes d'ingestion documentées et pilotables, prêtes pour démonstration et intégration partenaires.
+
+| Thème | Impact pour la direction |
+|-------|--------------------------|
+| Ingestion maîtrisée | déclenchement manuel Hub'Eau / simulation / capteurs physiques, sans attendre les cycles automatiques |
+| Documentation API | Swagger et contrats lisibles pour valider les échanges avec des tiers |
+| Traçabilité | chaque livraison reste reliée à l'historique Git et au changelog |
+
+### Version 0.4.0 — 2 juillet 2026
+
+**En une phrase :** UrbanHub passe d'un prototype technique à une plateforme opérationnelle supervisable en conditions réelles.
+
+| Thème | Impact pour la direction |
+|-------|--------------------------|
+| Fiabilité | reprise automatique de l'état des capteurs après redémarrage (plus de perte d'historique) |
+| Supervision | tableau de bord temps réel (carte, alertes, indicateurs) |
+| Données réelles | connexion à 6 stations Hub'Eau officielles sur la Seine |
+| Sécurité & qualité | scans automatiques (vulnérabilités, secrets, images Docker) à chaque livraison |
+| Documentation | site MkDocs publiable sur GitHub Pages pour le pilotage projet |
+
+### Version 0.3.0 — 1 juillet 2026
+
+**En une phrase :** les données officielles Hub'Eau alimentent la plateforme avec une fréquence adaptée au terrain.
+
+| Thème | Impact pour la direction |
+|-------|--------------------------|
+| Source de vérité | chaque capteur a une seule source (réelle ou simulée), sans doublon |
+| Données publiques | intégration Hub'Eau (pH, température, oxygène, etc.) |
+| Pilotage visuel | distinction claire sur le dashboard entre données réelles et simulées |
+
+### Version 0.2.0 — 15 juin 2026
+
+**En une phrase :** les opérateurs peuvent analyser chaque capteur en profondeur depuis le dashboard.
+
+| Thème | Impact pour la direction |
+|-------|--------------------------|
+| Analyse fine | historique 24h, mesures récentes, alertes par capteur |
+| Décision | vue consolidée pour prioriser les interventions |
+
+### Version 0.1.0 — 20 mai 2026
+
+**En une phrase :** mise en service de la première version de la plateforme de surveillance de la qualité de l'eau.
+
+| Thème | Impact pour la direction |
+|-------|--------------------------|
+| Architecture | microservices communicant par événements (Kafka) |
+| Alertes automatiques | détection des anomalies pH / turbidité |
+| Industrialisation | CI/CD, conteneurs Docker, observabilité de base |
+
+---
+
+## Détail technique par version
 
 ## [Unreleased]
 
-## [0.4.0] - 2026-07-02
+### Synthèse dirigeants
+
+- Routes d'ingestion explicites pour démonstrations, tests Postman et intégrations externes.
+- Documentation Swagger enrichie sur le service IoT.
 
 ### Added
 
-- Restauration de l'état de la machine à états au démarrage (`restore_states_from_db` dans `AlertService`) depuis la table `state_transitions` dans PostgreSQL. Empêche la perte d'état et d'historique des anomalies après un redémarrage du conteneur.
-- Création du module `domain.py` regroupant `SensorStreamProcessor` (Aggregate Root) et `SensorProcessorRegistry`, appliquant les concepts du Domain-Driven Design (DDD).
-- Test d'intégration complet pour vérifier la reprise d'état depuis la base de données.
+- `GET /ingestion/status` — état du pipeline (Kafka, Hub'Eau, simulateur).
+- `POST /ingestion/hubeau` — déclenchement manuel d'un cycle Hub'Eau.
+- `POST /ingestion/simuler` — déclenchement manuel d'un cycle simulateur.
+- Schémas Pydantic `ingestion_schemas.py` pour la documentation OpenAPI.
+- Tests `test_ingestion_routes.py` (4 scénarios).
 
 ### Changed
 
-- Simplification de la couche application `service.py` (contenant `AlertService`) désormais découplée de la logique pure du domaine.
+- `main.py` iot-service : tags Swagger `Health` / `Ingestion`, descriptions orientées exploitation.
+- `mkdocs.yml` : URL dépôt corrigée (`noukpoherve/xtreme-programming`).
 
-### Removed
+*Commits Git : `516247e` (2026-07-03)*
 
-- Client d'hydrométrie hérité (`HubEauSensorClient`) et tâche de fond associée (station `F700000103`).
-- Endpoints synchrone HTTP `POST /alertes` et `POST /measurements` dans `alert-service`, renforçant l'architecture événementielle asynchrone via Kafka.
-- Endpoints HTTP `POST /simulate` et `POST /quality/ingest` dans `iot-service`, isolant le service comme pur producteur Kafka avec uniquement `GET /health` actif.
+---
 
-### Fixed
+## [0.4.0] - 2026-07-03
 
-- Correction des erreurs d'importation de `alert_service.repository` en `alert_service.repositories`.
+### Synthèse dirigeants
+
+Livraison majeure : dashboard opérationnel, ingestion multi-sources, alertes résilientes, documentation publiable et pipeline qualité renforcé.
 
 ### Added
 
-- CI job that exports and validates the alert-service OpenAPI contract.
-- Automated GitHub Release generation with release notes on `master` pushes.
+- **Dashboard React** : carte capteurs, KPI, alertes temps réel, tiroir de détail par capteur.
+- **IoT** : poller Hub'Eau qualité (6 stations), simulateur local (6 capteurs), passerelle HTTP capteurs physiques.
+- **Alert-service** : domaine DDD (`domain.py`), reprise d'état PostgreSQL au redémarrage, gestionnaires d'erreurs robustes.
+- **Infra** : stack Docker Compose unifiée, Loki/Promtail/Grafana, workspaces `uv`.
+- **Documentation** : MkDocs Material, guides architecture (Mermaid), README par service.
+- **CI** : export/validation OpenAPI, releases GitHub automatiques, couverture pytest, scan Trivy images.
 
 ### Changed
 
-- Merged the legacy `sensor-simulator` service into `iot-service` to simplify operations and share the same Kafka producer/domain model.
-
-### Deprecated
-
-- Legacy hydrometry polling endpoints in `iot-service`; will be removed once water-quality coverage is complete.
+- Refactor `alert-service` selon principes DDD ; couche application allégée.
+- Fusion simulateur dans `iot-service` (un seul producteur Kafka).
+- Formatage codebase (`black`, `ruff`).
 
 ### Removed
 
-- Standalone `sensor-simulator` service and container.
+- Client hydrométrie legacy `HubEauSensorClient` (station unique).
+- Endpoints HTTP synchrones obsolètes (`POST /alertes`, `POST /simulate` legacy).
+- Service `sensor-simulator` autonome.
 
 ### Fixed
 
-- WebSocket path collision: endpoint moved from `/ws` to `/stream` to avoid matching `GET /sensors/{sensor_id}`.
-- State machine survives restarts: `list_sensors()` now reads the latest state from `state_transitions` via a LATERAL JOIN instead of relying on the in-memory registry.
+- Imports `repository` → `repositories`.
+- Collision WebSocket `/ws` → `/stream`.
+- État capteurs lu depuis PostgreSQL (`state_transitions`) et non plus uniquement en mémoire.
 
 ### Security
 
-- Added Bandit SAST, pip-audit SCA, gitleaks secret detection and Trivy image scanning to the CI pipeline.
+- Bandit (SAST), pip-audit (SCA), gitleaks, Trivy en CI.
+
+*Commits Git principaux : `6377154`, `906f542`, `5c671db`, `479bff9`, `d55e8b2`, `fe309dd`, `afb9383`, `74bf5e4`, `d396271`*
+
+---
 
 ## [0.3.0] - 2026-07-01
 
+### Synthèse dirigeants
+
+Connexion aux données publiques Hub'Eau pour 6 stations ; cadence de collecte adaptée aux analyses laboratoire.
+
 ### Added
 
-- Real Hub'Eau integration for 6 water-quality stations along the Seine (`SEINE-VITRY-001`, `SEINE-CHARENTON-002`, `SEINE-BERCY-003`, `SEINE-AUSTERLITZ-004`, `SEINE-CONCORDE-006`, `SEINE-COLOMBES-012`).
-- `HubEauQualiteClient` adapter fetching 5 parameters (pH, temperature, dissolved O₂, DCO, ammonium) in parallel with bounded timeout.
-- New manual trigger endpoint `POST /quality/ingest` on `iot-service`.
-- Data-source badge on dashboard markers and drawer (🌐 Hub'Eau / 🎲 Simulé).
+- Intégration Hub'Eau : 6 stations Seine (`SEINE-VITRY-001` … `SEINE-COLOMBES-012`).
+- Client `HubEauQualiteClient` (5 paramètres en parallèle).
+- Badge source de données sur le dashboard (réel / simulé).
 
 ### Changed
 
-- Increased Hub'Eau polling interval to 6 hours (`QUALITY_POLL_INTERVAL_SECONDS=21600`) to respect lab-analysis cadence and avoid API quota waste.
-- Simulator now excludes all Hub'Eau-mapped sensor IDs via `SIMULATOR_EXCLUDE_SENSORS`.
+- Intervalle polling Hub'Eau : 6 heures.
+- Simulateur exclut les capteurs déjà couverts par Hub'Eau.
 
 ### Fixed
 
-- Duplicate sensor sources: each sensor now has exactly one source of truth.
+- Suppression des doublons de source par capteur.
+
+---
 
 ## [0.2.0] - 2026-06-15
 
+### Synthèse dirigeants
+
+Analyse détaillée par capteur pour les opérateurs (graphiques, historique, alertes).
+
 ### Added
 
-- Per-sensor drill-down drawer in the dashboard with:
-  - sensor metadata (location, firmware, data source, last measurement),
-  - 24-hour time-series chart (pH, temperature, dissolved O₂),
-  - last 20 measurements table,
-  - last 10 alerts for the sensor.
-- Three new REST endpoints on `alert-service`:
-  - `GET /sensors/{id}/metadata`
-  - `GET /sensors/{id}/measurements`
-  - `GET /sensors/{id}/alerts`
-- `MeasurementSeriesResponse` and `SensorMetadataView` Pydantic models.
-- TimescaleDB continuous aggregates `measurements_hourly` and `measurements_daily`.
-- `current_sensor_state` database view for fast latest-state lookups.
+- Tiroir drill-down dashboard (métadonnées, courbe 24h, tableau mesures, alertes).
+- Endpoints `GET /sensors/{id}/metadata|measurements|alerts`.
+- Agrégats TimescaleDB (`measurements_hourly`, `measurements_daily`).
 
 ### Changed
 
-- Dashboard layout switched to a dashboard-first design: KPI strip, map + right rail, sensor table.
-- WebSocket reconnection logic with exponential backoff capped at 30 seconds.
+- Layout dashboard : KPI + carte + rail latéral.
+- Reconnexion WebSocket avec backoff.
 
 ### Fixed
 
-- Drawer not updating when a state transition occurred while it was open.
-- Mobile layout: drawer becomes a bottom sheet on screens < 1024 px.
+- Mise à jour du tiroir lors des transitions d'état.
+- Layout mobile (bottom sheet).
+
+---
 
 ## [0.1.0] - 2026-05-20
 
+### Synthèse dirigeants
+
+Première version exploitable : collecte, alertes automatiques, persistance et supervision.
+
 ### Added
 
-- Initial event-driven UrbanHub platform:
-  - `iot-service` producing `WaterMeasurementEvent` messages to Kafka.
-  - Local sensor simulator with diurnal cycle, random walk and pollution events for 6 virtual sensors.
-  - `alert-service` consuming measurements, running per-sensor state machine (NORMAL → WARNING → CRITICAL).
-  - WebSocket broadcast of state transitions to the dashboard.
-  - PostgreSQL + TimescaleDB persistence with hypertable `measurements` and 90-day retention.
-- React 19 + Vite + Tailwind dashboard with Leaflet map and real-time updates.
-- Docker Compose stack: Kafka 3.7 KRaft, PostgreSQL 16 + TimescaleDB, Prometheus, Grafana, Loki, Promtail.
-- GitHub Actions CI: lint, test, security scan, Docker build and OpenAPI export.
-- Pre-commit hooks: black, ruff, YAML/TOML lint, trailing-whitespace, secret detection.
-- Standardized error envelope with `trace_id` propagated end-to-end.
+- Plateforme événementielle : `iot-service` → Kafka → `alert-service`.
+- Machine à états capteurs (NORMAL → WARNING → CRITICAL).
+- Dashboard React + WebSocket temps réel.
+- PostgreSQL/TimescaleDB, rétention 90 jours.
+- Stack Docker : Kafka, Prometheus, Grafana, Loki.
+- CI GitHub Actions + pre-commit (black, ruff).
+- Enveloppe d'erreur standardisée avec `trace_id`.
 
-[Unreleased]: https://github.com/said/urbanhub/compare/v0.4.0...HEAD
-[0.4.0]: https://github.com/said/urbanhub/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/said/urbanhub/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/said/urbanhub/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/said/urbanhub/releases/tag/v0.1.0
+*Commits Git : init microservices mai 2026 (`ea56d81`, `65e6cd4`, `5f32d9c`, …)*
+
+---
+
+[Unreleased]: https://github.com/noukpoherve/xtreme-programming/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/noukpoherve/xtreme-programming/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/noukpoherve/xtreme-programming/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/noukpoherve/xtreme-programming/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/noukpoherve/xtreme-programming/releases/tag/v0.1.0
