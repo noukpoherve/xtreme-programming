@@ -38,6 +38,22 @@ theme:
 
 plugins:
   - search
+  - autorefs
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - alert-service/src
+            - iot-service/src
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            heading_level: 2
+            docstring_section_style: spacy
+            merge_init_into_class: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
   - minify:
       minify_html: true
 
@@ -95,4 +111,9 @@ nav:
       - dashboard: services/dashboard.md
       - monitoring: services/monitoring.md
   - Communication: communication.md
+  - API Python:
+      - api/index.md
+      - alert-service: api/alert-service.md
+      - iot-service: api/iot-service.md
+      - Doctests: api/doctests.md
   - Changelog: changelog.md

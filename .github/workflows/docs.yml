@@ -7,6 +7,8 @@ on:
       - "docs/**"
       - "mkdocs.yml"
       - "pyproject.toml"
+      - "alert-service/src/**"
+      - "iot-service/src/**"
       - "README.md"
       - "CHANGELOG.md"
       - "**/README.md"
@@ -38,7 +40,13 @@ jobs:
         run: uv python install 3.13
 
       - name: Install documentation dependencies
-        run: uv sync --group docs
+        run: uv sync --group docs --group docs-test
+
+      - name: Run documentation doctests (mkdocstrings examples)
+        run: uv run --group docs-test pytest docs/api -v
+
+      - name: Build MkDocs site (strict)
+        run: uv run --group docs mkdocs build --strict
 
       - name: Fetch gh-pages branch
         run: git fetch origin gh-pages --depth=1 || true
