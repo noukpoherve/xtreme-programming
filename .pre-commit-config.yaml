@@ -1,13 +1,118 @@
-repos:
-  - repo: https://github.com/psf/black
-    rev: 24.3.0
-    hooks:
-      - id: black
+---
+# Pre-commit hooks for UrbanHub
+# Install: pip install pre-commit && pre-commit install
+# Run all: pre-commit run --all-files
 
+repos:
+  # ──────────────────────────────────────────────────────────
+  # Standard hygiene hooks
+  # ──────────────────────────────────────────────────────────
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # ──────────────────────────────────────────────────────────
+  # Python — Black (formatting)
+  # ──────────────────────────────────────────────────────────
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+      - id: black
+        language_version: python3.13
+        files: '^(alert-service|iot-service)/'
+
+  # ──────────────────────────────────────────────────────────
+  # Python — Ruff (fast linter, replaces flake8/isort/pyupgrade)
+  # ──────────────────────────────────────────────────────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.4
+    hooks:
+      - id: ruff
+        args: ['--fix', '--exit-non-zero-on-fix']
+        files: '^(alert-service|iot-service)/.*\.py$'
+
+      - id: ruff-format
+        files: '^(alert-service|iot-service)/.*\.py$'
+
+  # ──────────────────────────────────────────────────────────
+  # Python — Bandit (security linter)
+  # ──────────────────────────────────────────────────────────
+  - repo: https://github.com/PyCQA/bandit
+    rev: '1.7.10'
+    hooks:
+      - id: bandit
+        args: ['-c', 'pyproject.toml']
+        additional_dependencies: ['bandit[toml]']
+        files: '^(alert-service|iot-service)/.*\.py$'
+        # Skip tests and __pycache__
+        exclude: '^.*/(tests|__pycache__)/.*$'
+
+  # ──────────────────────────────────────────────────────────
+  # Markdown — keep docs clean
+  # ──────────────────────────────────────────────────────────
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.43.0
+    hooks:
+      - id: markdownlint
+        args: ['--fix', '--disable', 'MD013', '--disable', 'MD033']
+        # Skip dashboard generated files
+        exclude: |
+          (?x)^(
+            .*node_modules/.*|
+            .*dist/.*|
+            .*\.venv/.*|
+            alert-service/api-specs/.*
+          )$
+
+  # ──────────────────────────────────────────────────────────
+  # Docker — lint Dockerfiles
+  # ──────────────────────────────────────────────────────────
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.13.0-beta
+    hooks:
+      - id: hadolint-docker
+        args: ['--failure-threshold=warning']
+
+  # ──────────────────────────────────────────────────────────
+  # Shell — lint shell scripts (defense-in-depth)
+  # ──────────────────────────────────────────────────────────
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+
+  # ──────────────────────────────────────────────────────────
+  # Local hooks — secrets, file size
+  # ──────────────────────────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: no-pwd-in-urls
+        name: Block pwd in URLs
+        entry: grep -E '(http://localhost|http://127\.0\.0\.1|http://0\.0\.0\.0)' --include='*.py' --include='*.yml' --include='*.yaml' --include='*.md' -r .
+        language: system
+        types: [file]
+        # Allow localhost in dev/test files but not in production-ish docs
+        exclude: |
+          (?x)^(
+            alert-service/tests/.*|
+            .*\.md
+          )
+
+      - id: forbid-commit-to-master-without-coauthor
+        name: Enforce commit format
+        entry: bash -c 'echo "Use Conventional Commits: feat/fix/chore/docs/ci/test/refactor"'
+        language: system
+        always_run: true
+        pass_filenames: false
+        stages: [commit-msg]

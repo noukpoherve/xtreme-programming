@@ -7,11 +7,26 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       WATER_QUALITY_TOPIC: mesure.qualite.eau
       POLLUTION_ALERT_TOPIC: alerte.pollution.detectee
+      DATABASE_URL: postgresql://urbanhub:urbanhub_dev_pwd@postgres:5432/urbanhub
     depends_on:
       kafka:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "5173:5173"
+    depends_on:
+      - alert-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -24,6 +39,9 @@ services:
       ALERT_SERVICE_URL: http://alert-service:8000
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       WATER_QUALITY_TOPIC: mesure.qualite.eau
+      # Local simulator (only for sensors not in Hub'Eau mapping)
+      SIMULATOR_INTERVAL_SECONDS: "300"
+      SIMULATOR_JITTER_SECONDS: "30"
     depends_on:
       alert-service:
         condition: service_healthy
@@ -70,6 +88,25 @@ services:
       kafka:
         condition: service_healthy
 
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: urbanhub
+      POSTGRES_USER: urbanhub
+      POSTGRES_PASSWORD: urbanhub_dev_pwd
+      TS_TUNE_MEMORY: 2GB
+      TS_TUNE_NUM_CPUS: 2
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./monitoring/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U urbanhub -d urbanhub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -103,3 +140,6 @@ services:
     depends_on:
       - loki
 
+volumes:
+  postgres_data:
+    driver: local
