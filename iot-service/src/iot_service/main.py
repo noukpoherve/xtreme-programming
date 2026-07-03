@@ -5,15 +5,20 @@ from contextlib import asynccontextmanager
 from datetime import datetime, UTC
 from typing import AsyncIterator
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-
-from iot_service.simulator.sensors import SENSORS
+from fastapi import FastAPI, HTTPException, status
 
 from iot_service.config import settings
+from iot_service.ingestion_schemas import (
+    HubEauIngestionResponse,
+    IngestionStatusResponse,
+    SensorMetricsAcceptedResponse,
+    SensorMetricsPayload,
+    SimulationIngestionResponse,
+)
 from iot_service.kafka_producer import MeasurementProducer
 from iot_service.quality_poller import HubEauQualityPoller
 from iot_service.simulator.orchestrator import SimulationOrchestrator
+from iot_service.simulator.sensors import SENSORS
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -30,14 +35,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.kafka_producer = MeasurementProducer()
     await app.state.kafka_producer.start()
 
-    # Hub'Eau quality poller (real lab data)
     app.state.quality_poller = HubEauQualityPoller(
         producer=app.state.kafka_producer,
         interval_seconds=settings.quality_poll_interval_seconds,
     )
     quality_task = asyncio.create_task(_quality_poller_loop(app.state.quality_poller))
 
-    # Local simulator for sensors without a real-time data source
     sim_orchestrator = SimulationOrchestrator(
         producer=app.state.kafka_producer,
     )
@@ -64,14 +67,32 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(
     title=settings.app_name,
+    description=(
+        "Service d'ingestion UrbanHub : collecte Hub'Eau, simulation locale "
+        "et passerelle HTTP pour capteurs physiques. Publie sur Kafka "
+        f"(`{settings.water_quality_topic}`)."
+    ),
     version=settings.app_version,
     lifespan=lifespan,
+    openapi_tags=[
+        {
+            "name": "Health",
+            "description": "Sonde de disponibilite et metriques runtime.",
+        },
+        {
+            "name": "Ingestion",
+            "description": (
+                "Routes d'ingestion : declenchement Hub'Eau, simulation "
+                "et reception de mesures capteurs."
+            ),
+        },
+    ],
 )
 
 
-@app.get("/health")
+@app.get("/health", tags=["Health"], summary="Verifier l'etat du service")
 async def health() -> dict:
-    """Liveness probe + component status."""
+    """Retourne l'etat des composants (Kafka, poller Hub'Eau, simulateur)."""
     poller = getattr(app.state, "quality_poller", None)
     return {
         "status": "healthy",
@@ -89,37 +110,111 @@ async def health() -> dict:
     }
 
 
-class SensorMetricsPayload(BaseModel):
-    ph: float = Field(..., ge=0.0, le=14.0, description="pH level (0-14)")
-    turbidite_ntu: float = Field(..., ge=0.0, description="Turbidity in NTU")
-    temperature_c: float = Field(..., description="Temperature in Celsius")
-    niveau_m: float = Field(..., ge=0.0, description="Water level in meters")
-    debit_m3s: float = Field(..., ge=0.0, description="Flow rate in m3/s")
-    oxygene_dissous_mgl: float = Field(
-        ..., ge=0.0, description="Dissolved oxygen in mg/L"
+@app.get(
+    "/ingestion/status",
+    response_model=IngestionStatusResponse,
+    tags=["Ingestion"],
+    summary="Etat du pipeline d'ingestion",
+)
+async def ingestion_status() -> IngestionStatusResponse:
+    """Expose l'etat Kafka, le poller Hub'Eau et le simulateur."""
+    poller: HubEauQualityPoller = app.state.quality_poller
+    orchestrator: SimulationOrchestrator = app.state.sim_orchestrator
+    return IngestionStatusResponse(
+        kafka_ready=app.state.kafka_producer.is_ready,
+        kafka_topic=settings.water_quality_topic,
+        quality_poller={
+            "stations": poller.station_count,
+            "cycles_completed": poller.cycles_completed,
+            "messages_published": poller.messages_published,
+            "interval_seconds": settings.quality_poll_interval_seconds,
+        },
+        simulator={
+            "active_sensors": len(orchestrator.sensors),
+            "cycles_completed": orchestrator.cycles_completed,
+            "interval_seconds": settings.simulator_interval_seconds,
+        },
     )
-    qualite_signal: str = Field("GOOD", description="Quality of signal")
-    firmware_version: str = Field("1.0.0", description="Firmware version of the sensor")
 
 
-@app.post("/api/sensors/{sensor_id}/metrics", status_code=202)
-async def post_sensor_metrics(sensor_id: str, payload: SensorMetricsPayload):
+@app.post(
+    "/ingestion/hubeau",
+    response_model=HubEauIngestionResponse,
+    tags=["Ingestion"],
+    summary="Declencher une ingestion Hub'Eau",
+    responses={503: {"description": "Kafka indisponible"}},
+)
+async def ingest_hubeau_now() -> HubEauIngestionResponse:
     """
-    HTTP Ingestion Gateway: Allows physical IoT sensors to POST metrics directly.
-    Maps input payload to a canonical WaterMeasurementEvent and publishes it to Kafka.
+    Lance immediatement un cycle Hub'Eau (6 stations).
+
+    Utile pour tests manuels, demos et validation Postman sans attendre le polling 6h.
     """
-    # 1. Resolve sensor profile for coordinates and metadata
+    if not app.state.kafka_producer.is_ready:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Kafka producer unavailable",
+        )
+    poller: HubEauQualityPoller = app.state.quality_poller
+    published = await poller.poll_once_now()
+    return HubEauIngestionResponse(
+        messages_published=published,
+        stations_polled=poller.station_count,
+    )
+
+
+@app.post(
+    "/ingestion/simuler",
+    response_model=SimulationIngestionResponse,
+    tags=["Ingestion"],
+    summary="Declencher un cycle simulateur",
+    responses={503: {"description": "Kafka indisponible"}},
+)
+async def ingest_simulate_now() -> SimulationIngestionResponse:
+    """
+    Lance immediatement un cycle du simulateur local (capteurs sans Hub'Eau).
+
+    Publie une mesure synthetique par capteur actif du simulateur.
+    """
+    if not app.state.kafka_producer.is_ready:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Kafka producer unavailable",
+        )
+    orchestrator: SimulationOrchestrator = app.state.sim_orchestrator
+    sent = await orchestrator.run_once_now()
+    return SimulationIngestionResponse(sensors_triggered=sent)
+
+
+@app.post(
+    "/api/sensors/{sensor_id}/metrics",
+    response_model=SensorMetricsAcceptedResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+    tags=["Ingestion"],
+    summary="Ingerer une mesure capteur (passerelle HTTP)",
+    responses={
+        400: {"description": "Capteur inconnu"},
+        503: {"description": "Kafka indisponible"},
+    },
+)
+async def post_sensor_metrics(
+    sensor_id: str, payload: SensorMetricsPayload
+) -> SensorMetricsAcceptedResponse:
+    """
+    Passerelle HTTP d'ingestion : un capteur physique POST ses metriques.
+
+    La mesure est convertie en `WaterMeasurementEvent` et publiee sur Kafka.
+    """
     profile = next((s for s in SENSORS if s.sensor_id == sensor_id), None)
     if not profile:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail={
                 "error": "UNKNOWN_SENSOR",
                 "message": f"Sensor '{sensor_id}' is not registered in the system.",
             },
         )
 
-    # 2. Build canonical event dict
     event = {
         "event_type": "mesure.qualite.eau",
         "event_id": str(uuid.uuid4()),
@@ -141,23 +236,22 @@ async def post_sensor_metrics(sensor_id: str, payload: SensorMetricsPayload):
         },
         "qualite_signal": payload.qualite_signal,
         "firmware_version": payload.firmware_version,
-        "data_source": "real",  # Physical sensors push actual data
+        "data_source": "real",
     }
 
-    # 3. Publish to Kafka
     published = await app.state.kafka_producer.send(event)
     if not published:
         raise HTTPException(
-            status_code=503,
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={
                 "error": "KAFKA_UNAVAILABLE",
                 "message": "Failed to publish metrics to the event bus.",
             },
         )
 
-    return {
-        "status": "accepted",
-        "event_id": event["event_id"],
-        "sensor_id": sensor_id,
-        "published": True,
-    }
+    return SensorMetricsAcceptedResponse(
+        status="accepted",
+        event_id=event["event_id"],
+        sensor_id=sensor_id,
+        published=True,
+    )

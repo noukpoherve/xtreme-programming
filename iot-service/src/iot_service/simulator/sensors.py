@@ -189,7 +189,15 @@ SENSORS: list[SensorProfile] = [
 
 
 def get_sensor(sensor_id: str) -> SensorProfile:
-    """Return the sensor profile for the given ID, or raise KeyError."""
+    """Return the sensor profile for the given ID, or raise KeyError.
+
+    >>> get_sensor("SEINE-BERCY-003").sensor_id
+    'SEINE-BERCY-003'
+    >>> get_sensor("UNKNOWN")
+    Traceback (most recent call last):
+        ...
+    KeyError: 'Unknown sensor: UNKNOWN'
+    """
     for sensor in SENSORS:
         if sensor.sensor_id == sensor_id:
             return sensor

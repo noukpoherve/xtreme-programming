@@ -63,6 +63,39 @@ uv run --group docs mkdocs serve
 
 Puis ouvrir <http://127.0.0.1:8000>.
 
+### Valider les doctests MkDocs
+
+Les exemples `>>>` dans `docs/api/*.md` sont exécutés comme des tests :
+
+```bash
+uv sync --group docs --group docs-test
+uv run --group docs-test pytest docs/api -v
+uv run --group docs mkdocs build --strict
+```
+
+## Documentation publiée (GitHub Pages + mike)
+
+La doc est déployée automatiquement sur GitHub Pages à chaque push sur `master` :
+
+**<https://noukpoherve.github.io/xtreme-programming/>**
+
+[mike](https://github.com/jimporter/mike) gère le versionnement : chaque version est publiée dans un sous-dossier (`/0.1.0/`, `/latest/`, etc.) avec un sélecteur de version dans le thème Material.
+
+### Déployer manuellement en local
+
+```bash
+uv sync --group docs
+uv run --group docs mike deploy --push --update-aliases 0.1.0 latest
+uv run --group docs mike set-default --push latest
+```
+
+### Prérequis GitHub (une seule fois)
+
+Dans **Settings → Pages** du dépôt :
+
+- **Source** : `Deploy from a branch`
+- **Branch** : `gh-pages` / `/ (root)`
+
 ## Arrêter la plateforme
 
 ```bash

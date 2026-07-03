@@ -135,10 +135,15 @@ The simulator **skips** any sensor_id listed in `SIMULATOR_EXCLUDE_SENSORS` (def
 
 ## 🔌 API Reference
 
+Documentation Swagger : **http://localhost:8001/docs**
+
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/health` | Liveness + component status + metrics |
-| POST | `/api/sensors/{sensor_id}/metrics` | HTTP Ingestion Gateway: Allows physical sensors to push metrics directly to Kafka |
+| GET | `/ingestion/status` | Etat du pipeline (Kafka, Hub'Eau, simulateur) |
+| POST | `/ingestion/hubeau` | Declenchement manuel d'un cycle Hub'Eau |
+| POST | `/ingestion/simuler` | Declenchement manuel d'un cycle simulateur |
+| POST | `/api/sensors/{sensor_id}/metrics` | Passerelle HTTP : mesure capteur physique → Kafka |
 
 Full OpenAPI at <http://localhost:8001/docs>.
 
@@ -215,5 +220,5 @@ Tests cover:
 
 - [alert-service](../alert-service/) — consumes what we produce.
 - [dashboard](../dashboard/) — visualizes the data.
-- [docs/architecture.md](https://github.com/chrfsa/xtreme-programming/blob/main/docs/architecture.md) — system-wide architecture.
+- [Architecture](../architecture.md) — system-wide architecture.
 - [Hub'Eau API docs](https://hubeau.eaufrance.fr/page/api-qualite-cours-deau)

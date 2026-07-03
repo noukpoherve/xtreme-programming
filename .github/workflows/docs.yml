@@ -7,26 +7,29 @@ on:
       - "docs/**"
       - "mkdocs.yml"
       - "pyproject.toml"
+      - "alert-service/src/**"
+      - "iot-service/src/**"
       - "README.md"
       - "CHANGELOG.md"
       - "**/README.md"
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy-docs:
+    name: Deploy with mike
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
@@ -37,23 +40,34 @@ jobs:
         run: uv python install 3.13
 
       - name: Install documentation dependencies
-        run: uv sync --group docs
+        run: uv sync --group docs --group docs-test
 
-      - name: Build MkDocs site
+      - name: Run MkDocs doctests
+        run: uv run --group docs-test pytest docs/api -v
+
+      - name: Build MkDocs site (strict)
         run: uv run --group docs mkdocs build --strict
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./site
+      - name: Fetch gh-pages branch
+        run: git fetch origin gh-pages --depth=1 || true
 
-  deploy:
-    needs: build
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Configure git for mike
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Get doc version
+        id: version
+        run: |
+          VERSION=$(grep -m 1 '^version' alert-service/pyproject.toml | cut -d '"' -f 2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Deploy docs with mike
+        run: |
+          uv run --group docs mike deploy \
+            --push \
+            --update-aliases \
+            "${{ steps.version.outputs.version }}" latest
+
+      - name: Set default documentation version
+        run: uv run --group docs mike set-default --push latest

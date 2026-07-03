@@ -1,9 +1,9 @@
 site_name: UrbanHub Documentation
 site_description: Documentation technique et fonctionnelle de la plateforme UrbanHub — Smart City Water Quality
-# site_url is intentionally left empty until GitHub Pages is enabled.
-repo_url: https://github.com/chrfsa/xtreme-programming
-repo_name: chrfsa/xtreme-programming
-edit_uri: edit/main/docs/
+site_url: https://noukpoherve.github.io/xtreme-programming/
+repo_url: https://github.com/noukpoherve/xtreme-programming
+repo_name: noukpoherve/xtreme-programming
+edit_uri: edit/master/docs/
 
 theme:
   name: material
@@ -95,4 +95,9 @@ nav:
       - dashboard: services/dashboard.md
       - monitoring: services/monitoring.md
   - Communication: communication.md
+  - Doctests:
+      - api/index.md
+      - alert-service: api/alert-service.md
+      - iot-service: api/iot-service.md
+      - Exemples: api/doctests.md
   - Changelog: changelog.md

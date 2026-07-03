@@ -151,3 +151,10 @@ class SimulationOrchestrator:
             sent,
             failed,
         )
+        return sent
+
+    async def run_once_now(self) -> int:
+        """Execute un cycle simulateur immediat. Retourne le nombre de messages envoyes."""
+        if not self._generators:
+            self.register_all_sensors()
+        return await self._run_one_cycle()
