@@ -1,9 +1,9 @@
 site_name: UrbanHub Documentation
 site_description: Documentation technique et fonctionnelle de la plateforme UrbanHub — Smart City Water Quality
-# site_url is intentionally left empty until GitHub Pages is enabled.
+site_url: https://noukpoherve.github.io/xtreme-programming/
 repo_url: https://github.com/noukpoherve/xtreme-programming
 repo_name: noukpoherve/xtreme-programming
-edit_uri: edit/main/docs/
+edit_uri: edit/master/docs/
 
 theme:
   name: material
