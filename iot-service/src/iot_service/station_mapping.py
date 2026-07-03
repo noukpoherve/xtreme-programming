@@ -88,15 +88,33 @@ _STATION_CODE_TO_STATION: dict[str, StationMapping] = {
 
 
 def get_station_for_sensor(sensor_id: str) -> StationMapping | None:
-    """Return the Hub'Eau station mapped to this UrbanHub sensor_id, or None."""
+    """Return the Hub'Eau station mapped to this UrbanHub sensor_id, or None.
+
+    >>> get_station_for_sensor("SEINE-BERCY-003").station_code
+    '03081000'
+    >>> get_station_for_sensor("SEINE-UNKNOWN-999") is None
+    True
+    """
     return _SENSOR_ID_TO_STATION.get(sensor_id)
 
 
 def get_station_for_code(station_code: str) -> StationMapping | None:
-    """Return the station mapping for a Hub'Eau station code, or None."""
+    """Return the station mapping for a Hub'Eau station code, or None.
+
+    >>> get_station_for_code("03081000").sensor_id
+    'SEINE-BERCY-003'
+    >>> get_station_for_code("00000000") is None
+    True
+    """
     return _STATION_CODE_TO_STATION.get(station_code)
 
 
 def get_sensor_ids() -> set[str]:
-    """Return the set of UrbanHub sensor_ids that have a real Hub'Eau station."""
+    """Return the set of UrbanHub sensor_ids that have a real Hub'Eau station.
+
+    >>> "SEINE-BERCY-003" in get_sensor_ids()
+    True
+    >>> len(get_sensor_ids())
+    6
+    """
     return set(_SENSOR_ID_TO_STATION.keys())

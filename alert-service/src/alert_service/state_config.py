@@ -60,15 +60,35 @@ class StateMetadata:
 
     @classmethod
     def rank(cls, state: SensorState) -> int:
-        """Severity rank: lower is calmer."""
+        """Severity rank: lower is calmer.
+
+        >>> StateMetadata.rank(SensorState.NORMAL)
+        0
+        >>> StateMetadata.rank(SensorState.WARNING)
+        1
+        >>> StateMetadata.rank(SensorState.CRITICAL)
+        2
+        """
         return cls._RANK.get(state, 99)
 
     @classmethod
     def label(cls, state: SensorState) -> str:
-        """Human-readable label."""
+        """Human-readable label.
+
+        >>> StateMetadata.label(SensorState.NORMAL)
+        'Normal'
+        >>> StateMetadata.label(SensorState.CRITICAL)
+        'Critique'
+        """
         return cls._LABEL.get(state, state.value)
 
     @classmethod
     def ordered(cls) -> tuple[SensorState, ...]:
-        """States ordered from most severe to least severe."""
+        """States ordered from most severe to least severe.
+
+        >>> StateMetadata.ordered()[0]
+        <SensorState.CRITICAL: 'CRITICAL'>
+        >>> StateMetadata.ordered()[-1]
+        <SensorState.NORMAL: 'NORMAL'>
+        """
         return tuple(sorted(cls._RANK.keys(), key=cls.rank, reverse=True))
