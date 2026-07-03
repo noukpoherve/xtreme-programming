@@ -1,0 +1,98 @@
+site_name: UrbanHub Documentation
+site_description: Documentation technique et fonctionnelle de la plateforme UrbanHub — Smart City Water Quality
+# site_url is intentionally left empty until GitHub Pages is enabled.
+repo_url: https://github.com/chrfsa/xtreme-programming
+repo_name: chrfsa/xtreme-programming
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: fr
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Passer en mode sombre
+    - scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Passer en mode clair
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.action.edit
+    - content.action.view
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+not_in_nav: |
+  COMMUNICATION_TECHNIQUE_VS_FONCTIONNELLE.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path:
+        - docs
+        - .
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - admonition
+  - abbr
+  - attr_list
+  - md_in_html
+  - tables
+  - def_list
+  - toc:
+      permalink: true
+      title: Sur cette page
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/chrfsa/xtreme-programming
+  version:
+    provider: mike
+
+copyright: Copyright &copy; 2026 UrbanHub Project — Master EADL
+
+nav:
+  - Accueil: index.md
+  - Démarrage: getting-started.md
+  - Architecture: architecture.md
+  - Services:
+      - services/index.md
+      - alert-service: services/alert-service.md
+      - iot-service: services/iot-service.md
+      - dashboard: services/dashboard.md
+      - monitoring: services/monitoring.md
+  - Communication: communication.md
+  - Changelog: changelog.md
