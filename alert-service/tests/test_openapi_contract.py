@@ -152,7 +152,9 @@ class TestErrorContract:
         """Verify the body matches the ErrorResponse schema exactly."""
         # Every field of the schema must be present
         required = {"error", "message", "trace_id", "timestamp", "path"}
-        assert required.issubset(body.keys()), f"Missing fields: {required - body.keys()}"
+        assert required.issubset(
+            body.keys()
+        ), f"Missing fields: {required - body.keys()}"
 
         # `error` must be a known code
         assert body["error"] in {c.value for c in ErrorCode}
@@ -181,7 +183,10 @@ class TestTraceIdPropagation:
 
     def test_trace_id_present_in_error_payload(self):
         provided = "trace-error-456"
-        response = client.get("/sensors/some-sensor/measurements?hours=-5", headers={"X-Trace-Id": provided})
+        response = client.get(
+            "/sensors/some-sensor/measurements?hours=-5",
+            headers={"X-Trace-Id": provided},
+        )
         assert response.json()["trace_id"] == provided
 
 
@@ -234,8 +239,6 @@ class TestHappyPathContract:
         assert body["status"] in {"healthy", "degraded"}
         assert body["version"]
         assert "components" in body
-
-
 
     def test_list_sensors_shape(self):
         """Verify /sensors returns the documented shape, regardless of state."""

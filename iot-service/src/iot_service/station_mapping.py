@@ -17,10 +17,10 @@ from dataclasses import dataclass
 class StationMapping:
     """Binds a Hub'Eau station to an UrbanHub sensor_id."""
 
-    station_code: str          # Hub'Eau code, e.g. "03081000"
-    station_name: str          # Human label
-    sensor_id: str            # UrbanHub sensor_id, e.g. "SEINE-BERCY-003"
-    sensor_name: str          # Display label on the dashboard
+    station_code: str  # Hub'Eau code, e.g. "03081000"
+    station_name: str  # Human label
+    sensor_id: str  # UrbanHub sensor_id, e.g. "SEINE-BERCY-003"
+    sensor_name: str  # Display label on the dashboard
     latitude: float = 0.0
     longitude: float = 0.0
 

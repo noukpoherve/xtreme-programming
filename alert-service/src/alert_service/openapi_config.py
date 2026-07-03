@@ -154,9 +154,7 @@ COMMON_RESPONSES: dict[int | str, dict[str, Any]] = {
         "model": ErrorResponse,
         "description": "A downstream dependency (Kafka) is unavailable.",
         "content": {
-            "application/json": {
-                "examples": {"kafka": KAFKA_PUBLISH_FAILED_EXAMPLE}
-            }
+            "application/json": {"examples": {"kafka": KAFKA_PUBLISH_FAILED_EXAMPLE}}
         },
     },
 }

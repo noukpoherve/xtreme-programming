@@ -54,7 +54,9 @@ class SensorStreamProcessor:
         """État précédent du capteur (lecture seule)."""
         return self.__previous_state
 
-    def update(self, measurement: WaterMeasurementEvent) -> tuple[SensorState, SensorState]:
+    def update(
+        self, measurement: WaterMeasurementEvent
+    ) -> tuple[SensorState, SensorState]:
         """
         Met à jour l'état interne à partir d'une nouvelle mesure.
         Retourne (état_précédent, nouvel_état) pour permettre la détection de transitions.

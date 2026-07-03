@@ -28,6 +28,7 @@ from alert_service.websocket import WebSocketHub
 
 logger = logging.getLogger(__name__)
 
+
 # ──────────────────────────────────────────────────────────────────────
 # Service applicatif (orchestration)
 # ──────────────────────────────────────────────────────────────────────
@@ -65,7 +66,9 @@ class AlertService:
         depuis la base de données (table state_transitions).
         """
         if self._transition_repo is None:
-            logger.warning("Restauration impossible : le dépôt des transitions est indisponible.")
+            logger.warning(
+                "Restauration impossible : le dépôt des transitions est indisponible."
+            )
             return
 
         try:
@@ -79,9 +82,13 @@ class AlertService:
                     previous_state=state_view.state,
                 )
                 self.__registry.set(sensor_id, processor)
-            logger.info("Machine à états restaurée avec succès pour %d capteurs.", len(states))
+            logger.info(
+                "Machine à états restaurée avec succès pour %d capteurs.", len(states)
+            )
         except Exception:
-            logger.exception("Erreur lors du chargement des états depuis la base de données")
+            logger.exception(
+                "Erreur lors du chargement des états depuis la base de données"
+            )
 
     async def process_alert(self, payload: AlertPayload) -> dict:
         """
@@ -115,7 +122,9 @@ class AlertService:
         # 1. Resolve the sensor UUID from the catalogue (if persistence is on)
         sensor_row = None
         if self._sensor_repo:
-            sensor_row = await self._sensor_repo.get_by_sensor_id(measurement.capteur_id)
+            sensor_row = await self._sensor_repo.get_by_sensor_id(
+                measurement.capteur_id
+            )
 
         # 2. Persist the raw measurement (best-effort)
         if self._measurement_repo and sensor_row:
@@ -211,7 +220,9 @@ class AlertService:
                     key=lambda v: v.sensor_id,
                 )
             except Exception:
-                logger.exception("list_sensors: DB read failed, falling back to registry")
+                logger.exception(
+                    "list_sensors: DB read failed, falling back to registry"
+                )
 
         processors = self.__registry.all()
         return [
@@ -286,7 +297,11 @@ class AlertService:
         live_previous = (
             self.__registry._previous_state_of(sensor_id)
             if match
-            else (SensorState(row["previous_state"]) if row.get("previous_state") else None)
+            else (
+                SensorState(row["previous_state"])
+                if row.get("previous_state")
+                else None
+            )
         )
 
         # data_source is inferred from firmware_version. A sensor is

@@ -40,10 +40,10 @@ class MeasurementGenerator:
     """Stateful generator that produces realistic measurements for one sensor."""
 
     # Pollution scenarios
-    POLLUTION_PH_CRITICAL = {"ph_delta": -2.5}      # pH drops to ~5
-    POLLUTION_PH_WARNING = {"ph_delta": -1.5}       # pH drops to ~6
+    POLLUTION_PH_CRITICAL = {"ph_delta": -2.5}  # pH drops to ~5
+    POLLUTION_PH_WARNING = {"ph_delta": -1.5}  # pH drops to ~6
     POLLUTION_TURB_CRITICAL = {"turbidity_delta": 40.0}  # Turbidity goes > 50
-    POLLUTION_TURB_WARNING = {"turbidity_delta": 15.0}   # Turbidity goes > 25
+    POLLUTION_TURB_WARNING = {"turbidity_delta": 15.0}  # Turbidity goes > 25
     POLLUTION_COMBINED = {"ph_delta": -2.0, "turbidity_delta": 30.0}
 
     def __init__(self, sensor: SensorProfile, seed: int | None = None):
@@ -82,16 +82,13 @@ class MeasurementGenerator:
         # Diurnal variation: pH slightly higher midday (photosynthesis)
         ph_diurnal = 0.15 * math.sin((hour - 6) * math.pi / 12)
         # Random walk (small drift)
-        self._ph_walk = max(-0.5, min(0.5, self._ph_walk + self.rng.uniform(-0.05, 0.05)))
+        self._ph_walk = max(
+            -0.5, min(0.5, self._ph_walk + self.rng.uniform(-0.05, 0.05))
+        )
         # Noise
         ph_noise = self.rng.gauss(0, 0.08)
 
-        ph = (
-            self.sensor.ph_baseline
-            + ph_diurnal
-            + self._ph_walk
-            + ph_noise
-        )
+        ph = self.sensor.ph_baseline + ph_diurnal + self._ph_walk + ph_noise
 
         # Apply active pollution
         if self._active_pollution and "ph_delta" in self._active_pollution:
@@ -103,14 +100,13 @@ class MeasurementGenerator:
         # 3. Compute turbidity similarly
         # ───────────────────────────────────────────
         turb_diurnal = 2.0 * math.sin((hour - 18) * math.pi / 12)  # Higher at evening
-        self._turb_walk = max(-5.0, min(5.0, self._turb_walk + self.rng.uniform(-1.0, 1.0)))
+        self._turb_walk = max(
+            -5.0, min(5.0, self._turb_walk + self.rng.uniform(-1.0, 1.0))
+        )
         turb_noise = self.rng.gauss(0, 1.5)
 
         turbidity = (
-            self.sensor.turbidity_baseline
-            + turb_diurnal
-            + self._turb_walk
-            + turb_noise
+            self.sensor.turbidity_baseline + turb_diurnal + self._turb_walk + turb_noise
         )
 
         if self._active_pollution and "turbidity_delta" in self._active_pollution:
@@ -125,10 +121,7 @@ class MeasurementGenerator:
             + 2.0 * math.sin((hour - 14) * math.pi / 12)  # Warmer afternoon
             + self.rng.gauss(0, 0.3)
         )
-        oxygen = (
-            self.sensor.oxygen_baseline
-            + self.rng.gauss(0, 0.2)
-        )
+        oxygen = self.sensor.oxygen_baseline + self.rng.gauss(0, 0.2)
         # Constant values for now (could add flow variation later)
         niveau_m = 1.0 + self.rng.gauss(0, 0.1)
         debit_m3s = 250.0 + self.rng.gauss(0, 20.0)
@@ -166,9 +159,13 @@ class MeasurementGenerator:
         roll = self.rng.random()
 
         if poll_type == "ph":
-            return self.rng.choice([self.POLLUTION_PH_WARNING, self.POLLUTION_PH_CRITICAL])
+            return self.rng.choice(
+                [self.POLLUTION_PH_WARNING, self.POLLUTION_PH_CRITICAL]
+            )
         elif poll_type == "turbidity":
-            return self.rng.choice([self.POLLUTION_TURB_WARNING, self.POLLUTION_TURB_CRITICAL])
+            return self.rng.choice(
+                [self.POLLUTION_TURB_WARNING, self.POLLUTION_TURB_CRITICAL]
+            )
         else:  # both
             if roll < 0.3:
                 return self.POLLUTION_PH_CRITICAL

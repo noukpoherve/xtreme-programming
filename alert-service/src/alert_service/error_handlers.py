@@ -152,9 +152,7 @@ async def http_exception_handler(
     )
 
 
-async def unhandled_exception_handler(
-    request: Request, exc: Exception
-) -> JSONResponse:
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Last-resort handler for any exception not caught by a more specific one."""
 
     logger.exception(

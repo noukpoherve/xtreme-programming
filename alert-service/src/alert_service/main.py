@@ -3,7 +3,16 @@ import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, HTTPException, Path, Query, Request, WebSocket, WebSocketDisconnect, status
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    Path,
+    Query,
+    Request,
+    WebSocket,
+    WebSocketDisconnect,
+    status,
+)
 from fastapi.responses import JSONResponse
 
 from alert_service.config import settings
@@ -139,7 +148,11 @@ async def health() -> HealthResponse:
         "kafka_consumer": "up" if (consumer and consumer._running) else "down",
         "sensor_registry": "ok",
     }
-    overall = "healthy" if all(v == "up" or v == "ok" for v in components.values()) else "degraded"
+    overall = (
+        "healthy"
+        if all(v == "up" or v == "ok" for v in components.values())
+        else "degraded"
+    )
 
     body = HealthResponse(status=overall, version=API_VERSION, components=components)
 
@@ -150,7 +163,6 @@ async def health() -> HealthResponse:
             content=body.model_dump(),
         )
     return body
-
 
 
 @app.get(
@@ -198,25 +210,25 @@ async def get_stats():
         pool = app.state.db_pool
         if pool is not None:
             async with pool.acquire() as conn:
-                open_count = await conn.fetchval(
-                    "SELECT COUNT(*) FROM alerts WHERE status IN ('OPEN', 'ACK')"
-                ) or 0
-                last_24h = await conn.fetchval(
-                    """SELECT COUNT(*) FROM alerts
-                       WHERE opened_at >= NOW() - INTERVAL '24 hours'"""
-                ) or 0
-                last_7d = await conn.fetchval(
-                    """SELECT COUNT(*) FROM alerts
-                       WHERE opened_at >= NOW() - INTERVAL '7 days'"""
-                ) or 0
-                top_rows = await conn.fetch(
-                    """SELECT s.sensor_id, COUNT(*) AS cnt
+                open_count = (
+                    await conn.fetchval(
+                        "SELECT COUNT(*) FROM alerts WHERE status IN ('OPEN', 'ACK')"
+                    )
+                    or 0
+                )
+                last_24h = await conn.fetchval("""SELECT COUNT(*) FROM alerts
+                       WHERE opened_at >= NOW() - INTERVAL '24 hours'""") or 0
+                last_7d = await conn.fetchval("""SELECT COUNT(*) FROM alerts
+                       WHERE opened_at >= NOW() - INTERVAL '7 days'""") or 0
+                top_rows = await conn.fetch("""SELECT s.sensor_id, COUNT(*) AS cnt
                        FROM alerts a JOIN sensors s ON a.sensor_uuid = s.id
                        WHERE a.opened_at >= NOW() - INTERVAL '7 days'
                        GROUP BY s.sensor_id
-                       ORDER BY cnt DESC LIMIT 5"""
-                )
-                top = [{"sensor_id": r["sensor_id"], "alert_count": r["cnt"]} for r in top_rows]
+                       ORDER BY cnt DESC LIMIT 5""")
+                top = [
+                    {"sensor_id": r["sensor_id"], "alert_count": r["cnt"]}
+                    for r in top_rows
+                ]
         else:
             open_count = last_24h = last_7d = 0
             top = []
@@ -281,11 +293,13 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     await hub.connect(websocket)
     try:
         # Send a welcome message
-        await websocket.send_json({
-            "event_type": "welcome",
-            "data": {"message": "Connected to UrbanHub alert-service"},
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
+        await websocket.send_json(
+            {
+                "event_type": "welcome",
+                "data": {"message": "Connected to UrbanHub alert-service"},
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        )
         # Keep the connection open; we don't expect inbound messages
         while True:
             await websocket.receive_text()
@@ -315,7 +329,9 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
         503: COMMON_RESPONSES[503],
     },
 )
-async def get_sensor_metadata(sensor_id: str = Path(..., min_length=1)) -> SensorMetadataView:
+async def get_sensor_metadata(
+    sensor_id: str = Path(..., min_length=1)
+) -> SensorMetadataView:
     if alert_service._sensor_repo is None or app.state.db_pool is None:
         raise HTTPException(
             status_code=503,
@@ -340,7 +356,9 @@ async def get_sensor_metadata(sensor_id: str = Path(..., min_length=1)) -> Senso
 )
 async def get_sensor_measurements(
     sensor_id: str = Path(..., min_length=1),
-    hours: int = Query(24, ge=1, le=168, description="Lookback window in hours (max 7 days)."),
+    hours: int = Query(
+        24, ge=1, le=168, description="Lookback window in hours (max 7 days)."
+    ),
     limit: int = Query(500, ge=1, le=2000, description="Max points returned."),
 ) -> MeasurementSeriesResponse:
     if alert_service._measurement_repo is None or app.state.db_pool is None:

@@ -113,9 +113,7 @@ class MeasurementRepository(abc.ABC):
         """Return measurements newer than `since`, oldest first (for charts)."""
 
     @abc.abstractmethod
-    async def has_firmware(
-        self, sensor_uuid: uuid.UUID, firmware_version: str
-    ) -> bool:
+    async def has_firmware(self, sensor_uuid: uuid.UUID, firmware_version: str) -> bool:
         """True if at least one measurement with this firmware_version exists."""
 
 
@@ -209,7 +207,11 @@ class PostgresSensorRepository(SensorRepository):
                     updated_at = NOW()
                 RETURNING id, sensor_id, name, latitude, longitude, point_reference
                 """,
-                sensor_id, name, latitude, longitude, point_reference,
+                sensor_id,
+                name,
+                latitude,
+                longitude,
+                point_reference,
             )
             return SensorRow(
                 id=row["id"],
@@ -222,14 +224,12 @@ class PostgresSensorRepository(SensorRepository):
 
     async def list_all(self) -> list[SensorRow]:
         async with self._pool.acquire() as conn:
-            rows = await conn.fetch(
-                """
+            rows = await conn.fetch("""
                 SELECT id, sensor_id, name, latitude, longitude, point_reference
                 FROM sensors
                 WHERE deleted_at IS NULL
                 ORDER BY sensor_id
-                """
-            )
+                """)
             return [
                 SensorRow(
                     id=r["id"],
@@ -336,7 +336,8 @@ class PostgresMeasurementRepository(MeasurementRepository):
                 ORDER BY timestamp DESC
                 LIMIT $2
                 """,
-                sensor_uuid, limit,
+                sensor_uuid,
+                limit,
             )
             return [dict(r) for r in rows]
 
@@ -368,19 +369,20 @@ class PostgresMeasurementRepository(MeasurementRepository):
                 ) recent
                 ORDER BY timestamp ASC
                 """,
-                sensor_uuid, since_naive, limit,
+                sensor_uuid,
+                since_naive,
+                limit,
             )
             return [dict(r) for r in rows]
 
-    async def has_firmware(
-        self, sensor_uuid: uuid.UUID, firmware_version: str
-    ) -> bool:
+    async def has_firmware(self, sensor_uuid: uuid.UUID, firmware_version: str) -> bool:
         """True if at least one measurement with this firmware_version exists."""
         async with self._pool.acquire() as conn:
             row = await conn.fetchrow(
                 "SELECT EXISTS (SELECT 1 FROM measurements "
                 "WHERE sensor_uuid = $1 AND firmware_version = $2 LIMIT 1) AS ok",
-                sensor_uuid, firmware_version,
+                sensor_uuid,
+                firmware_version,
             )
             return bool(row["ok"]) if row else False
 
@@ -419,8 +421,7 @@ class PostgresStateTransitionRepository(StateTransitionRepository):
 
     async def get_current_states(self) -> dict[uuid.UUID, SensorStateView]:
         async with self._pool.acquire() as conn:
-            rows = await conn.fetch(
-                """
+            rows = await conn.fetch("""
                 SELECT
                     s.id AS sensor_uuid,
                     s.sensor_id,
@@ -436,8 +437,7 @@ class PostgresStateTransitionRepository(StateTransitionRepository):
                     LIMIT 1
                 ) st ON TRUE
                 WHERE s.deleted_at IS NULL
-                """
-            )
+                """)
             return {
                 r["sensor_uuid"]: SensorStateView(
                     sensor_id=r["sensor_id"],
@@ -497,15 +497,13 @@ class PostgresAlertRepository(AlertRepository):
 
     async def count_by_state(self) -> dict[str, int]:
         async with self._pool.acquire() as conn:
-            rows = await conn.fetch(
-                """
+            rows = await conn.fetch("""
                 SELECT
                     COUNT(*) FILTER (WHERE state = 'NORMAL') AS normal,
                     COUNT(*) FILTER (WHERE state = 'WARNING') AS warning,
                     COUNT(*) FILTER (WHERE state = 'CRITICAL') AS critical
                 FROM current_sensor_state
-                """
-            )
+                """)
             row = rows[0]
             return {
                 "NORMAL": row["normal"],
@@ -532,7 +530,9 @@ class PostgresAlertRepository(AlertRepository):
                 ORDER BY a.opened_at DESC
                 LIMIT $3
                 """,
-                sensor_uuid, only_open, limit,
+                sensor_uuid,
+                only_open,
+                limit,
             )
             return [dict(r) for r in rows]
 
@@ -540,6 +540,7 @@ class PostgresAlertRepository(AlertRepository):
     def _jsonify(metadata: dict[str, Any]) -> str:
         """Convert metadata dict to JSON string for PostgreSQL JSONB."""
         import json
+
         return json.dumps(metadata, default=str)
 
 

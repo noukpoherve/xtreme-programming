@@ -35,9 +35,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         producer=app.state.kafka_producer,
         interval_seconds=settings.quality_poll_interval_seconds,
     )
-    quality_task = asyncio.create_task(
-        _quality_poller_loop(app.state.quality_poller)
-    )
+    quality_task = asyncio.create_task(_quality_poller_loop(app.state.quality_poller))
 
     # Local simulator for sensors without a real-time data source
     sim_orchestrator = SimulationOrchestrator(
@@ -71,9 +69,6 @@ app = FastAPI(
 )
 
 
-
-
-
 @app.get("/health")
 async def health() -> dict:
     """Liveness probe + component status."""
@@ -100,7 +95,9 @@ class SensorMetricsPayload(BaseModel):
     temperature_c: float = Field(..., description="Temperature in Celsius")
     niveau_m: float = Field(..., ge=0.0, description="Water level in meters")
     debit_m3s: float = Field(..., ge=0.0, description="Flow rate in m3/s")
-    oxygene_dissous_mgl: float = Field(..., ge=0.0, description="Dissolved oxygen in mg/L")
+    oxygene_dissous_mgl: float = Field(
+        ..., ge=0.0, description="Dissolved oxygen in mg/L"
+    )
     qualite_signal: str = Field("GOOD", description="Quality of signal")
     firmware_version: str = Field("1.0.0", description="Firmware version of the sensor")
 
@@ -119,7 +116,7 @@ async def post_sensor_metrics(sensor_id: str, payload: SensorMetricsPayload):
             detail={
                 "error": "UNKNOWN_SENSOR",
                 "message": f"Sensor '{sensor_id}' is not registered in the system.",
-            }
+            },
         )
 
     # 2. Build canonical event dict
@@ -155,7 +152,7 @@ async def post_sensor_metrics(sensor_id: str, payload: SensorMetricsPayload):
             detail={
                 "error": "KAFKA_UNAVAILABLE",
                 "message": "Failed to publish metrics to the event bus.",
-            }
+            },
         )
 
     return {
@@ -164,7 +161,3 @@ async def post_sensor_metrics(sensor_id: str, payload: SensorMetricsPayload):
         "sensor_id": sensor_id,
         "published": True,
     }
-
-
-
-

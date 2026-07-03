@@ -74,9 +74,7 @@ class Settings:
                 )
             ),
             simulator_interval_seconds=float(
-                os.getenv(
-                    "SIMULATOR_INTERVAL_SECONDS", cls.simulator_interval_seconds
-                )
+                os.getenv("SIMULATOR_INTERVAL_SECONDS", cls.simulator_interval_seconds)
             ),
             simulator_jitter_seconds=float(
                 os.getenv("SIMULATOR_JITTER_SECONDS", cls.simulator_jitter_seconds)

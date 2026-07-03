@@ -73,7 +73,9 @@ class WebSocketHub:
         )
         # Count successes
         sent = sum(1 for r in results if r is True)
-        logger.debug("Broadcast %s: %d/%d clients received", event_type, sent, len(connections))
+        logger.debug(
+            "Broadcast %s: %d/%d clients received", event_type, sent, len(connections)
+        )
 
     @staticmethod
     async def _safe_send(ws: WebSocket, payload: str) -> bool:

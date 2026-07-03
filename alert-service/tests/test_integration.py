@@ -28,4 +28,3 @@ async def test_restore_states_from_db():
     processor = registry.get("SEINE-RESTORE-001")
     assert processor.state == SensorState.CRITICAL
     assert processor.anomaly_count == 4
-

@@ -21,7 +21,9 @@ from iot_service.hubeau_qualite_client import (
 )
 
 
-def make_hubeau_response(parameter_code: str, value: float, date: str = "2025-06-15") -> dict:
+def make_hubeau_response(
+    parameter_code: str, value: float, date: str = "2025-06-15"
+) -> dict:
     return {
         "count": 1,
         "data": [
@@ -109,22 +111,32 @@ class TestHubEauQualiteClient:
 class TestLatestQualityMeasurement:
     def test_is_complete_requires_ph_and_oxygen(self):
         snap = LatestQualityMeasurement(
-            station_code="X", station_name="Y",
-            latitude=0, longitude=0,
-            ph=7.0, temperature_c=15.0, dissolved_oxygen_mgl=8.0,
+            station_code="X",
+            station_name="Y",
+            latitude=0,
+            longitude=0,
+            ph=7.0,
+            temperature_c=15.0,
+            dissolved_oxygen_mgl=8.0,
         )
         assert snap.is_complete()
 
         snap_missing_o2 = LatestQualityMeasurement(
-            station_code="X", station_name="Y",
-            latitude=0, longitude=0,
-            ph=7.0, dissolved_oxygen_mgl=None,
+            station_code="X",
+            station_name="Y",
+            latitude=0,
+            longitude=0,
+            ph=7.0,
+            dissolved_oxygen_mgl=None,
         )
         assert not snap_missing_o2.is_complete()
 
         snap_missing_ph = LatestQualityMeasurement(
-            station_code="X", station_name="Y",
-            latitude=0, longitude=0,
-            ph=None, dissolved_oxygen_mgl=8.0,
+            station_code="X",
+            station_name="Y",
+            latitude=0,
+            longitude=0,
+            ph=None,
+            dissolved_oxygen_mgl=8.0,
         )
         assert not snap_missing_ph.is_complete()

@@ -27,11 +27,11 @@ logger = logging.getLogger(__name__)
 # ──────────────────────────────────────────────────────────────────────
 # Hub'Eau parameter codes (Sandre référential)
 # ──────────────────────────────────────────────────────────────────────
-PARAM_PH = "1302"          # Potentiel en Hydrogène
-PARAM_TEMP = "1301"        # Température de l'eau
-PARAM_OXYGEN = "1311"      # Oxygène dissous
-PARAM_COD = "1314"         # Demande Chimique en Oxygène (pollution organique)
-PARAM_AMMONIUM = "1335"    # Ammonium
+PARAM_PH = "1302"  # Potentiel en Hydrogène
+PARAM_TEMP = "1301"  # Température de l'eau
+PARAM_OXYGEN = "1311"  # Oxygène dissous
+PARAM_COD = "1314"  # Demande Chimique en Oxygène (pollution organique)
+PARAM_AMMONIUM = "1335"  # Ammonium
 
 ALL_QUALITY_PARAMS = [PARAM_PH, PARAM_TEMP, PARAM_OXYGEN, PARAM_COD, PARAM_AMMONIUM]
 
@@ -124,19 +124,24 @@ class HubEauQualiteClient:
         latest_by_param: dict[str, HubEauAnalysis] = {}
         station_meta: Optional[HubEauAnalysis] = None
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=len(ALL_QUALITY_PARAMS)) as pool:
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=len(ALL_QUALITY_PARAMS)
+        ) as pool:
             futures = {
                 pool.submit(self._fetch_latest_analysis, station_code, param): param
                 for param in ALL_QUALITY_PARAMS
             }
-            for future in concurrent.futures.as_completed(futures, timeout=self._timeout + 5):
+            for future in concurrent.futures.as_completed(
+                futures, timeout=self._timeout + 5
+            ):
                 param = futures[future]
                 try:
                     analysis = future.result(timeout=self._timeout)
                 except Exception:
                     logger.warning(
                         "Hub'Eau fetch failed for station=%s param=%s (ignored)",
-                        station_code, param,
+                        station_code,
+                        param,
                     )
                     continue
                 if analysis is None:
@@ -147,7 +152,8 @@ class HubEauQualiteClient:
 
         if station_meta is None:
             logger.warning(
-                "No Hub'Eau quality data found for station=%s", station_code,
+                "No Hub'Eau quality data found for station=%s",
+                station_code,
             )
             return None
 
@@ -197,19 +203,24 @@ class HubEauQualiteClient:
         except TimeoutError:
             logger.warning(
                 "Hub'Eau quality fetch timed out (%.1fs) station=%s param=%s",
-                self._timeout, station_code, parameter_code,
+                self._timeout,
+                station_code,
+                parameter_code,
             )
             return None
         except urllib.error.URLError as e:
             logger.warning(
                 "Hub'Eau quality connection error station=%s param=%s: %s",
-                station_code, parameter_code, str(e),
+                station_code,
+                parameter_code,
+                str(e),
             )
             return None
         except (json.JSONDecodeError, KeyError):
             logger.exception(
                 "Hub'Eau quality payload parsing failed station=%s param=%s",
-                station_code, parameter_code,
+                station_code,
+                parameter_code,
             )
             return None
 
@@ -244,6 +255,8 @@ class HubEauQualiteClient:
         except (KeyError, ValueError, TypeError):
             logger.exception(
                 "Malformed Hub'Eau row for station=%s param=%s: %s",
-                station_code, parameter_code, first,
+                station_code,
+                parameter_code,
+                first,
             )
             return None
