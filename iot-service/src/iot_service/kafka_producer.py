@@ -12,7 +12,7 @@ import json
 import logging
 import uuid
 from dataclasses import asdict
-from datetime import UTC, datetime
+from datetime import UTC
 from typing import Any
 
 from aiokafka import AIOKafkaProducer

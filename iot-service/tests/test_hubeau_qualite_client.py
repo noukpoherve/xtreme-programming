@@ -6,13 +6,10 @@ Tests use urllib monkey-patching to avoid real HTTP calls.
 from __future__ import annotations
 
 import json
-from datetime import datetime
 from unittest.mock import patch
 
-import pytest
 
 from iot_service.hubeau_qualite_client import (
-    HubEauAnalysis,
     HubEauQualiteClient,
     LatestQualityMeasurement,
     PARAM_OXYGEN,

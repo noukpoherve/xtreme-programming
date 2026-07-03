@@ -152,9 +152,8 @@ class TestErrorContract:
         """Verify the body matches the ErrorResponse schema exactly."""
         # Every field of the schema must be present
         required = {"error", "message", "trace_id", "timestamp", "path"}
-        assert required.issubset(
-            body.keys()
-        ), f"Missing fields: {required - body.keys()}"
+        missing = required - body.keys()
+        assert required.issubset(body.keys()), f"Missing fields: {missing}"
 
         # `error` must be a known code
         assert body["error"] in {c.value for c in ErrorCode}

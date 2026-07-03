@@ -18,18 +18,15 @@ from fastapi.responses import JSONResponse
 from alert_service.config import settings
 from alert_service.error_handlers import register_error_handlers
 from alert_service.kafka_consumer import MeasurementConsumer
-from alert_service.middleware import TRACE_ID_HEADER, TraceIdMiddleware
+from alert_service.middleware import TraceIdMiddleware
 from alert_service.models import (
     AlertListResponse,
-    AlertPayload,
-    AlertResponse,
     ErrorResponse,
     HealthResponse,
     MeasurementSeriesResponse,
     SensorMetadataView,
     SensorStateListResponse,
     SensorStateView,
-    WaterMeasurementEvent,
 )
 from alert_service.openapi_config import (
     API_CONTACT,
@@ -41,7 +38,6 @@ from alert_service.openapi_config import (
     COMMON_RESPONSES,
     TAGS_METADATA,
     SENSOR_NOT_FOUND_EXAMPLE,
-    INVALID_MEASUREMENT_EXAMPLE,
 )
 from alert_service.repositories import (
     PostgresAlertRepository,
@@ -50,8 +46,8 @@ from alert_service.repositories import (
     PostgresStateTransitionRepository,
     create_pool,
 )
-from alert_service.service import AlertService, alert_service
-from alert_service.websocket import WebSocketHub, hub
+from alert_service.service import alert_service
+from alert_service.websocket import hub
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -216,10 +212,18 @@ async def get_stats():
                     )
                     or 0
                 )
-                last_24h = await conn.fetchval("""SELECT COUNT(*) FROM alerts
-                       WHERE opened_at >= NOW() - INTERVAL '24 hours'""") or 0
-                last_7d = await conn.fetchval("""SELECT COUNT(*) FROM alerts
-                       WHERE opened_at >= NOW() - INTERVAL '7 days'""") or 0
+                last_24h = (
+                    await conn.fetchval(
+                        "SELECT COUNT(*) FROM alerts WHERE opened_at >= NOW() - INTERVAL '24 hours'"
+                    )
+                    or 0
+                )
+                last_7d = (
+                    await conn.fetchval(
+                        "SELECT COUNT(*) FROM alerts WHERE opened_at >= NOW() - INTERVAL '7 days'"
+                    )
+                    or 0
+                )
                 top_rows = await conn.fetch("""SELECT s.sensor_id, COUNT(*) AS cnt
                        FROM alerts a JOIN sensors s ON a.sensor_uuid = s.id
                        WHERE a.opened_at >= NOW() - INTERVAL '7 days'
@@ -330,7 +334,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     },
 )
 async def get_sensor_metadata(
-    sensor_id: str = Path(..., min_length=1)
+    sensor_id: str = Path(..., min_length=1),
 ) -> SensorMetadataView:
     if alert_service._sensor_repo is None or app.state.db_pool is None:
         raise HTTPException(

@@ -1,6 +1,5 @@
 import pytest
 import pytest_asyncio
-from datetime import datetime, timezone
 from httpx import ASGITransport, AsyncClient
 from unittest.mock import MagicMock
 

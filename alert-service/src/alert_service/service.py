@@ -5,7 +5,6 @@ from datetime import datetime, timedelta, timezone
 from alert_service.domain import SensorProcessorRegistry, SensorStreamProcessor
 from alert_service.exceptions import (
     InvalidAlertPayloadError,
-    InvalidMeasurementError,
     SensorNotFoundError,
 )
 from alert_service.models import (
@@ -17,7 +16,7 @@ from alert_service.models import (
     SensorStateView,
     WaterMeasurementEvent,
 )
-from alert_service.state_config import SensorState, StateMetadata, StateThresholds
+from alert_service.state_config import SensorState
 from alert_service.repositories import (
     AlertRepository,
     MeasurementRepository,
@@ -277,7 +276,7 @@ class AlertService:
         """
         if self._sensor_repo is None:
             raise SensorNotFoundError(
-                f"Sensor catalogue is unavailable (no DB).",
+                "Sensor catalogue is unavailable (no DB).",
                 details={"sensor_id": sensor_id},
             )
         row = await self._sensor_repo.get_metadata(sensor_id)
@@ -342,7 +341,7 @@ class AlertService:
         """Return the recent time-series for a sensor."""
         if self._sensor_repo is None or self._measurement_repo is None:
             raise SensorNotFoundError(
-                f"Persistence is unavailable.",
+                "Persistence is unavailable.",
                 details={"sensor_id": sensor_id},
             )
         # Validate sensor exists (raises 404 if not)
@@ -381,7 +380,7 @@ class AlertService:
         """Return recent alerts scoped to a single sensor."""
         if self._sensor_repo is None or self._alert_repo is None:
             raise SensorNotFoundError(
-                f"Persistence is unavailable.",
+                "Persistence is unavailable.",
                 details={"sensor_id": sensor_id},
             )
         # Validate sensor exists
