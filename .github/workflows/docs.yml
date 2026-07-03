@@ -42,7 +42,7 @@ jobs:
       - name: Install documentation dependencies
         run: uv sync --group docs --group docs-test
 
-      - name: Run documentation doctests (mkdocstrings examples)
+      - name: Run MkDocs doctests
         run: uv run --group docs-test pytest docs/api -v
 
       - name: Build MkDocs site (strict)

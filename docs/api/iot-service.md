@@ -1,15 +1,35 @@
-# iot-service — référence Python
+# Référence code — iot-service
 
-Documentation auto-générée depuis le code source `iot-service`.
+Documentation **Markdown** (MkDocs) avec exemples Python exécutables (`doctest`).
 
 ## Mapping Hub'Eau
 
-::: iot_service.station_mapping.get_station_for_sensor
+Correspondance entre les capteurs UrbanHub et les stations officielles Hub'Eau.
 
-::: iot_service.station_mapping.get_station_for_code
+```python
+>>> from iot_service.station_mapping import get_station_for_sensor, get_station_for_code
+>>> get_station_for_sensor("SEINE-BERCY-003").station_code
+'03081000'
+>>> get_station_for_code("03081000").sensor_id
+'SEINE-BERCY-003'
+>>> get_station_for_sensor("SEINE-UNKNOWN-999") is None
+True
+```
 
-::: iot_service.station_mapping.get_sensor_ids
+## Capteurs Hub'Eau actifs
 
-## Simulateur — profils capteurs
+```python
+>>> from iot_service.station_mapping import get_sensor_ids
+>>> "SEINE-BERCY-003" in get_sensor_ids()
+True
+>>> len(get_sensor_ids())
+6
+```
 
-::: iot_service.simulator.sensors.get_sensor
+## Profils simulateur
+
+```python
+>>> from iot_service.simulator.sensors import get_sensor
+>>> get_sensor("SEINE-BERCY-003").sensor_id
+'SEINE-BERCY-003'
+```

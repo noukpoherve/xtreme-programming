@@ -63,11 +63,9 @@ uv run --group docs mkdocs serve
 
 Puis ouvrir <http://127.0.0.1:8000>.
 
-La section **API Python** du site est générée par [mkdocstrings](https://mkdocstrings.github.io/) depuis le code source (`::: module` dans `docs/api/`).
+### Valider les doctests MkDocs
 
-### Valider les doctests de la documentation
-
-Les exemples `>>>` des pages `docs/api/` sont exécutés par [pytest-doctest-mkdocstrings](https://pypi.org/project/pytest-doctest-mkdocstrings/) :
+Les exemples `>>>` dans `docs/api/*.md` sont exécutés comme des tests :
 
 ```bash
 uv sync --group docs --group docs-test

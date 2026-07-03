@@ -1,21 +1,25 @@
-# API Python (auto-documentation)
+# Doctests MkDocs
 
-Cette section est générée avec **[mkdocstrings](https://mkdocstrings.github.io/)** :
-les signatures, docstrings et exemples `>>>` proviennent directement du code source.
+Cette section contient des **exemples Python dans la documentation Markdown**.
+Ils sont exécutés automatiquement pour vérifier que la doc reste correcte.
 
-Les exemples sont **exécutables** et vérifiés par `pytest-doctest-mkdocstrings` (voir [Doctests](doctests.md)).
+## Comment ça marche
 
-## Modules documentés
+1. Les pages `docs/api/*.md` contiennent des blocs ` ```python ` avec des lignes `>>>`.
+2. `pytest` + `pytest-doctest-mkdocstrings` exécute ces exemples comme des tests.
+3. MkDocs affiche ces pages telles quelles sur le site (pas d'injection depuis le code).
 
-| Service | Module | Contenu |
-|---------|--------|---------|
-| alert-service | `alert_service.state_config` | États capteurs, seuils, métadonnées |
-| iot-service | `iot_service.station_mapping` | Mapping Hub'Eau ↔ capteurs UrbanHub |
-| iot-service | `iot_service.simulator.sensors` | Profils capteurs simulés |
-
-## Lancer la validation des exemples
+## Lancer les doctests
 
 ```bash
 uv sync --group docs --group docs-test
-uv run --group docs-test pytest docs/api --doctest-modules --doctest-glob="docs/api/*.md" --doctest-mdcodeblocks -v
+uv run --group docs-test pytest docs/api -v
 ```
+
+## Pages couvertes
+
+| Page | Contenu testé |
+|------|----------------|
+| [alert-service](alert-service.md) | `StateMetadata` (rangs, libellés, ordre) |
+| [iot-service](iot-service.md) | Mapping Hub'Eau, capteurs, simulateur |
+| [doctests](doctests.md) | Scénarios combinés |

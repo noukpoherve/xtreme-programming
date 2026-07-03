@@ -1,29 +1,33 @@
-# alert-service — référence Python
+# Référence code — alert-service
 
-Documentation auto-générée depuis `alert-service/src/alert_service/state_config.py`.
+Documentation **Markdown** (MkDocs) avec exemples Python exécutables (`doctest`).
 
-## StateMetadata
+## StateMetadata — gravité et libellés
 
-::: alert_service.state_config.StateMetadata
-    options:
-      members:
-        - rank
-        - label
-        - ordered
-      show_root_heading: false
-      show_source: true
-      docstring_section_style: spacy
+`StateMetadata` fournit le rang de sévérité et les libellés affichés pour chaque état capteur.
 
-## SensorState
+```python
+>>> from alert_service.state_config import StateMetadata, SensorState
+>>> StateMetadata.rank(SensorState.NORMAL)
+0
+>>> StateMetadata.rank(SensorState.WARNING)
+1
+>>> StateMetadata.rank(SensorState.CRITICAL)
+2
+>>> StateMetadata.label(SensorState.NORMAL)
+'Normal'
+>>> StateMetadata.label(SensorState.CRITICAL)
+'Critique'
+```
 
-::: alert_service.state_config.SensorState
-    options:
-      show_root_heading: false
-      show_source: false
+## Ordre d'affichage des états
 
-## StateThresholds
+Les états sont triés du plus grave au moins grave (utile pour le dashboard).
 
-::: alert_service.state_config.StateThresholds
-    options:
-      show_root_heading: false
-      show_source: true
+```python
+>>> from alert_service.state_config import StateMetadata, SensorState
+>>> StateMetadata.ordered()[0]
+<SensorState.CRITICAL: 'CRITICAL'>
+>>> StateMetadata.ordered()[-1]
+<SensorState.NORMAL: 'NORMAL'>
+```
