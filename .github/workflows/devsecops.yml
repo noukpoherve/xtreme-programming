@@ -1,0 +1,394 @@
+name: DevSecOps Pipeline (TP4)
+
+# Pipeline CI/CD durci — énoncé TP4 DevSecOps UrbanHub
+# 6 étapes : lint/tests → SAST → SCA+secrets → build+scan → push+cosign+SBOM → staging smoke
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+concurrency:
+  group: devsecops-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════
+  # 1. Lint + tests unitaires (coverage ≥ 60 %)
+  # ═══════════════════════════════════════════════════════════════
+  lint-test:
+    name: "1 · Lint + Tests (≥60%)"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [alert-service, iot-service]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Setup Python
+        run: uv python install 3.13
+
+      - name: Sync dependencies
+        working-directory: ${{ matrix.service }}
+        run: uv sync --all-groups --no-progress
+
+      - name: Ruff lint
+        working-directory: ${{ matrix.service }}
+        run: uv run ruff check src/ tests/
+
+      - name: Ruff format check
+        working-directory: ${{ matrix.service }}
+        run: uv run ruff format --check src/ tests/
+
+      - name: Pytest + coverage gate (≥ 60 %)
+        working-directory: ${{ matrix.service }}
+        run: |
+          uv run pytest tests/ -v \
+            --cov=src \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --cov-fail-under=60 \
+            --junitxml=junit.xml
+
+      - name: Upload test artefacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-${{ matrix.service }}
+          path: |
+            ${{ matrix.service }}/coverage.xml
+            ${{ matrix.service }}/junit.xml
+
+  # ═══════════════════════════════════════════════════════════════
+  # 2. SAST — Semgrep + Bandit (SARIF)
+  # ═══════════════════════════════════════════════════════════════
+  sast:
+    name: "2 · SAST (Bandit + Semgrep)"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Setup Python
+        run: uv python install 3.13
+
+      - name: Prepare evidence directory
+        run: mkdir -p evidence/tp4
+
+      - name: Bandit SARIF (alert-service)
+        run: |
+          uvx bandit -r alert-service/src -f sarif -o evidence/tp4/bandit-alert.sarif || true
+          uvx bandit -r alert-service/src -f json -o evidence/tp4/bandit-alert.json || true
+
+      - name: Bandit SARIF (iot-service)
+        run: |
+          uvx bandit -r iot-service/src -f sarif -o evidence/tp4/bandit-iot.sarif || true
+          uvx bandit -r iot-service/src -f json -o evidence/tp4/bandit-iot.json || true
+
+      - name: Semgrep SARIF
+        run: |
+          docker run --rm -v "$PWD:/src" returntocorp/semgrep:latest \
+            semgrep --config=p/owasp-top-ten --config=p/python \
+            --sarif --output=/src/evidence/tp4/semgrep.sarif \
+            /src/alert-service/src /src/iot-service/src || true
+
+      - name: Upload SAST artefacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-sast
+          path: evidence/tp4/*
+
+  # ═══════════════════════════════════════════════════════════════
+  # 3. SCA (Trivy fs) + Secrets (Gitleaks) — fail CRITICAL / secret
+  # ═══════════════════════════════════════════════════════════════
+  sca-secrets:
+    name: "3 · SCA + Secrets (gates)"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare evidence directory
+        run: mkdir -p evidence/tp4
+
+      - name: Gitleaks (BLOQUANT)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trivy fs — CRITICAL gate (BLOQUANT)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
+          format: json
+          output: evidence/tp4/trivy-fs-critical.json
+          skip-dirs: .venv,iot-service/.venv,alert-service/.venv,dashboard/node_modules,.git,.idea
+
+      - name: Trivy fs — HIGH report (non bloquant / rodage)
+        if: always()
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: "0"
+          ignore-unfixed: true
+          format: table
+          skip-dirs: .venv,iot-service/.venv,alert-service/.venv,dashboard/node_modules,.git,.idea
+
+      - name: Upload SCA artefacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-sca-secrets
+          path: evidence/tp4/trivy-fs-critical.json
+          if-no-files-found: warn
+
+  # ═══════════════════════════════════════════════════════════════
+  # 4. Build Docker multi-stage + Trivy image (gate CRITICAL)
+  # ═══════════════════════════════════════════════════════════════
+  build-scan:
+    name: "4 · Build + Image scan"
+    runs-on: ubuntu-latest
+    needs: [lint-test, sast, sca-secrets]
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - name: alert-service
+            context: ./alert-service
+          - name: iot-service
+            context: ./iot-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Prepare evidence directory
+        run: mkdir -p evidence/tp4
+
+      - name: Build image (multi-stage, non-root)
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.service.context }}
+          push: false
+          load: true
+          tags: urbanhub/${{ matrix.service.name }}:ci-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Trivy image — CRITICAL gate (BLOQUANT)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: urbanhub/${{ matrix.service.name }}:ci-${{ github.sha }}
+          severity: CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
+          format: json
+          output: evidence/tp4/trivy-image-${{ matrix.service.name }}.json
+
+      - name: Trivy image — table HIGH+CRITICAL (visibilité)
+        if: always()
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: urbanhub/${{ matrix.service.name }}:ci-${{ github.sha }}
+          severity: HIGH,CRITICAL
+          exit-code: "0"
+          ignore-unfixed: true
+          format: table
+
+      - name: Upload image scan
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-image-${{ matrix.service.name }}
+          path: evidence/tp4/trivy-image-${{ matrix.service.name }}.json
+          if-no-files-found: warn
+
+  # ═══════════════════════════════════════════════════════════════
+  # 5. Push GHCR + Cosign keyless + SBOM
+  # ═══════════════════════════════════════════════════════════════
+  push-sign-sbom:
+    name: "5 · Push + Cosign + SBOM"
+    runs-on: ubuntu-latest
+    needs: [build-scan]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [alert-service, iot-service]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=latest
+
+      - name: Build & push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.service }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Prepare evidence directory
+        run: mkdir -p evidence/tp4
+
+      - name: Sign image (keyless OIDC)
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}"
+          echo "Signing ${IMAGE}@${DIGEST}"
+          cosign sign --yes "${IMAGE}@${DIGEST}"
+          cosign verify \
+            --certificate-identity-regexp="https://github.com/${{ github.repository }}/.*" \
+            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
+            "${IMAGE}@${DIGEST}" | tee evidence/tp4/cosign-verify-${{ matrix.service }}.txt
+
+      - name: Generate SBOM CycloneDX
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}@${{ steps.build.outputs.digest }}
+          format: cyclonedx
+          output: evidence/tp4/sbom-${{ matrix.service }}.json
+          exit-code: "0"
+
+      - name: Upload SBOM + Cosign evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-supplychain-${{ matrix.service }}
+          path: |
+            evidence/tp4/sbom-${{ matrix.service }}.json
+            evidence/tp4/cosign-verify-${{ matrix.service }}.txt
+
+  # ═══════════════════════════════════════════════════════════════
+  # 6. Déploiement staging (compose) + smoke test
+  # ═══════════════════════════════════════════════════════════════
+  staging-smoke:
+    name: "6 · Staging smoke"
+    runs-on: ubuntu-latest
+    needs: [build-scan]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build staging images
+        run: |
+          docker compose build alert-service iot-service
+
+      - name: Start core stack (kafka + postgres + services)
+        run: |
+          docker compose up -d postgres kafka alert-service iot-service
+
+      - name: Wait for health (smoke)
+        run: |
+          set -e
+          echo "Waiting for alert-service..."
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:8000/health; then
+              echo " alert-service OK"
+              break
+            fi
+            sleep 5
+            if [ "$i" -eq 60 ]; then echo "alert-service smoke FAILED"; exit 1; fi
+          done
+          echo "Waiting for iot-service..."
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:8001/health; then
+              echo " iot-service OK"
+              break
+            fi
+            sleep 5
+            if [ "$i" -eq 60 ]; then echo "iot-service smoke FAILED"; exit 1; fi
+          done
+
+      - name: Collect compose logs on failure
+        if: failure()
+        run: docker compose logs --no-color | tee evidence/tp4/staging-logs.txt
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
+
+  # ═══════════════════════════════════════════════════════════════
+  # Agrégation — statut global TP4
+  # ═══════════════════════════════════════════════════════════════
+  tp4-success:
+    name: "TP4 · All gates green"
+    runs-on: ubuntu-latest
+    needs: [lint-test, sast, sca-secrets, build-scan, staging-smoke]
+    if: always()
+    steps:
+      - name: Check required jobs
+        run: |
+          fail=0
+          for job in lint-test sast sca-secrets build-scan staging-smoke; do
+            # shellcheck disable=SC2086
+            result=$(echo '${{ toJson(needs) }}' | jq -r --arg j "$job" '.[$j].result')
+            echo "$job → $result"
+            if [ "$result" != "success" ]; then fail=1; fi
+          done
+          if [ "$fail" -ne 0 ]; then
+            echo "❌ Un ou plusieurs gates TP4 ont échoué"
+            exit 1
+          fi
+          echo "✅ Pipeline DevSecOps TP4 : 6 étapes OK"

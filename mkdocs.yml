@@ -94,5 +94,9 @@ nav:
       - iot-service: services/iot-service.md
       - dashboard: services/dashboard.md
       - monitoring: services/monitoring.md
+  - TP DevSecOps:
+      - tp/README.md
+      - TP3 Gestion vulnérabilités: tp/TP3-gestion-vulnerabilites-UrbanHub.md
+      - TP4 Pipeline DevSecOps: tp/TP4-pipeline-DevSecOps-UrbanHub.md
   - Communication: communication.md
   - Changelog: changelog.md
