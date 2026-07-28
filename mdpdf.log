@@ -1,0 +1,670 @@
+    INFO: 2026-07-28 11:04:19,722:               log.py:   20: Logging to D:\EADL-2025-IMIE\Usine Logiciel\xtreme-programming\mdpdf.log
+   DEBUG: 2026-07-28 11:04:19,722:               cli.py:  103: evidence/urbanhub-audit-report.md
+    INFO: 2026-07-28 11:04:19,733:         converter.py:   14: evidence/urbanhub-audit-report.md
+   DEBUG: 2026-07-28 11:04:19,751:      pdf_renderer.py:  470: printSegment: TP2 - Rapport d
+   DEBUG: 2026-07-28 11:04:19,761:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,765:      pdf_renderer.py:  470: printSegment: audit initial UrbanHub
+   DEBUG: 2026-07-28 11:04:19,766:      pdf_renderer.py:  470: printSegment: 1. Contexte et perimetre
+   DEBUG: 2026-07-28 11:04:19,769:      pdf_renderer.py:  470: printSegment: Cet audit initial couvre le depot 
+   DEBUG: 2026-07-28 11:04:19,773:      pdf_renderer.py:  470: printSegment: xtreme-programming
+   DEBUG: 2026-07-28 11:04:19,776:      pdf_renderer.py:  470: printSegment:  sur la branche 
+   DEBUG: 2026-07-28 11:04:19,778:      pdf_renderer.py:  470: printSegment: master
+   DEBUG: 2026-07-28 11:04:19,779:      pdf_renderer.py:  470: printSegment: , avec un focus sur les deux
+   DEBUG: 2026-07-28 11:04:19,780:      pdf_renderer.py:  470: printSegment: services Python exposes:
+   DEBUG: 2026-07-28 11:04:19,780:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,782:      pdf_renderer.py:  470: printSegment: iot-service
+   DEBUG: 2026-07-28 11:04:19,783:      pdf_renderer.py:  470: printSegment:  (FastAPI)
+   DEBUG: 2026-07-28 11:04:19,784:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,785:      pdf_renderer.py:  470: printSegment: alert-service
+   DEBUG: 2026-07-28 11:04:19,785:      pdf_renderer.py:  470: printSegment:  (FastAPI)
+   DEBUG: 2026-07-28 11:04:19,786:      pdf_renderer.py:  470: printSegment: Objectifs:
+   DEBUG: 2026-07-28 11:04:19,787:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,788:      pdf_renderer.py:  470: printSegment: identifier rapidement les vulnerabilites dans le code applicatif;
+   DEBUG: 2026-07-28 11:04:19,789:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,790:      pdf_renderer.py:  470: printSegment: identifier les vulnerabilites dans les dependances;
+   DEBUG: 2026-07-28 11:04:19,791:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,792:      pdf_renderer.py:  470: printSegment: verifier l
+   DEBUG: 2026-07-28 11:04:19,792:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,793:      pdf_renderer.py:  470: printSegment: absence d
+   DEBUG: 2026-07-28 11:04:19,794:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,795:      pdf_renderer.py:  470: printSegment: exposition evidente de secrets dans le depot Git;
+   DEBUG: 2026-07-28 11:04:19,797:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,799:      pdf_renderer.py:  470: printSegment: produire une priorisation exploitable pour un RSSI.
+   DEBUG: 2026-07-28 11:04:19,800:      pdf_renderer.py:  470: printSegment: Perimetre scanne:
+   DEBUG: 2026-07-28 11:04:19,801:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,801:      pdf_renderer.py:  470: printSegment: code source Python sous 
+   DEBUG: 2026-07-28 11:04:19,803:      pdf_renderer.py:  470: printSegment: iot-service/src
+   DEBUG: 2026-07-28 11:04:19,804:      pdf_renderer.py:  470: printSegment:  et 
+   DEBUG: 2026-07-28 11:04:19,806:      pdf_renderer.py:  470: printSegment: alert-service/src
+   DEBUG: 2026-07-28 11:04:19,807:      pdf_renderer.py:  470: printSegment: ;
+   DEBUG: 2026-07-28 11:04:19,808:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,811:      pdf_renderer.py:  470: printSegment: dependances resolues via 
+   DEBUG: 2026-07-28 11:04:19,812:      pdf_renderer.py:  470: printSegment: uv.lock
+   DEBUG: 2026-07-28 11:04:19,813:      pdf_renderer.py:  470: printSegment: ;
+   DEBUG: 2026-07-28 11:04:19,814:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,815:      pdf_renderer.py:  470: printSegment: historique Git et fichiers suivis pour la recherche de secrets.
+   DEBUG: 2026-07-28 11:04:19,816:      pdf_renderer.py:  470: printSegment: 2. Justification du combo d
+   DEBUG: 2026-07-28 11:04:19,816:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,817:      pdf_renderer.py:  470: printSegment: outils
+   DEBUG: 2026-07-28 11:04:19,818:      pdf_renderer.py:  470: printSegment: Choix retenu
+   DEBUG: 2026-07-28 11:04:19,819:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,819:      pdf_renderer.py:  470: printSegment: SAST: 
+   DEBUG: 2026-07-28 11:04:19,820:      pdf_renderer.py:  470: printSegment: Bandit
+   DEBUG: 2026-07-28 11:04:19,820:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,821:      pdf_renderer.py:  470: printSegment: SCA: 
+   DEBUG: 2026-07-28 11:04:19,822:      pdf_renderer.py:  470: printSegment: Trivy fs
+   DEBUG: 2026-07-28 11:04:19,822:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,823:      pdf_renderer.py:  470: printSegment: Secret scan: 
+   DEBUG: 2026-07-28 11:04:19,823:      pdf_renderer.py:  470: printSegment: Gitleaks
+   DEBUG: 2026-07-28 11:04:19,824:      pdf_renderer.py:  470: printSegment: Justification par matrice de decision
+   DEBUG: 2026-07-28 11:04:19,825:      pdf_renderer.py:  470: printSegment: | Critere | Bandit | Trivy fs | Gitleaks |
+   DEBUG: 2026-07-28 11:04:19,826:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:19,827:      pdf_renderer.py:  470: printSegment: |---|---|---|---|
+   DEBUG: 2026-07-28 11:04:19,828:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:19,834:      pdf_renderer.py:  470: printSegment: | Adequation a la stack | Excellent pour Python | Excellent
+   DEBUG: 2026-07-28 11:04:19,835:      pdf_renderer.py:  470: printSegment: pour dependances Python lockees | Standard tres repandu, simple a lancer |
+   DEBUG: 2026-07-28 11:04:19,836:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:19,837:      pdf_renderer.py:  470: printSegment: | Facilité d
+   DEBUG: 2026-07-28 11:04:19,837:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,839:      pdf_renderer.py:  470: printSegment: execution locale | Tres
+   DEBUG: 2026-07-28 11:04:19,840:      pdf_renderer.py:  470: printSegment: bonne | Bonne | Tres bonne |
+   DEBUG: 2026-07-28 11:04:19,841:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:19,846:      pdf_renderer.py:  470: printSegment: | Sortie exploitable | JSON detaille avec CWE et severite | JSON riche avec CVE,
+   DEBUG: 2026-07-28 11:04:19,847:      pdf_renderer.py:  470: printSegment: CVSS et version corrigee | SARIF / JSON pour preuves |
+   DEBUG: 2026-07-28 11:04:19,848:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:19,856:      pdf_renderer.py:  470: printSegment: | Rapport signal / bruit | Bon sur petits services Python
+   DEBUG: 2026-07-28 11:04:19,858:      pdf_renderer.py:  470: printSegment: | Bon si on cible les services et ignore les environnements | Bon sur le depot Git, plus bruiteux sur 
+   DEBUG: 2026-07-28 11:04:19,858:      pdf_renderer.py:  470: printSegment: .venv
+   DEBUG: 2026-07-28 11:04:19,859:      pdf_renderer.py:  470: printSegment:  |
+   DEBUG: 2026-07-28 11:04:19,860:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:19,867:      pdf_renderer.py:  470: printSegment: |
+   DEBUG: 2026-07-28 11:04:19,871:      pdf_renderer.py:  470: printSegment: Pertinence pedagogique | Met en evidence les patterns de code risqués | Couvre les libs tierces, angle
+   DEBUG: 2026-07-28 11:04:19,872:      pdf_renderer.py:  470: printSegment: indispensable | Repond au risque d
+   DEBUG: 2026-07-28 11:04:19,873:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,873:      pdf_renderer.py:  470: printSegment: exposition accidentelle de secrets |
+   DEBUG: 2026-07-28 11:04:19,874:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:19,876:      pdf_renderer.py:  470: printSegment: | Integration CI future | Facile | Tres facile
+   DEBUG: 2026-07-28 11:04:19,878:      pdf_renderer.py:  470: printSegment: | Tres facile |
+   DEBUG: 2026-07-28 11:04:19,879:      pdf_renderer.py:  470: printSegment: Pourquoi ce trio est adapte a UrbanHub
+   DEBUG: 2026-07-28 11:04:19,880:      pdf_renderer.py:  470: printSegment: Bandit
+   DEBUG: 2026-07-28 11:04:19,881:      pdf_renderer.py:  470: printSegment:  est le meilleur choix ici car UrbanHub est en Python/FastAPI et l
+   DEBUG: 2026-07-28 11:04:19,881:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,885:      pdf_renderer.py:  470: printSegment: objectif est un premier audit
+   DEBUG: 2026-07-28 11:04:19,886:      pdf_renderer.py:  470: printSegment: pragmatique. Il detecte vite les usages sensibles (
+   DEBUG: 2026-07-28 11:04:19,887:      pdf_renderer.py:  470: printSegment: urlopen
+   DEBUG: 2026-07-28 11:04:19,891:      pdf_renderer.py:  470: printSegment: , gestion trop large des exceptions, generateur
+   DEBUG: 2026-07-28 11:04:19,893:      pdf_renderer.py:  470: printSegment: aleatoire non crypto, etc.) avec un cout de mise en oeuvre tres faible.
+   DEBUG: 2026-07-28 11:04:19,894:      pdf_renderer.py:  470: printSegment: Trivy fs
+   DEBUG: 2026-07-28 11:04:19,895:      pdf_renderer.py:  470: printSegment:  complete l
+   DEBUG: 2026-07-28 11:04:19,895:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,897:      pdf_renderer.py:  470: printSegment: analyse cote supply chain. Le projet depend de 
+   DEBUG: 2026-07-28 11:04:19,898:      pdf_renderer.py:  470: printSegment: FastAPI
+   DEBUG: 2026-07-28 11:04:19,899:      pdf_renderer.py:  470: printSegment: , donc indirectement de 
+   DEBUG: 2026-07-28 11:04:19,900:      pdf_renderer.py:  470: printSegment: Starlette
+   DEBUG: 2026-07-28 11:04:19,900:      pdf_renderer.py:  470: printSegment: ; l
+   DEBUG: 2026-07-28 11:04:19,901:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,903:      pdf_renderer.py:  470: printSegment: audit a justement remonte deux CVE corrigees sur 
+   DEBUG: 2026-07-28 11:04:19,904:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:19,906:      pdf_renderer.py:  470: printSegment: . Ce type de faiblesse
+   DEBUG: 2026-07-28 11:04:19,907:      pdf_renderer.py:  470: printSegment: ne serait pas visible via un SAST seul.
+   DEBUG: 2026-07-28 11:04:19,908:      pdf_renderer.py:  470: printSegment: Gitleaks
+   DEBUG: 2026-07-28 11:04:19,909:      pdf_renderer.py:  470: printSegment:  est pertinent pour verifier un risque different: l
+   DEBUG: 2026-07-28 11:04:19,910:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,922:      pdf_renderer.py:  470: printSegment: exposition de secrets dans le depot et son historique.
+   DEBUG: 2026-07-28 11:04:19,928:      pdf_renderer.py:  470: printSegment: Le scan du depot Git ne remonte aucun secret confirme. Le scan brut du filesystem remontait uniquement des
+   DEBUG: 2026-07-28 11:04:19,930:      pdf_renderer.py:  470: printSegment: faux positifs dans des dossiers 
+   DEBUG: 2026-07-28 11:04:19,931:      pdf_renderer.py:  470: printSegment: .venv
+   DEBUG: 2026-07-28 11:04:19,933:      pdf_renderer.py:  470: printSegment: , exclus du rapport executif.
+   DEBUG: 2026-07-28 11:04:19,934:      pdf_renderer.py:  470: printSegment: 3. Execution effective
+   DEBUG: 2026-07-28 11:04:19,935:      pdf_renderer.py:  470: printSegment: Methode recommandee (sortie ordonnee)
+   DEBUG: 2026-07-28 11:04:19,937:      pdf_renderer.py:  470: printSegment: Pour eviter un terminal illisible, utiliser le script:
+   DEBUG: 2026-07-28 11:04:19,938:      pdf_renderer.py:  470: printSegment: powershell -ExecutionPolicy Bypass -File evidence/run-audit.ps1
+   DEBUG: 2026-07-28 11:04:19,939:      pdf_renderer.py:  470: printSegment: Ce script execute les scans dans l
+   DEBUG: 2026-07-28 11:04:19,939:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,940:      pdf_renderer.py:  470: printSegment: ordre et genere des logs propres:
+   DEBUG: 2026-07-28 11:04:19,941:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,942:      pdf_renderer.py:  470: printSegment: evidence/logs-bandit.txt
+   DEBUG: 2026-07-28 11:04:19,942:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,943:      pdf_renderer.py:  470: printSegment: evidence/logs-trivy.txt
+   DEBUG: 2026-07-28 11:04:19,944:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:19,946:      pdf_renderer.py:  470: printSegment: evidence/logs-gitleaks.txt
+   DEBUG: 2026-07-28 11:04:19,947:      pdf_renderer.py:  470: printSegment: Ces fichiers sont adaptes aux captures d
+   DEBUG: 2026-07-28 11:04:19,947:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:19,948:      pdf_renderer.py:  470: printSegment: ecran du rendu.
+   DEBUG: 2026-07-28 11:04:19,949:      pdf_renderer.py:  470: printSegment: Commandes executees
+   DEBUG: 2026-07-28 11:04:19,949:      pdf_renderer.py:  470: printSegment: SAST:
+   DEBUG: 2026-07-28 11:04:19,956:      pdf_renderer.py:  470: printSegment: docker run --rm -v "${PWD}:/src" -w /src python:3.12-slim bash
+   DEBUG: 2026-07-28 11:04:19,959:      pdf_renderer.py:  470: printSegment: -c "pip install -q bandit && bandit -r iot-service/src
+   DEBUG: 2026-07-28 11:04:19,960:      pdf_renderer.py:  470: printSegment: alert-service/src -f json -o evidence/bandit.json"
+   DEBUG: 2026-07-28 11:04:19,961:      pdf_renderer.py:  470: printSegment: SCA:
+   DEBUG: 2026-07-28 11:04:19,969:      pdf_renderer.py:  470: printSegment: docker run --rm -v "${PWD}:/src" aquasec/trivy:latest fs --quiet
+   DEBUG: 2026-07-28 11:04:19,973:      pdf_renderer.py:  470: printSegment: --no-progress --severity HIGH,CRITICAL --scanners vuln
+   DEBUG: 2026-07-28 11:04:19,976:      pdf_renderer.py:  470: printSegment: --skip-dirs
+   DEBUG: 2026-07-28 11:04:19,981:      pdf_renderer.py:  470: printSegment: /src/iot-service/.venv,/src/.venv,/src/.git,/src/.idea,/src/site
+   DEBUG: 2026-07-28 11:04:19,983:      pdf_renderer.py:  470: printSegment: --format json -o /src/evidence/trivy-iot.json /src/iot-service
+   DEBUG: 2026-07-28 11:04:19,991:      pdf_renderer.py:  470: printSegment: docker run --rm -v "${PWD}:/src" aquasec/trivy:latest fs --quiet
+   DEBUG: 2026-07-28 11:04:19,995:      pdf_renderer.py:  470: printSegment: --no-progress --severity HIGH,CRITICAL --scanners vuln
+   DEBUG: 2026-07-28 11:04:19,999:      pdf_renderer.py:  470: printSegment: --skip-dirs
+   DEBUG: 2026-07-28 11:04:20,002:      pdf_renderer.py:  470: printSegment: /src/alert-service/.venv,/src/.venv,/src/.git,/src/.idea,/src/site --format json -o /src/evidence/trivy-alert.json /src/alert-service
+   DEBUG: 2026-07-28 11:04:20,003:      pdf_renderer.py:  470: printSegment: Secrets:
+   DEBUG: 2026-07-28 11:04:20,007:      pdf_renderer.py:  470: printSegment: docker run --rm -v "${PWD}:/src" -w /src
+   DEBUG: 2026-07-28 11:04:20,009:      pdf_renderer.py:  470: printSegment: zricethezav/gitleaks:latest detect --report-format sarif
+   DEBUG: 2026-07-28 11:04:20,010:      pdf_renderer.py:  470: printSegment: --report-path /src/evidence/gitleaks-git.sarif --no-banner
+   DEBUG: 2026-07-28 11:04:20,011:      pdf_renderer.py:  470: printSegment: Fichiers de preuve generes
+   DEBUG: 2026-07-28 11:04:20,012:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,013:      pdf_renderer.py:  470: printSegment: evidence/bandit.json
+   DEBUG: 2026-07-28 11:04:20,013:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,014:      pdf_renderer.py:  470: printSegment: evidence/trivy-iot.json
+   DEBUG: 2026-07-28 11:04:20,015:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,016:      pdf_renderer.py:  470: printSegment: evidence/trivy-alert.json
+   DEBUG: 2026-07-28 11:04:20,016:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,017:      pdf_renderer.py:  470: printSegment: evidence/gitleaks-git.sarif
+   DEBUG: 2026-07-28 11:04:20,018:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,019:      pdf_renderer.py:  470: printSegment: evidence/pip-audit-iot.json
+   DEBUG: 2026-07-28 11:04:20,020:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,021:      pdf_renderer.py:  470: printSegment: evidence/pip-audit-alert.json
+   DEBUG: 2026-07-28 11:04:20,022:      pdf_renderer.py:  470: printSegment: 4. Synthese executive
+   DEBUG: 2026-07-28 11:04:20,023:      pdf_renderer.py:  470: printSegment: Niveau de risque global
+   DEBUG: 2026-07-28 11:04:20,023:      pdf_renderer.py:  470: printSegment: Risque initial 
+   DEBUG: 2026-07-28 11:04:20,026:      pdf_renderer.py:  470: printSegment: modere a eleve
+   DEBUG: 2026-07-28 11:04:20,028:      pdf_renderer.py:  470: printSegment: .
+   DEBUG: 2026-07-28 11:04:20,030:      pdf_renderer.py:  470: printSegment: Les principaux risques identifies ne sont pas des secrets exposes, mais:
+   DEBUG: 2026-07-28 11:04:20,031:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,031:      pdf_renderer.py:  470: printSegment: deux vulnerabilites de dependance 
+   DEBUG: 2026-07-28 11:04:20,033:      pdf_renderer.py:  470: printSegment: Starlette
+   DEBUG: 2026-07-28 11:04:20,034:      pdf_renderer.py:  470: printSegment:  presentes dans les deux services Python;
+   DEBUG: 2026-07-28 11:04:20,035:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,036:      pdf_renderer.py:  470: printSegment: un appel reseau potentiellement dangereux via 
+   DEBUG: 2026-07-28 11:04:20,037:      pdf_renderer.py:  470: printSegment: urllib.request.urlopen
+   DEBUG: 2026-07-28 11:04:20,038:      pdf_renderer.py:  470: printSegment: ;
+   DEBUG: 2026-07-28 11:04:20,039:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,039:      pdf_renderer.py:  470: printSegment: une gestion d
+   DEBUG: 2026-07-28 11:04:20,040:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,041:      pdf_renderer.py:  470: printSegment: exception qui masque les erreurs et complique la detection d
+   DEBUG: 2026-07-28 11:04:20,042:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,042:      pdf_renderer.py:  470: printSegment: incidents.
+   DEBUG: 2026-07-28 11:04:20,043:      pdf_renderer.py:  470: printSegment: Chiffres cles
+   DEBUG: 2026-07-28 11:04:20,044:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,046:      pdf_renderer.py:  470: printSegment: SAST Bandit: 
+   DEBUG: 2026-07-28 11:04:20,046:      pdf_renderer.py:  470: printSegment: 4 findings
+   DEBUG: 2026-07-28 11:04:20,047:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,048:      pdf_renderer.py:  470: printSegment: SCA Trivy: 
+   DEBUG: 2026-07-28 11:04:20,049:      pdf_renderer.py:  470: printSegment: 4 findings confirmes
+   DEBUG: 2026-07-28 11:04:20,049:      pdf_renderer.py:  470: printSegment:  (2 CVE, presentes dans 2 services)
+   DEBUG: 2026-07-28 11:04:20,050:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,052:      pdf_renderer.py:  470: printSegment: Secrets Git: 
+   DEBUG: 2026-07-28 11:04:20,052:      pdf_renderer.py:  470: printSegment: 0 secret confirme
+   DEBUG: 2026-07-28 11:04:20,053:      pdf_renderer.py:  470: printSegment: 5. Top findings priorises
+   DEBUG: 2026-07-28 11:04:20,053:      pdf_renderer.py:  470: printSegment: Vue d
+   DEBUG: 2026-07-28 11:04:20,054:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,054:      pdf_renderer.py:  470: printSegment: ensemble
+   DEBUG: 2026-07-28 11:04:20,055:      pdf_renderer.py:  470: printSegment: | ID | Outil | Objet | Criticite |
+   DEBUG: 2026-07-28 11:04:20,055:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,056:      pdf_renderer.py:  470: printSegment: |---|---|---|---|
+   DEBUG: 2026-07-28 11:04:20,057:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,057:      pdf_renderer.py:  470: printSegment: | F-01 | Trivy | 
+   DEBUG: 2026-07-28 11:04:20,058:      pdf_renderer.py:  470: printSegment: iot-service
+   DEBUG: 2026-07-28 11:04:20,059:      pdf_renderer.py:  470: printSegment:  -> 
+   DEBUG: 2026-07-28 11:04:20,060:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:20,061:      pdf_renderer.py:  470: printSegment:  | HIGH /
+   DEBUG: 2026-07-28 11:04:20,061:      pdf_renderer.py:  470: printSegment: 7.5 |
+   DEBUG: 2026-07-28 11:04:20,061:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,063:      pdf_renderer.py:  470: printSegment: | F-02 | Trivy | 
+   DEBUG: 2026-07-28 11:04:20,064:      pdf_renderer.py:  470: printSegment: alert-service
+   DEBUG: 2026-07-28 11:04:20,064:      pdf_renderer.py:  470: printSegment:  -> 
+   DEBUG: 2026-07-28 11:04:20,065:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:20,066:      pdf_renderer.py:  470: printSegment:  | HIGH / 7.5 |
+   DEBUG: 2026-07-28 11:04:20,067:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,067:      pdf_renderer.py:  470: printSegment: | F-03 | Trivy | 
+   DEBUG: 2026-07-28 11:04:20,068:      pdf_renderer.py:  470: printSegment: iot-service
+   DEBUG: 2026-07-28 11:04:20,069:      pdf_renderer.py:  470: printSegment: 
+   DEBUG: 2026-07-28 11:04:20,069:      pdf_renderer.py:  470: printSegment: -> 
+   DEBUG: 2026-07-28 11:04:20,070:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:20,070:      pdf_renderer.py:  470: printSegment:  | HIGH / 7.5 |
+   DEBUG: 2026-07-28 11:04:20,071:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,071:      pdf_renderer.py:  470: printSegment: | F-04 | Trivy | 
+   DEBUG: 2026-07-28 11:04:20,072:      pdf_renderer.py:  470: printSegment: alert-service
+   DEBUG: 2026-07-28 11:04:20,073:      pdf_renderer.py:  470: printSegment:  -> 
+   DEBUG: 2026-07-28 11:04:20,073:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:20,074:      pdf_renderer.py:  470: printSegment:  | HIGH /
+   DEBUG: 2026-07-28 11:04:20,074:      pdf_renderer.py:  470: printSegment: 7.5 |
+   DEBUG: 2026-07-28 11:04:20,075:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,076:      pdf_renderer.py:  470: printSegment: | F-05 | Bandit B310 | 
+   DEBUG: 2026-07-28 11:04:20,077:      pdf_renderer.py:  470: printSegment: hubeau_qualite_client.py:201
+   DEBUG: 2026-07-28 11:04:20,078:      pdf_renderer.py:  470: printSegment:  | MEDIUM |
+   DEBUG: 2026-07-28 11:04:20,079:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,080:      pdf_renderer.py:  470: printSegment: | F-06 | Bandit B110 | 
+   DEBUG: 2026-07-28 11:04:20,081:      pdf_renderer.py:  470: printSegment: websocket.py:90
+   DEBUG: 2026-07-28 11:04:20,081:      pdf_renderer.py:  470: printSegment:  | LOW |
+   DEBUG: 2026-07-28 11:04:20,081:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,083:      pdf_renderer.py:  470: printSegment: | F-07 | Bandit B311 | 
+   DEBUG: 2026-07-28 11:04:20,084:      pdf_renderer.py:  470: printSegment: generator.py:51
+   DEBUG: 2026-07-28 11:04:20,085:      pdf_renderer.py:  470: printSegment:  | LOW |
+   DEBUG: 2026-07-28 11:04:20,085:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,086:      pdf_renderer.py:  470: printSegment: | F-08 | Bandit B311 | 
+   DEBUG: 2026-07-28 11:04:20,087:      pdf_renderer.py:  470: printSegment: orchestrator.py:118
+   DEBUG: 2026-07-28 11:04:20,088:      pdf_renderer.py:  470: printSegment:  | LOW |
+   DEBUG: 2026-07-28 11:04:20,088:      pdf_renderer.py:  470: printSegment: Detail des findings
+   DEBUG: 2026-07-28 11:04:20,089:      pdf_renderer.py:  470: printSegment: F-01 - Vulnerabilite de dependance dans 
+   DEBUG: 2026-07-28 11:04:20,090:      pdf_renderer.py:  470: printSegment: iot-service
+   DEBUG: 2026-07-28 11:04:20,091:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,091:      pdf_renderer.py:  470: printSegment: Outil: 
+   DEBUG: 2026-07-28 11:04:20,092:      pdf_renderer.py:  470: printSegment: Trivy
+   DEBUG: 2026-07-28 11:04:20,093:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,094:      pdf_renderer.py:  470: printSegment: Composant: 
+   DEBUG: 2026-07-28 11:04:20,095:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:20,095:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,097:      pdf_renderer.py:  470: printSegment: Severite: 
+   DEBUG: 2026-07-28 11:04:20,097:      pdf_renderer.py:  470: printSegment: HIGH
+   DEBUG: 2026-07-28 11:04:20,098:      pdf_renderer.py:  470: printSegment: , CVSS 
+   DEBUG: 2026-07-28 11:04:20,099:      pdf_renderer.py:  470: printSegment: 7.5
+   DEBUG: 2026-07-28 11:04:20,099:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,100:      pdf_renderer.py:  470: printSegment: CWE: 
+   DEBUG: 2026-07-28 11:04:20,101:      pdf_renderer.py:  470: printSegment: CWE-918
+   DEBUG: 2026-07-28 11:04:20,101:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,102:      pdf_renderer.py:  470: printSegment: Resume: risque de SSRF et de fuite potentielle d
+   DEBUG: 2026-07-28 11:04:20,103:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,103:      pdf_renderer.py:  470: printSegment: identifiants NTLM via chemin UNC sous
+   DEBUG: 2026-07-28 11:04:20,104:      pdf_renderer.py:  470: printSegment: Windows
+   DEBUG: 2026-07-28 11:04:20,105:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,106:      pdf_renderer.py:  470: printSegment: Exploitabilite estimee: moyenne a elevee si des fichiers statiques sont exposes
+   DEBUG: 2026-07-28 11:04:20,107:      pdf_renderer.py:  470: printSegment: F-02 - Vulnerabilite de dependance dans 
+   DEBUG: 2026-07-28 11:04:20,108:      pdf_renderer.py:  470: printSegment: alert-service
+   DEBUG: 2026-07-28 11:04:20,109:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,110:      pdf_renderer.py:  470: printSegment: Outil: 
+   DEBUG: 2026-07-28 11:04:20,110:      pdf_renderer.py:  470: printSegment: Trivy
+   DEBUG: 2026-07-28 11:04:20,111:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,113:      pdf_renderer.py:  470: printSegment: Composant: 
+   DEBUG: 2026-07-28 11:04:20,113:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:20,114:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,115:      pdf_renderer.py:  470: printSegment: Severite: 
+   DEBUG: 2026-07-28 11:04:20,115:      pdf_renderer.py:  470: printSegment: HIGH
+   DEBUG: 2026-07-28 11:04:20,116:      pdf_renderer.py:  470: printSegment: , CVSS 
+   DEBUG: 2026-07-28 11:04:20,117:      pdf_renderer.py:  470: printSegment: 7.5
+   DEBUG: 2026-07-28 11:04:20,118:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,118:      pdf_renderer.py:  470: printSegment: CWE: 
+   DEBUG: 2026-07-28 11:04:20,119:      pdf_renderer.py:  470: printSegment: CWE-918
+   DEBUG: 2026-07-28 11:04:20,120:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,121:      pdf_renderer.py:  470: printSegment: Resume: meme vulnerabilite que F-01, avec impact potentiel sur le service d
+   DEBUG: 2026-07-28 11:04:20,121:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,123:      pdf_renderer.py:  470: printSegment: alertes
+   DEBUG: 2026-07-28 11:04:20,124:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,126:      pdf_renderer.py:  470: printSegment: Exploitabilite estimee: moyenne a elevee si la surface HTTP est exposable
+   DEBUG: 2026-07-28 11:04:20,127:      pdf_renderer.py:  470: printSegment: F-03 - Risque de denial-of-service dans 
+   DEBUG: 2026-07-28 11:04:20,129:      pdf_renderer.py:  470: printSegment: iot-service
+   DEBUG: 2026-07-28 11:04:20,130:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,131:      pdf_renderer.py:  470: printSegment: Outil: 
+   DEBUG: 2026-07-28 11:04:20,131:      pdf_renderer.py:  470: printSegment: Trivy
+   DEBUG: 2026-07-28 11:04:20,132:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,133:      pdf_renderer.py:  470: printSegment: Composant: 
+   DEBUG: 2026-07-28 11:04:20,133:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:20,134:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,135:      pdf_renderer.py:  470: printSegment: Severite: 
+   DEBUG: 2026-07-28 11:04:20,136:      pdf_renderer.py:  470: printSegment: HIGH
+   DEBUG: 2026-07-28 11:04:20,136:      pdf_renderer.py:  470: printSegment: , CVSS 
+   DEBUG: 2026-07-28 11:04:20,137:      pdf_renderer.py:  470: printSegment: 7.5
+   DEBUG: 2026-07-28 11:04:20,138:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,139:      pdf_renderer.py:  470: printSegment: CWE: 
+   DEBUG: 2026-07-28 11:04:20,140:      pdf_renderer.py:  470: printSegment: CWE-770
+   DEBUG: 2026-07-28 11:04:20,141:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,141:      pdf_renderer.py:  470: printSegment: Resume: les limites de 
+   DEBUG: 2026-07-28 11:04:20,143:      pdf_renderer.py:  470: printSegment: request.form()
+   DEBUG: 2026-07-28 11:04:20,145:      pdf_renderer.py:  470: printSegment:  peuvent etre ignorees pour 
+   DEBUG: 2026-07-28 11:04:20,147:      pdf_renderer.py:  470: printSegment: application/x-www-form-urlencoded
+   DEBUG: 2026-07-28 11:04:20,147:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,149:      pdf_renderer.py:  470: printSegment: Exploitabilite estimee: elevee si des endpoints acceptent des formulaires
+   DEBUG: 2026-07-28 11:04:20,150:      pdf_renderer.py:  470: printSegment: F-04 - Risque de denial-of-service dans 
+   DEBUG: 2026-07-28 11:04:20,151:      pdf_renderer.py:  470: printSegment: alert-service
+   DEBUG: 2026-07-28 11:04:20,152:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,152:      pdf_renderer.py:  470: printSegment: Outil: 
+   DEBUG: 2026-07-28 11:04:20,153:      pdf_renderer.py:  470: printSegment: Trivy
+   DEBUG: 2026-07-28 11:04:20,153:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,154:      pdf_renderer.py:  470: printSegment: Composant: 
+   DEBUG: 2026-07-28 11:04:20,155:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:20,156:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,157:      pdf_renderer.py:  470: printSegment: Severite: 
+   DEBUG: 2026-07-28 11:04:20,158:      pdf_renderer.py:  470: printSegment: HIGH
+   DEBUG: 2026-07-28 11:04:20,159:      pdf_renderer.py:  470: printSegment: , CVSS 
+   DEBUG: 2026-07-28 11:04:20,160:      pdf_renderer.py:  470: printSegment: 7.5
+   DEBUG: 2026-07-28 11:04:20,161:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,163:      pdf_renderer.py:  470: printSegment: CWE: 
+   DEBUG: 2026-07-28 11:04:20,164:      pdf_renderer.py:  470: printSegment: CWE-770
+   DEBUG: 2026-07-28 11:04:20,164:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,166:      pdf_renderer.py:  470: printSegment: Resume: meme vulnerabilite que F-03 sur le service d
+   DEBUG: 2026-07-28 11:04:20,166:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,167:      pdf_renderer.py:  470: printSegment: alertes
+   DEBUG: 2026-07-28 11:04:20,168:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,170:      pdf_renderer.py:  470: printSegment: Exploitabilite estimee: elevee si des endpoints acceptent des formulaires
+   DEBUG: 2026-07-28 11:04:20,171:      pdf_renderer.py:  470: printSegment: F-05 - Appel HTTP a encadrer
+   DEBUG: 2026-07-28 11:04:20,172:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,173:      pdf_renderer.py:  470: printSegment: Outil: 
+   DEBUG: 2026-07-28 11:04:20,173:      pdf_renderer.py:  470: printSegment: Bandit
+   DEBUG: 2026-07-28 11:04:20,174:      pdf_renderer.py:  470: printSegment:  (
+   DEBUG: 2026-07-28 11:04:20,174:      pdf_renderer.py:  470: printSegment: B310
+   DEBUG: 2026-07-28 11:04:20,175:      pdf_renderer.py:  470: printSegment: )
+   DEBUG: 2026-07-28 11:04:20,176:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,176:      pdf_renderer.py:  470: printSegment: Fichier: 
+   DEBUG: 2026-07-28 11:04:20,177:      pdf_renderer.py:  470: printSegment: iot-service/src/iot_service/hubeau_qualite_client.py:201
+   DEBUG: 2026-07-28 11:04:20,178:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,178:      pdf_renderer.py:  470: printSegment: Severite: 
+   DEBUG: 2026-07-28 11:04:20,179:      pdf_renderer.py:  470: printSegment: MEDIUM
+   DEBUG: 2026-07-28 11:04:20,180:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,180:      pdf_renderer.py:  470: printSegment: CWE: 
+   DEBUG: 2026-07-28 11:04:20,181:      pdf_renderer.py:  470: printSegment: CWE-22
+   DEBUG: 2026-07-28 11:04:20,181:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,181:      pdf_renderer.py:  470: printSegment: Resume: usage de 
+   DEBUG: 2026-07-28 11:04:20,183:      pdf_renderer.py:  470: printSegment: urllib.request.urlopen()
+   DEBUG: 2026-07-28 11:04:20,184:      pdf_renderer.py:  470: printSegment:  a auditer pour les schemas autorises
+   DEBUG: 2026-07-28 11:04:20,184:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,185:      pdf_renderer.py:  470: printSegment: Exploitabilite estimee: moyenne
+   DEBUG: 2026-07-28 11:04:20,186:      pdf_renderer.py:  470: printSegment: F-06 - Exception silencieuse
+   DEBUG: 2026-07-28 11:04:20,186:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,187:      pdf_renderer.py:  470: printSegment: Outil: 
+   DEBUG: 2026-07-28 11:04:20,188:      pdf_renderer.py:  470: printSegment: Bandit
+   DEBUG: 2026-07-28 11:04:20,188:      pdf_renderer.py:  470: printSegment:  (
+   DEBUG: 2026-07-28 11:04:20,189:      pdf_renderer.py:  470: printSegment: B110
+   DEBUG: 2026-07-28 11:04:20,189:      pdf_renderer.py:  470: printSegment: )
+   DEBUG: 2026-07-28 11:04:20,190:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,191:      pdf_renderer.py:  470: printSegment: Fichier: 
+   DEBUG: 2026-07-28 11:04:20,192:      pdf_renderer.py:  470: printSegment: alert-service/src/alert_service/websocket.py:90
+   DEBUG: 2026-07-28 11:04:20,192:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,193:      pdf_renderer.py:  470: printSegment: Severite: 
+   DEBUG: 2026-07-28 11:04:20,193:      pdf_renderer.py:  470: printSegment: LOW
+   DEBUG: 2026-07-28 11:04:20,194:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,194:      pdf_renderer.py:  470: printSegment: CWE: 
+   DEBUG: 2026-07-28 11:04:20,195:      pdf_renderer.py:  470: printSegment: CWE-703
+   DEBUG: 2026-07-28 11:04:20,196:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,196:      pdf_renderer.py:  470: printSegment: Resume: 
+   DEBUG: 2026-07-28 11:04:20,198:      pdf_renderer.py:  470: printSegment: try/except/pass
+   DEBUG: 2026-07-28 11:04:20,198:      pdf_renderer.py:  470: printSegment:  masque une erreur de fermeture WebSocket
+   DEBUG: 2026-07-28 11:04:20,199:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,200:      pdf_renderer.py:  470: printSegment: Exploitabilite estimee: faible a moyenne
+   DEBUG: 2026-07-28 11:04:20,201:      pdf_renderer.py:  470: printSegment: F-07 - Generateur pseudo-aleatoire non cryptographique
+   DEBUG: 2026-07-28 11:04:20,202:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,202:      pdf_renderer.py:  470: printSegment: Outil: 
+   DEBUG: 2026-07-28 11:04:20,203:      pdf_renderer.py:  470: printSegment: Bandit
+   DEBUG: 2026-07-28 11:04:20,204:      pdf_renderer.py:  470: printSegment:  (
+   DEBUG: 2026-07-28 11:04:20,204:      pdf_renderer.py:  470: printSegment: B311
+   DEBUG: 2026-07-28 11:04:20,205:      pdf_renderer.py:  470: printSegment: )
+   DEBUG: 2026-07-28 11:04:20,206:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,206:      pdf_renderer.py:  470: printSegment: Fichier: 
+   DEBUG: 2026-07-28 11:04:20,207:      pdf_renderer.py:  470: printSegment: iot-service/src/iot_service/simulator/generator.py:51
+   DEBUG: 2026-07-28 11:04:20,208:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,209:      pdf_renderer.py:  470: printSegment: Severite: 
+   DEBUG: 2026-07-28 11:04:20,210:      pdf_renderer.py:  470: printSegment: LOW
+   DEBUG: 2026-07-28 11:04:20,210:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,211:      pdf_renderer.py:  470: printSegment: CWE: 
+   DEBUG: 2026-07-28 11:04:20,211:      pdf_renderer.py:  470: printSegment: CWE-330
+   DEBUG: 2026-07-28 11:04:20,213:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,214:      pdf_renderer.py:  470: printSegment: Resume: 
+   DEBUG: 2026-07-28 11:04:20,215:      pdf_renderer.py:  470: printSegment: random.Random()
+   DEBUG: 2026-07-28 11:04:20,215:      pdf_renderer.py:  470: printSegment:  n
+   DEBUG: 2026-07-28 11:04:20,216:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,217:      pdf_renderer.py:  470: printSegment: est pas adapte a un usage de securite
+   DEBUG: 2026-07-28 11:04:20,217:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,218:      pdf_renderer.py:  470: printSegment: Exploitabilite estimee: faible dans le contexte actuel de simulation
+   DEBUG: 2026-07-28 11:04:20,220:      pdf_renderer.py:  470: printSegment: F-08 - Alea non cryptographique pour le jitter
+   DEBUG: 2026-07-28 11:04:20,220:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,221:      pdf_renderer.py:  470: printSegment: Outil: 
+   DEBUG: 2026-07-28 11:04:20,222:      pdf_renderer.py:  470: printSegment: Bandit
+   DEBUG: 2026-07-28 11:04:20,222:      pdf_renderer.py:  470: printSegment:  (
+   DEBUG: 2026-07-28 11:04:20,223:      pdf_renderer.py:  470: printSegment: B311
+   DEBUG: 2026-07-28 11:04:20,223:      pdf_renderer.py:  470: printSegment: )
+   DEBUG: 2026-07-28 11:04:20,224:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,224:      pdf_renderer.py:  470: printSegment: Fichier: 
+   DEBUG: 2026-07-28 11:04:20,226:      pdf_renderer.py:  470: printSegment: iot-service/src/iot_service/simulator/orchestrator.py:118
+   DEBUG: 2026-07-28 11:04:20,226:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,227:      pdf_renderer.py:  470: printSegment: Severite: 
+   DEBUG: 2026-07-28 11:04:20,228:      pdf_renderer.py:  470: printSegment: LOW
+   DEBUG: 2026-07-28 11:04:20,229:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,230:      pdf_renderer.py:  470: printSegment: CWE: 
+   DEBUG: 2026-07-28 11:04:20,230:      pdf_renderer.py:  470: printSegment: CWE-330
+   DEBUG: 2026-07-28 11:04:20,231:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,231:      pdf_renderer.py:  470: printSegment: Resume: 
+   DEBUG: 2026-07-28 11:04:20,233:      pdf_renderer.py:  470: printSegment: random.uniform()
+   DEBUG: 2026-07-28 11:04:20,234:      pdf_renderer.py:  470: printSegment:  n
+   DEBUG: 2026-07-28 11:04:20,234:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,235:      pdf_renderer.py:  470: printSegment: est pas adapte a un usage de securite
+   DEBUG: 2026-07-28 11:04:20,236:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,237:      pdf_renderer.py:  470: printSegment: Exploitabilite estimee: faible dans le contexte actuel de simulation
+   DEBUG: 2026-07-28 11:04:20,238:      pdf_renderer.py:  470: printSegment: 6. Analyse contextuelle des findings
+   DEBUG: 2026-07-28 11:04:20,239:      pdf_renderer.py:  470: printSegment: F-01 / F-02 - Starlette 
+   DEBUG: 2026-07-28 11:04:20,240:      pdf_renderer.py:  470: printSegment: CVE-2026-48818
+   DEBUG: 2026-07-28 11:04:20,241:      pdf_renderer.py:  470: printSegment: Les deux services reposent sur 
+   DEBUG: 2026-07-28 11:04:20,242:      pdf_renderer.py:  470: printSegment: FastAPI
+   DEBUG: 2026-07-28 11:04:20,243:      pdf_renderer.py:  470: printSegment: , qui embarque 
+   DEBUG: 2026-07-28 11:04:20,244:      pdf_renderer.py:  470: printSegment: Starlette
+   DEBUG: 2026-07-28 11:04:20,245:      pdf_renderer.py:  470: printSegment: . La version verrouillee 
+   DEBUG: 2026-07-28 11:04:20,246:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:20,249:      pdf_renderer.py:  470: printSegment:  est vulnerable a un scenario SSRF sous Windows avec tentative de resolution de chemin
+   DEBUG: 2026-07-28 11:04:20,250:      pdf_renderer.py:  470: printSegment: UNC, pouvant provoquer une fuite NTLM.
+   DEBUG: 2026-07-28 11:04:20,252:      pdf_renderer.py:  470: printSegment: Dans votre contexte de TP sous Windows, cette remontee est a prendre au serieux meme si l
+   DEBUG: 2026-07-28 11:04:20,253:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,253:      pdf_renderer.py:  470: printSegment: exploitabilite
+   DEBUG: 2026-07-28 11:04:20,254:      pdf_renderer.py:  470: printSegment: exacte depend de l
+   DEBUG: 2026-07-28 11:04:20,255:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,256:      pdf_renderer.py:  470: printSegment: usage de 
+   DEBUG: 2026-07-28 11:04:20,257:      pdf_renderer.py:  470: printSegment: StaticFiles
+   DEBUG: 2026-07-28 11:04:20,257:      pdf_renderer.py:  470: printSegment: .
+   DEBUG: 2026-07-28 11:04:20,259:      pdf_renderer.py:  470: printSegment: F-03 / F-04 - Starlette 
+   DEBUG: 2026-07-28 11:04:20,260:      pdf_renderer.py:  470: printSegment: CVE-2026-54283
+   DEBUG: 2026-07-28 11:04:20,261:      pdf_renderer.py:  470: printSegment: La version 
+   DEBUG: 2026-07-28 11:04:20,261:      pdf_renderer.py:  470: printSegment: starlette@1.0.0
+   DEBUG: 2026-07-28 11:04:20,264:      pdf_renderer.py:  470: printSegment:  est egalement vulnerable a un contournement des limites de parsing pour les
+   DEBUG: 2026-07-28 11:04:20,265:      pdf_renderer.py:  470: printSegment: corps 
+   DEBUG: 2026-07-28 11:04:20,266:      pdf_renderer.py:  470: printSegment: application/x-www-form-urlencoded
+   DEBUG: 2026-07-28 11:04:20,267:      pdf_renderer.py:  470: printSegment: , avec impact de type denial-of-service.
+   DEBUG: 2026-07-28 11:04:20,269:      pdf_renderer.py:  470: printSegment: Cette faille est tres pertinente pour des APIs exposees publiquement.
+   DEBUG: 2026-07-28 11:04:20,270:      pdf_renderer.py:  470: printSegment: F-05 - Appel externe via 
+   DEBUG: 2026-07-28 11:04:20,271:      pdf_renderer.py:  470: printSegment: urlopen
+   DEBUG: 2026-07-28 11:04:20,272:      pdf_renderer.py:  470: printSegment: Le point ci-dessous merite revue:
+   DEBUG: 2026-07-28 11:04:20,273:      pdf_renderer.py:  470: printSegment:             f"?code_station={station_code}"
+   DEBUG: 2026-07-28 11:04:20,273:      pdf_renderer.py:  470: printSegment:             f"&code_parametre={parameter_code}"
+   DEBUG: 2026-07-28 11:04:20,274:      pdf_renderer.py:  470: printSegment:             f"&size=20"
+   DEBUG: 2026-07-28 11:04:20,275:      pdf_renderer.py:  470: printSegment:             f"&sort=desc"
+   DEBUG: 2026-07-28 11:04:20,276:      pdf_renderer.py:  470: printSegment:         )
+   DEBUG: 2026-07-28 11:04:20,277:      pdf_renderer.py:  470: printSegment:         try:
+   DEBUG: 2026-07-28 11:04:20,279:      pdf_renderer.py:  470: printSegment:             with urllib.request.urlopen(url,
+   DEBUG: 2026-07-28 11:04:20,279:      pdf_renderer.py:  470: printSegment: timeout=self._timeout) as resp:
+   DEBUG: 2026-07-28 11:04:20,280:      pdf_renderer.py:  470: printSegment:                 payload = json.loads(resp.read())
+   DEBUG: 2026-07-28 11:04:20,281:      pdf_renderer.py:  470: printSegment: Le risque n
+   DEBUG: 2026-07-28 11:04:20,281:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,283:      pdf_renderer.py:  470: printSegment: est pas un SSRF prouve en l
+   DEBUG: 2026-07-28 11:04:20,284:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,284:      pdf_renderer.py:  470: printSegment: etat, car l
+   DEBUG: 2026-07-28 11:04:20,285:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,286:      pdf_renderer.py:  470: printSegment: URL semble construiree depuis une base constante. En
+   DEBUG: 2026-07-28 11:04:20,287:      pdf_renderer.py:  470: printSegment: revanche, l
+   DEBUG: 2026-07-28 11:04:20,288:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,288:      pdf_renderer.py:  470: printSegment: outil signale correctement qu
+   DEBUG: 2026-07-28 11:04:20,289:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,289:      pdf_renderer.py:  470: printSegment: un appel 
+   DEBUG: 2026-07-28 11:04:20,290:      pdf_renderer.py:  470: printSegment: urlopen
+   DEBUG: 2026-07-28 11:04:20,293:      pdf_renderer.py:  470: printSegment:  doit etre justifie, encadre et si possible remplace
+   DEBUG: 2026-07-28 11:04:20,293:      pdf_renderer.py:  470: printSegment: par un client HTTP mieux controle.
+   DEBUG: 2026-07-28 11:04:20,295:      pdf_renderer.py:  470: printSegment: F-06 - Exception masquee
+   DEBUG: 2026-07-28 11:04:20,296:      pdf_renderer.py:  470: printSegment:         except Exception:
+   DEBUG: 2026-07-28 11:04:20,298:      pdf_renderer.py:  470: printSegment:             logger.warning("WebSocket send failed, closing
+   DEBUG: 2026-07-28 11:04:20,298:      pdf_renderer.py:  470: printSegment: connection")
+   DEBUG: 2026-07-28 11:04:20,299:      pdf_renderer.py:  470: printSegment:             try:
+   DEBUG: 2026-07-28 11:04:20,300:      pdf_renderer.py:  470: printSegment:                 await ws.close()
+   DEBUG: 2026-07-28 11:04:20,301:      pdf_renderer.py:  470: printSegment:             except Exception:
+   DEBUG: 2026-07-28 11:04:20,301:      pdf_renderer.py:  470: printSegment:                 pass
+   DEBUG: 2026-07-28 11:04:20,302:      pdf_renderer.py:  470: printSegment:             return False
+   DEBUG: 2026-07-28 11:04:20,303:      pdf_renderer.py:  470: printSegment: Le 
+   DEBUG: 2026-07-28 11:04:20,303:      pdf_renderer.py:  470: printSegment: pass
+   DEBUG: 2026-07-28 11:04:20,304:      pdf_renderer.py:  470: printSegment:  empeche toute trace precise d
+   DEBUG: 2026-07-28 11:04:20,304:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,305:      pdf_renderer.py:  470: printSegment: un probleme de fermeture, ce qui degrade la detectabilite et l
+   DEBUG: 2026-07-28 11:04:20,306:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,306:      pdf_renderer.py:  470: printSegment: investigation d
+   DEBUG: 2026-07-28 11:04:20,307:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,308:      pdf_renderer.py:  470: printSegment: incident.
+   DEBUG: 2026-07-28 11:04:20,309:      pdf_renderer.py:  470: printSegment: F-07 / F-08 - Usage de 
+   DEBUG: 2026-07-28 11:04:20,310:      pdf_renderer.py:  470: printSegment: random
+   DEBUG: 2026-07-28 11:04:20,312:      pdf_renderer.py:  470: printSegment:     def __init__(self, sensor: SensorProfile, seed: int | None =
+   DEBUG: 2026-07-28 11:04:20,312:      pdf_renderer.py:  470: printSegment: None):
+   DEBUG: 2026-07-28 11:04:20,313:      pdf_renderer.py:  470: printSegment:         self.sensor = sensor
+   DEBUG: 2026-07-28 11:04:20,314:      pdf_renderer.py:  470: printSegment:         self.rng = random.Random(seed)
+   DEBUG: 2026-07-28 11:04:20,315:      pdf_renderer.py:  470: printSegment:         # Current state for random walk
+   DEBUG: 2026-07-28 11:04:20,316:      pdf_renderer.py:  470: printSegment:             wait_time = self._config.interval_seconds +
+   DEBUG: 2026-07-28 11:04:20,317:      pdf_renderer.py:  470: printSegment: random.uniform(
+   DEBUG: 2026-07-28 11:04:20,318:      pdf_renderer.py:  470: printSegment:                 -self._config.jitter_seconds,
+   DEBUG: 2026-07-28 11:04:20,319:      pdf_renderer.py:  470: printSegment:                 self._config.jitter_seconds,
+   DEBUG: 2026-07-28 11:04:20,319:      pdf_renderer.py:  470: printSegment:             )
+   DEBUG: 2026-07-28 11:04:20,324:      pdf_renderer.py:  470: printSegment: Ces findings sont faibles car ce code sert a la simulation et non a un mecanisme de securite. Ils doivent etre
+   DEBUG: 2026-07-28 11:04:20,325:      pdf_renderer.py:  470: printSegment: gardes dans le rapport, mais clairement de-priorises.
+   DEBUG: 2026-07-28 11:04:20,326:      pdf_renderer.py:  470: printSegment: 7. Plan de remediations
+   DEBUG: 2026-07-28 11:04:20,327:      pdf_renderer.py:  470: printSegment: | ID | Action proposee | Type | Proprietaire | SLA propose |
+   DEBUG: 2026-07-28 11:04:20,328:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,330:      pdf_renderer.py:  470: printSegment: |---|---|---|---|---|
+   DEBUG: 2026-07-28 11:04:20,330:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,331:      pdf_renderer.py:  470: printSegment: | F-01 | Mettre a jour 
+   DEBUG: 2026-07-28 11:04:20,332:      pdf_renderer.py:  470: printSegment: FastAPI/Starlette
+   DEBUG: 2026-07-28 11:04:20,333:      pdf_renderer.py:  470: printSegment:  pour obtenir au minimum 
+   DEBUG: 2026-07-28 11:04:20,334:      pdf_renderer.py:  470: printSegment: starlette>=1.1.0
+   DEBUG: 2026-07-28 11:04:20,336:      pdf_renderer.py:  470: printSegment: , puis retester les routes statiques |
+   DEBUG: 2026-07-28 11:04:20,337:      pdf_renderer.py:  470: printSegment: Upgrade | Dev backend | 7 jours |
+   DEBUG: 2026-07-28 11:04:20,338:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,339:      pdf_renderer.py:  470: printSegment: | F-02 | Meme action que F-01 sur 
+   DEBUG: 2026-07-28 11:04:20,339:      pdf_renderer.py:  470: printSegment: alert-service
+   DEBUG: 2026-07-28 11:04:20,341:      pdf_renderer.py:  470: printSegment:  | Upgrade | Dev
+   DEBUG: 2026-07-28 11:04:20,342:      pdf_renderer.py:  470: printSegment: backend | 7 jours |
+   DEBUG: 2026-07-28 11:04:20,343:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,345:      pdf_renderer.py:  470: printSegment: | F-03 | Mettre a jour 
+   DEBUG: 2026-07-28 11:04:20,346:      pdf_renderer.py:  470: printSegment: FastAPI/Starlette
+   DEBUG: 2026-07-28 11:04:20,347:      pdf_renderer.py:  470: printSegment:  vers une version embarquant 
+   DEBUG: 2026-07-28 11:04:20,348:      pdf_renderer.py:  470: printSegment: starlette>=1.3.1
+   DEBUG: 2026-07-28 11:04:20,353:      pdf_renderer.py:  470: printSegment: ; ajouter en plus des limites de payload cote reverse proxy/API | Upgrade + mitigation |
+   DEBUG: 2026-07-28 11:04:20,354:      pdf_renderer.py:  470: printSegment: Dev backend + Ops | 7 jours |
+   DEBUG: 2026-07-28 11:04:20,355:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,356:      pdf_renderer.py:  470: printSegment: | F-04 | Meme action que F-03 sur 
+   DEBUG: 2026-07-28 11:04:20,357:      pdf_renderer.py:  470: printSegment: alert-service
+   DEBUG: 2026-07-28 11:04:20,359:      pdf_renderer.py:  470: printSegment:  | Upgrade + mitigation |
+   DEBUG: 2026-07-28 11:04:20,360:      pdf_renderer.py:  470: printSegment: Dev backend + Ops | 7 jours |
+   DEBUG: 2026-07-28 11:04:20,361:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,362:      pdf_renderer.py:  470: printSegment: | F-05 | Remplacer 
+   DEBUG: 2026-07-28 11:04:20,363:      pdf_renderer.py:  470: printSegment: urllib.request.urlopen
+   DEBUG: 2026-07-28 11:04:20,363:      pdf_renderer.py:  470: printSegment:  par 
+   DEBUG: 2026-07-28 11:04:20,364:      pdf_renderer.py:  470: printSegment: httpx
+   DEBUG: 2026-07-28 11:04:20,365:      pdf_renderer.py:  470: printSegment:  ou verrouiller
+   DEBUG: 2026-07-28 11:04:20,366:      pdf_renderer.py:  470: printSegment: strictement l
+   DEBUG: 2026-07-28 11:04:20,367:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,370:      pdf_renderer.py:  470: printSegment: host, le schema et le timeout; documenter le flux sortant autorise | Patch / mitigation | Dev backend
+   DEBUG: 2026-07-28 11:04:20,371:      pdf_renderer.py:  470: printSegment: IoT | 14 jours |
+   DEBUG: 2026-07-28 11:04:20,371:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,373:      pdf_renderer.py:  470: printSegment: | F-06 | Remplacer 
+   DEBUG: 2026-07-28 11:04:20,374:      pdf_renderer.py:  470: printSegment: pass
+   DEBUG: 2026-07-28 11:04:20,375:      pdf_renderer.py:  470: printSegment:  par une journalisation explicite de l
+   DEBUG: 2026-07-28 11:04:20,377:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,381:      pdf_renderer.py:  470: printSegment: erreur de fermeture ou une
+   DEBUG: 2026-07-28 11:04:20,382:      pdf_renderer.py:  470: printSegment: exception controlee | Patch | Dev backend Alert | 14 jours |
+   DEBUG: 2026-07-28 11:04:20,383:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,385:      pdf_renderer.py:  470: printSegment: | F-07 | Accepter le risque si le module reste limite a
+   DEBUG: 2026-07-28 11:04:20,386:      pdf_renderer.py:  470: printSegment: la simulation, sinon remplacer par 
+   DEBUG: 2026-07-28 11:04:20,387:      pdf_renderer.py:  470: printSegment: secrets
+   DEBUG: 2026-07-28 11:04:20,390:      pdf_renderer.py:  470: printSegment:  si reutilisation securitaire future | Acceptation / patch | Dev
+   DEBUG: 2026-07-28 11:04:20,391:      pdf_renderer.py:  470: printSegment: backend IoT | 30 jours |
+   DEBUG: 2026-07-28 11:04:20,393:      pdf_renderer.py:  470: printSegment:  
+   DEBUG: 2026-07-28 11:04:20,396:      pdf_renderer.py:  470: printSegment: | F-08 | Meme action que F-07 | Acceptation / patch | Dev backend IoT | 30 jours |
+   DEBUG: 2026-07-28 11:04:20,397:      pdf_renderer.py:  470: printSegment: 8. Resultat du secret scan
+   DEBUG: 2026-07-28 11:04:20,398:      pdf_renderer.py:  470: printSegment: Le scan 
+   DEBUG: 2026-07-28 11:04:20,398:      pdf_renderer.py:  470: printSegment: Gitleaks
+   DEBUG: 2026-07-28 11:04:20,399:      pdf_renderer.py:  470: printSegment:  sur le depot Git ne remonte 
+   DEBUG: 2026-07-28 11:04:20,400:      pdf_renderer.py:  470: printSegment: aucun secret confirme
+   DEBUG: 2026-07-28 11:04:20,401:      pdf_renderer.py:  470: printSegment: .
+   DEBUG: 2026-07-28 11:04:20,401:      pdf_renderer.py:  470: printSegment: Un premier scan brut du filesystem remontait 7 resultats, mais ils provenaient tous de dossiers 
+   DEBUG: 2026-07-28 11:04:20,403:      pdf_renderer.py:  470: printSegment: .venv
+   DEBUG: 2026-07-28 11:04:20,407:      pdf_renderer.py:  470: printSegment:  locaux et
+   DEBUG: 2026-07-28 11:04:20,408:      pdf_renderer.py:  470: printSegment: correspondaient a des faux positifs. Ils ne doivent pas etre inclus dans le rapport executif.
+   DEBUG: 2026-07-28 11:04:20,408:      pdf_renderer.py:  470: printSegment: 9. Conclusion
+   DEBUG: 2026-07-28 11:04:20,409:      pdf_renderer.py:  470: printSegment: L
+   DEBUG: 2026-07-28 11:04:20,410:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,414:      pdf_renderer.py:  470: printSegment: audit initial UrbanHub ne revele pas de secret expose dans le depot, mais il met en evidence une dette de mise
+   DEBUG: 2026-07-28 11:04:20,415:      pdf_renderer.py:  470: printSegment: a jour de dependances autour de 
+   DEBUG: 2026-07-28 11:04:20,415:      pdf_renderer.py:  470: printSegment: Starlette
+   DEBUG: 2026-07-28 11:04:20,416:      pdf_renderer.py:  470: printSegment: , ainsi qu
+   DEBUG: 2026-07-28 11:04:20,416:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,417:      pdf_renderer.py:  470: printSegment: un petit nombre de points de code a corriger ou justifier.
+   DEBUG: 2026-07-28 11:04:20,418:      pdf_renderer.py:  470: printSegment: La priorite RSSI doit etre:
+   DEBUG: 2026-07-28 11:04:20,419:      pdf_renderer.py:  470: printSegment:  1 
+   DEBUG: 2026-07-28 11:04:20,419:      pdf_renderer.py:  470: printSegment: corriger les CVE 
+   DEBUG: 2026-07-28 11:04:20,420:      pdf_renderer.py:  470: printSegment: Starlette
+   DEBUG: 2026-07-28 11:04:20,420:      pdf_renderer.py:  470: printSegment: ;
+   DEBUG: 2026-07-28 11:04:20,421:      pdf_renderer.py:  470: printSegment:  2 
+   DEBUG: 2026-07-28 11:04:20,421:      pdf_renderer.py:  470: printSegment: encadrer l
+   DEBUG: 2026-07-28 11:04:20,423:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,423:      pdf_renderer.py:  470: printSegment: appel sortant dans 
+   DEBUG: 2026-07-28 11:04:20,424:      pdf_renderer.py:  470: printSegment: hubeau_qualite_client.py
+   DEBUG: 2026-07-28 11:04:20,425:      pdf_renderer.py:  470: printSegment: ;
+   DEBUG: 2026-07-28 11:04:20,425:      pdf_renderer.py:  470: printSegment:  3 
+   DEBUG: 2026-07-28 11:04:20,426:      pdf_renderer.py:  470: printSegment: nettoyer les exceptions silencieuses;
+   DEBUG: 2026-07-28 11:04:20,427:      pdf_renderer.py:  470: printSegment:  4 
+   DEBUG: 2026-07-28 11:04:20,428:      pdf_renderer.py:  470: printSegment: documenter l
+   DEBUG: 2026-07-28 11:04:20,429:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,430:      pdf_renderer.py:  470: printSegment: acceptation des findings lies a la simulation.
+   DEBUG: 2026-07-28 11:04:20,431:      pdf_renderer.py:  470: printSegment: 10. Finalisation du rendu
+   DEBUG: 2026-07-28 11:04:20,431:      pdf_renderer.py:  470: printSegment: Actions recommandees avant depot:
+   DEBUG: 2026-07-28 11:04:20,432:      pdf_renderer.py:  470: printSegment:  1 
+   DEBUG: 2026-07-28 11:04:20,433:      pdf_renderer.py:  470: printSegment: Joindre le rapport PDF 
+   DEBUG: 2026-07-28 11:04:20,433:      pdf_renderer.py:  470: printSegment: evidence/urbanhub-audit-report.pdf
+   DEBUG: 2026-07-28 11:04:20,434:      pdf_renderer.py:  470: printSegment: .
+   DEBUG: 2026-07-28 11:04:20,434:      pdf_renderer.py:  470: printSegment:  2 
+   DEBUG: 2026-07-28 11:04:20,435:      pdf_renderer.py:  470: printSegment: Joindre le dossier 
+   DEBUG: 2026-07-28 11:04:20,436:      pdf_renderer.py:  470: printSegment: evidence/
+   DEBUG: 2026-07-28 11:04:20,437:      pdf_renderer.py:  470: printSegment:  avec les sorties 
+   DEBUG: 2026-07-28 11:04:20,438:      pdf_renderer.py:  470: printSegment: JSON
+   DEBUG: 2026-07-28 11:04:20,439:      pdf_renderer.py:  470: printSegment:  et 
+   DEBUG: 2026-07-28 11:04:20,439:      pdf_renderer.py:  470: printSegment: SARIF
+   DEBUG: 2026-07-28 11:04:20,440:      pdf_renderer.py:  470: printSegment: .
+   DEBUG: 2026-07-28 11:04:20,441:      pdf_renderer.py:  470: printSegment:  3 
+   DEBUG: 2026-07-28 11:04:20,441:      pdf_renderer.py:  470: printSegment: Ajouter 3 captures d
+   DEBUG: 2026-07-28 11:04:20,443:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,444:      pdf_renderer.py:  470: printSegment: ecran lisibles:
+   DEBUG: 2026-07-28 11:04:20,446:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,447:      pdf_renderer.py:  470: printSegment: evidence/logs-bandit.txt
+   DEBUG: 2026-07-28 11:04:20,448:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,449:      pdf_renderer.py:  470: printSegment: evidence/logs-trivy.txt
+   DEBUG: 2026-07-28 11:04:20,450:      pdf_renderer.py:  470: printSegment: l
+   DEBUG: 2026-07-28 11:04:20,450:      pdf_renderer.py:  470: printSegment: evidence/logs-gitleaks.txt
+   DEBUG: 2026-07-28 11:04:20,451:      pdf_renderer.py:  470: printSegment:  4 
+   DEBUG: 2026-07-28 11:04:20,452:      pdf_renderer.py:  470: printSegment: Si l
+   DEBUG: 2026-07-28 11:04:20,453:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,453:      pdf_renderer.py:  470: printSegment: enseignant exige strictement un 
+   DEBUG: 2026-07-28 11:04:20,454:      pdf_renderer.py:  470: printSegment: "
+   DEBUG: 2026-07-28 11:04:20,455:      pdf_renderer.py:  470: printSegment: top 10
+   DEBUG: 2026-07-28 11:04:20,455:      pdf_renderer.py:  470: printSegment: "
+   DEBUG: 2026-07-28 11:04:20,456:      pdf_renderer.py:  470: printSegment: , preciser qu
+   DEBUG: 2026-07-28 11:04:20,457:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,457:      pdf_renderer.py:  470: printSegment: il n
+   DEBUG: 2026-07-28 11:04:20,458:      pdf_renderer.py:  470: printSegment: '
+   DEBUG: 2026-07-28 11:04:20,459:      pdf_renderer.py:  470: printSegment: y a que 
+   DEBUG: 2026-07-28 11:04:20,460:      pdf_renderer.py:  470: printSegment: 8 findings confirmes
+   DEBUG: 2026-07-28 11:04:20,461:      pdf_renderer.py:  470: printSegment:  sur le
+   DEBUG: 2026-07-28 11:04:20,463:      pdf_renderer.py:  470: printSegment: perimetre scanne.
+   DEBUG: 2026-07-28 11:04:20,483:      pdf_renderer.py:   53: 0, [1, 'TP2 - Rapport d', 1, 68.0]
+   DEBUG: 2026-07-28 11:04:20,483:      pdf_renderer.py:   53: 1, [2, '1. Contexte et perimetre', 1, 106.0]
+   DEBUG: 2026-07-28 11:04:20,483:      pdf_renderer.py:   53: 2, [2, '2. Justification du combo d', 1, 349.6]
+   DEBUG: 2026-07-28 11:04:20,483:      pdf_renderer.py:   53: 3, [3, 'Choix retenu', 1, 382.8]
+   DEBUG: 2026-07-28 11:04:20,483:      pdf_renderer.py:   53: 4, [3, 'Justification par matrice de decision', 1, 459.59999999999997]
+   DEBUG: 2026-07-28 11:04:20,483:      pdf_renderer.py:   53: 5, [3, 'Pourquoi ce trio est adapte a UrbanHub', 1, 590.4]
+   DEBUG: 2026-07-28 11:04:20,483:      pdf_renderer.py:   53: 6, [2, '3. Execution effective', 1, 745.5999999999999]
+   DEBUG: 2026-07-28 11:04:20,483:      pdf_renderer.py:   53: 7, [3, 'Methode recommandee (sortie ordonnee)', 2, 72.0]
+   DEBUG: 2026-07-28 11:04:20,483:      pdf_renderer.py:   53: 8, [3, 'Commandes executees', 2, 226.8]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 9, [3, 'Fichiers de preuve generes', 2, 537.6]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 10, [2, '4. Synthese executive', 2, 650.8]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 11, [3, 'Niveau de risque global', 2, 683.9999999999999]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 12, [3, 'Chiffres cles', 3, 104.4]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 13, [2, '5. Top findings priorises', 3, 181.60000000000002]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 14, [3, 'Vue d', 3, 214.80000000000004]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 15, [3, 'Detail des findings', 3, 321.6]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 16, [2, '6. Analyse contextuelle des findings', 4, 500.79999999999995]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 17, [3, 'F-01 / F-02 - Starlette ', 4, 533.9999999999999]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 18, [3, 'F-03 / F-04 - Starlette ', 4, 634.7999999999998]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 19, [3, 'F-05 - Appel externe via ', 4, 711.5999999999998]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 20, [3, 'F-06 - Exception masquee', 5, 230.4]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 21, [3, 'F-07 / F-08 - Usage de ', 5, 397.2]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 22, [2, '7. Plan de remediations', 5, 600.3999999999999]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 23, [2, '8. Resultat du secret scan', 6, 70.0]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 24, [2, '9. Conclusion', 6, 151.60000000000002]
+   DEBUG: 2026-07-28 11:04:20,484:      pdf_renderer.py:   53: 25, [2, '10. Finalisation du rendu', 6, 293.20000000000005]

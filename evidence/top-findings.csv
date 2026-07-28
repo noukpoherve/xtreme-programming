@@ -1,0 +1,9 @@
+ID,outil,fichier_ou_composant,severite_cvss,CWE,description_courte,exploitabilite_estimee
+F-01,Trivy,iot-service -> starlette@1.0.0,HIGH 7.5,CWE-918,"SSRF et fuite potentielle d'identifiants NTLM via UNC path sous Windows",Moyenne a elevee
+F-02,Trivy,alert-service -> starlette@1.0.0,HIGH 7.5,CWE-918,"SSRF et fuite potentielle d'identifiants NTLM via UNC path sous Windows",Moyenne a elevee
+F-03,Trivy,iot-service -> starlette@1.0.0,HIGH 7.5,CWE-770,"Limites request.form() ignorees pour application/x-www-form-urlencoded, risque DoS",Elevee
+F-04,Trivy,alert-service -> starlette@1.0.0,HIGH 7.5,CWE-770,"Limites request.form() ignorees pour application/x-www-form-urlencoded, risque DoS",Elevee
+F-05,Bandit,iot-service/src/iot_service/hubeau_qualite_client.py:201,MEDIUM,CWE-22,"Usage de urllib.request.urlopen() a auditer pour les schemas autorises",Moyenne
+F-06,Bandit,alert-service/src/alert_service/websocket.py:90,LOW,CWE-703,"try/except/pass masque une erreur de fermeture WebSocket",Faible a moyenne
+F-07,Bandit,iot-service/src/iot_service/simulator/generator.py:51,LOW,CWE-330,"random.Random() non crypto",Faible
+F-08,Bandit,iot-service/src/iot_service/simulator/orchestrator.py:118,LOW,CWE-330,"random.uniform() non crypto",Faible

@@ -111,7 +111,8 @@ repos:
 
       - id: forbid-commit-to-master-without-coauthor
         name: Enforce commit format
-        entry: bash -c 'echo "Use Conventional Commits: feat/fix/chore/docs/ci/test/refactor"'
+        entry: >
+         bash -c 'echo "Use Conventional Commits: feat/fix/chore/docs/ci/test/refactor"'
         language: system
         always_run: true
         pass_filenames: false

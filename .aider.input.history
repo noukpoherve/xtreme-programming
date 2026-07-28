@@ -1,0 +1,24 @@
+
+# 2026-07-02 11:08:24.769868
++Y
+
+# 2026-07-02 11:08:49.310347
++N
+
+# 2026-07-02 11:09:25.116040
++/ls
+
+# 2026-07-02 11:11:17.534691
++/add supervision-service/src/supervision_service/main.py supervision-service/src/supervision_service/api.py
+
+# 2026-07-02 11:11:36.078873
++je voudrais que tu annalyse tous les fichiers 
+
+# 2026-07-02 11:22:15.353115
++je voudrais que tu cree un fichier changelog et tu mets tout le necessaire 
+
+# 2026-07-02 11:40:03.962322
++Y
+
+# 2026-07-02 11:43:00.522770
++mets a jour le fichier changelog.md avec les dates te tout ce que le repo comporte et fais un commit 
