@@ -28,12 +28,12 @@ Archive de rendu pour l’industrialisation du microservice **Python FastAPI** d
 
 ```text
 EC03_P1_NomPrenom_UrbanHub_CICD/
-├── 00_extraits_code/          ← domaine, API, tests (iot-service)
-├── 01_pipeline.yml            ← pipeline 6 étapes (étape 3 — en cours)
-├── 02_scripts/                ← smoke / scans (complété avec le pipeline)
-├── 03_rapport_tests.md        ← preuves tests + coverage (à finaliser après pipeline vert)
+├── 00_extraits_code/ ← domaine, API, tests (iot-service)
+├── 01_pipeline.yml ← pipeline 6 étapes (étape 3 — en cours)
+├── 02_scripts/ ← smoke / scans (complété avec le pipeline)
+├── 03_rapport_tests.md ← preuves tests + coverage (à finaliser après pipeline vert)
 ├── 04_analyse_qualite_securite.md
-└── README.md                    ← ce fichier (+ section IA)
+└── README.md ← ce fichier (+ section IA)
 ```
 
 Les versions PDF (`03_*.pdf`, `04_*.pdf`) seront générées à partir des `.md` avant envoi du ZIP.
@@ -108,10 +108,10 @@ Checklist à respecter **dans tout le contenu du ZIP** (code, YAML, logs collés
 
 | Livrable | Fichier | Statut |
 |----------|---------|--------|
-| Code source | `00_extraits_code/` | ✅ Complet |
-| Pipeline CI/CD | `01_pipeline.yml` & `.github/workflows/ec03-iot-service.yml` | ✅ 6/6 étapes OK (Bloquant) |
-| Scripts locaux | `02_scripts/` (`run_local_pipeline.sh`, `smoke_test.sh`) | ✅ Opérationnels |
-| Rapport de tests | `03_rapport_tests.md` | ✅ Complété + anonymisé |
-| Rapport Qualité & Sécurité | `04_analyse_qualite_securite.md` | ✅ Complété + anonymisé |
-| Notice & IA | `README.md` | ✅ Conforme |
+| Code source | `00_extraits_code/` | Complet |
+| Pipeline CI/CD | `01_pipeline.yml` & `.github/workflows/ec03-iot-service.yml` | 6/6 étapes OK (Bloquant) |
+| Scripts locaux | `02_scripts/` (`run_local_pipeline.sh`, `smoke_test.sh`) | Opérationnels |
+| Rapport de tests | `03_rapport_tests.md` | Complété + anonymisé |
+| Rapport Qualité & Sécurité | `04_analyse_qualite_securite.md` | Complété + anonymisé |
+| Notice & IA | `README.md` | Conforme |
 

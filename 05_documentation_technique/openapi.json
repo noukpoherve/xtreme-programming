@@ -1,0 +1,219 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "UrbanHub iot-service",
+    "description": "Microservice d'ingestion de la qualite de l'eau de la Seine — Plateforme Smart City UrbanHub",
+    "version": "0.1.1"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Liveness probe + component status",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "example": {
+                  "status": "healthy",
+                  "version": "0.1.1",
+                  "components": {
+                    "kafka_producer": "up",
+                    "quality_poller": "running",
+                    "quality_stations": 6
+                  },
+                  "metrics": {
+                    "quality_cycles": 4,
+                    "quality_messages_published": 24,
+                    "total_messages_sent": 150
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sensors/{sensor_id}/metrics": {
+      "post": {
+        "summary": "HTTP Ingestion Gateway",
+        "description": "Allows physical IoT sensors to POST metrics directly. Maps input payload to a canonical WaterMeasurementEvent and publishes it to Kafka.",
+        "operationId": "post_sensor_metrics_api_sensors__sensor_id__metrics_post",
+        "parameters": [
+          {
+            "name": "sensor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id",
+              "example": "SEINE-VITRY-001"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SensorMetricsPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted — Mesure validee et publiee sur Kafka",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "example": {
+                  "status": "accepted",
+                  "event_id": "550e8400-e29b-41d4-a716-446655440000",
+                  "sensor_id": "SEINE-VITRY-001",
+                  "published": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Capteur inconnu",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "UNKNOWN_SENSOR",
+                  "message": "Sensor 'XXXXX' is not registered in the system."
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error — Donnees hors bornes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable — Kafka injoignable",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "KAFKA_UNAVAILABLE",
+                  "message": "Failed to publish metrics to the event bus."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SensorMetricsPayload": {
+        "type": "object",
+        "title": "SensorMetricsPayload",
+        "required": ["ph", "turbidite_ntu", "temperature_c", "niveau_m", "debit_m3s", "oxygene_dissous_mgl"],
+        "properties": {
+          "ph": {
+            "type": "number",
+            "title": "pH level",
+            "description": "pH level (0-14)",
+            "minimum": 0.0,
+            "maximum": 14.0,
+            "example": 7.45
+          },
+          "turbidite_ntu": {
+            "type": "number",
+            "title": "Turbidity in NTU",
+            "description": "Turbidity in NTU",
+            "minimum": 0.0,
+            "example": 12.8
+          },
+          "temperature_c": {
+            "type": "number",
+            "title": "Temperature in Celsius",
+            "description": "Temperature in Celsius",
+            "example": 19.2
+          },
+          "niveau_m": {
+            "type": "number",
+            "title": "Water level in meters",
+            "description": "Water level in meters",
+            "minimum": 0.0,
+            "example": 1.15
+          },
+          "debit_m3s": {
+            "type": "number",
+            "title": "Flow rate in m3/s",
+            "description": "Flow rate in m3/s",
+            "minimum": 0.0,
+            "example": 215.0
+          },
+          "oxygene_dissous_mgl": {
+            "type": "number",
+            "title": "Dissolved oxygen in mg/L",
+            "description": "Dissolved oxygen in mg/L",
+            "minimum": 0.0,
+            "example": 8.3
+          },
+          "qualite_signal": {
+            "type": "string",
+            "title": "Quality of signal",
+            "description": "Quality of signal",
+            "default": "GOOD"
+          },
+          "firmware_version": {
+            "type": "string",
+            "title": "Firmware version of the sensor",
+            "description": "Firmware version of the sensor",
+            "default": "1.0.0"
+          }
+        }
+      },
+      "HTTPValidationError": {
+        "type": "object",
+        "title": "HTTPValidationError",
+        "properties": {
+          "detail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "title": "ValidationError",
+        "required": ["loc", "msg", "type"],
+        "properties": {
+          "loc": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {"type": "string"},
+                {"type": "integer"}
+              ]
+            },
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        }
+      }
+    }
+  }
+}

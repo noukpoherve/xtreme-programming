@@ -1,19 +1,11 @@
-<<<<<<< HEAD
-#  Rapport de Synthèse Décideur / Client (Méthode BLUF)
-=======
 # Rapport de Synthèse Décideur / Client (Méthode BLUF)
->>>>>>> 3c2250d385a9cbf1057889068587388be2a50437
 
 > **Projet** : Plateforme Smart City UrbanHub — Microservice d'Ingestion Qualité de l'Eau (`iot-service`)
 > **Public cible** : Direction Générale, Métier Smart City, Responsables RSE & IT
 
 ---
 
-<<<<<<< HEAD
-##  BLUF (Bottom Line Up Front) — L’Essentiel en Un Coup d’Œil
-=======
 ## BLUF (Bottom Line Up Front) — L’Essentiel en Un Coup d’Œil
->>>>>>> 3c2250d385a9cbf1057889068587388be2a50437
 
 Le microservice **`iot-service`** fournit à la collectivité une solution clé en main, industrialisée et sécurisée pour **surveiller en temps réel la santé écologique de la Seine**.
 
@@ -21,11 +13,7 @@ Grâce à une architecture hybride combinant **données réelles publiques** (mi
 
 ---
 
-<<<<<<< HEAD
-##  1. Bénéfices Métiers & Opérationnels
-=======
 ## 1. Bénéfices Métiers & Opérationnels
->>>>>>> 3c2250d385a9cbf1057889068587388be2a50437
 
 - **Surveillance Continue & Temps Réel** : Ingestion automatique des données de 12 points stratégiques de la Seine (de Vitry-sur-Seine jusqu'à Colombes).
 - **Indicateurs Clés de Santé Environnementale** : Suivi de 5 paramètres physico-chimiques majeurs (pH, température, oxygène dissous, pollution organique DCO, ammonium).
@@ -33,11 +21,7 @@ Grâce à une architecture hybride combinant **données réelles publiques** (mi
 
 ---
 
-<<<<<<< HEAD
-##  2. Impacts Écologiques & Sobriété Numérique (Green IT)
-=======
 ## 2. Impacts Écologiques & Sobriété Numérique (Green IT)
->>>>>>> 3c2250d385a9cbf1057889068587388be2a50437
 
 - **Réduction de l'Empreinte Carbone par Polling Intelligent** :
  - L'API d'État Hub'Eau met à jour ses analyses de laboratoire toutes les quelques heures.
@@ -47,11 +31,7 @@ Grâce à une architecture hybride combinant **données réelles publiques** (mi
 
 ---
 
-<<<<<<< HEAD
-##  3. Bénéfices Financiers & ROI
-=======
 ## 3. Bénéfices Financiers & ROI
->>>>>>> 3c2250d385a9cbf1057889068587388be2a50437
 
 - **Zéro Coût de Licence Logicielle** : Architecture bâtie à 100 % sur des technologies Open Source éprouvées (FastAPI, Python 3.13, Apache Kafka, Docker).
 - **Zéro Redondance de Capteurs Physiques** : Réutilisation directe de l'Open Data public Hub'Eau pour 6 stations clés, économisant l'achat, l'installation et la maintenance de 6 sondes physiques coûteuses (économie estimée à > 45 000 € de CAPEX initial).
@@ -59,11 +39,7 @@ Grâce à une architecture hybride combinant **données réelles publiques** (mi
 
 ---
 
-<<<<<<< HEAD
-##  4. Synthèse des Recommandations Décideur
-=======
 ## 4. Synthèse des Recommandations Décideur
->>>>>>> 3c2250d385a9cbf1057889068587388be2a50437
 
 | Axe | Recommandation | Impact pour la Collectivité |
 |-----|----------------|-----------------------------|
