@@ -1,6 +1,6 @@
 # Rapport de Synthèse Décideur / Client (Méthode BLUF)
 
-> **Projet** : Platforme Smart City UrbanHub — Microservice d'Ingestion Qualité de l'Eau (`iot-service`)
+> **Projet** : Plateforme Smart City UrbanHub — Microservice d'Ingestion Qualité de l'Eau (`iot-service`)
 > **Public cible** : Direction Générale, Métier Smart City, Responsables RSE & IT
 
 ---
@@ -34,7 +34,7 @@ Grâce à une architecture hybride combinant **données réelles publiques** (mi
 ## 3. Bénéfices Financiers & ROI
 
 - **Zéro Coût de Licence Logicielle** : Architecture bâtie à 100 % sur des technologies Open Source éprouvées (FastAPI, Python 3.13, Apache Kafka, Docker).
-- **Zéro Redondance de Capteurs Physiques** : Réutilisation directe de l'Open Data public Hub'Eau pour 6 stations clés, économisant l'achat, l'installation et la maintenance de 6 sondes physiques coûteuses (économie estimée à > 45 000 € d'CAPEX initial).
+- **Zéro Redondance de Capteurs Physiques** : Réutilisation directe de l'Open Data public Hub'Eau pour 6 stations clés, économisant l'achat, l'installation et la maintenance de 6 sondes physiques coûteuses (économie estimée à > 45 000 € de CAPEX initial).
 - **Diminution de la Dette Technique** : Chaîne d'intégration continue bloquante (6 étapes CI/CD) et automatisation DevSecOps (Gitleaks, Bandit, Trivy) garantissant zéro faille critique en production et réduisant les coûts de maintenance corrective.
 
 ---

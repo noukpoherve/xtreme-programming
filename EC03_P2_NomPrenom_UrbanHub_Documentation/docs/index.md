@@ -11,8 +11,8 @@ Le microservice `iot-service` constitue la porte d'entrée de données pour la p
 ```mermaid
 graph LR
  subgraph Sources ["Sources de données"]
- HubEau[" API Hub'Eau (Réel - 6h)"]
- Simu[" Simulateur (Virtuel - 5min)"]
+ HubEau["API Hub'Eau (Réel - 6h)"]
+ Simu["Simulateur (Virtuel - 5min)"]
  end
 
  subgraph Core ["Microservice iot-service"]

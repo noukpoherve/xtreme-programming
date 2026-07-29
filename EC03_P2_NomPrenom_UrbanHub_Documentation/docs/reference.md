@@ -33,7 +33,7 @@ Le microservice expose ses spécifications sous forme de schémas OpenAPI v3 acc
 
 - **Description** : Accepte les métriques d'un capteur physique, les valide via Pydantic v2 et les publie sur le topic Kafka `mesure.qualite.eau`.
 - **Paramètres de Path** :
- - `sensor_id` (string, requis) : Identifiant du capteur (ex. `SEINE-VITRY-001`). Must follow pattern `SEINE-[A-Z0-9-]+`.
+ - `sensor_id` (string, requis) : Identifiant du capteur (ex. `SEINE-VITRY-001`). Doit respecter le format `SEINE-[A-Z0-9-]+`.
 - **Headers requis** : `Content-Type: application/json`
 - **Codes de retour** :
  - `200 OK` : Mesure acceptée et transmise à Kafka.
@@ -127,18 +127,33 @@ class SensorMetricsInput(BaseModel):
 
 ---
 
-## Docstrings & Mkdocstrings
+## Docstrings & Convention Google Style
 
 Le code source du microservice est entièrement annoté selon les conventions **Google Python Style Guide**.
 
-Exemple d'extraction via le plugin `mkdocstrings` :
+Exemple de docstring issue du code source :
 
-::: iot_service.hubeau_qualite_client.HubEauQualiteClient
- options:
- show_source: true
- heading_level: 3
+```python
+class HubEauQualiteClient:
+    """
+    Fetches the latest water-quality snapshot for a station.
 
-::: iot_service.simulator.orchestrator.SimulatorOrchestrator
- options:
- show_source: true
- heading_level: 3
+    Strategy:
+      1. For each known parameter (pH, O2, ...) call `analyse_pc` once.
+      2. Sort by `date_prelevement DESC` and take the first row.
+      3. Aggregate into a single `LatestQualityMeasurement`.
+    """
+
+    def get_latest(self, station_code: str) -> LatestQualityMeasurement | None:
+        """Return the latest available snapshot for the given station.
+
+        Args:
+            station_code: Code Sandre de la station Hub'Eau.
+
+        Returns:
+            LatestQualityMeasurement or None if no data available.
+        """
+        ...
+```
+
+Le plugin `mkdocstrings-python` peut etre active ulterieurement pour generer automatiquement la reference API a partir de ces annotations.
