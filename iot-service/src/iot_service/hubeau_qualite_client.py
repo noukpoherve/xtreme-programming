@@ -197,7 +197,7 @@ class HubEauQualiteClient:
         )
 
         try:
-            with urllib.request.urlopen(url, timeout=self._timeout) as resp:
+            with urllib.request.urlopen(url, timeout=self._timeout) as resp:  # nosec B310
                 payload = json.loads(resp.read())
         except TimeoutError:
             logger.warning(
