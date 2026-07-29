@@ -19,7 +19,6 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -65,12 +64,12 @@ class LatestQualityMeasurement:
     station_name: str
     latitude: float
     longitude: float
-    sampled_at: Optional[datetime] = None
-    ph: Optional[float] = None
-    temperature_c: Optional[float] = None
-    dissolved_oxygen_mgl: Optional[float] = None
-    cod_mgl: Optional[float] = None  # Demande Chimique en Oxygène (pollution indicator)
-    ammonium_mgl: Optional[float] = None
+    sampled_at: datetime | None = None
+    ph: float | None = None
+    temperature_c: float | None = None
+    dissolved_oxygen_mgl: float | None = None
+    cod_mgl: float | None = None  # Demande Chimique en Oxygène (pollution indicator)
+    ammonium_mgl: float | None = None
 
     def is_complete(self) -> bool:
         """A measurement is usable for state-machine analysis only if it has pH + O₂."""
@@ -109,7 +108,7 @@ class HubEauQualiteClient:
     def __init__(self, *, timeout_seconds: float = 15.0) -> None:
         self._timeout = timeout_seconds
 
-    def get_latest(self, station_code: str) -> Optional[LatestQualityMeasurement]:
+    def get_latest(self, station_code: str) -> LatestQualityMeasurement | None:
         """
         Return the latest available snapshot for the given station, or None
         if no recent data could be retrieved.
@@ -122,7 +121,7 @@ class HubEauQualiteClient:
         import concurrent.futures
 
         latest_by_param: dict[str, HubEauAnalysis] = {}
-        station_meta: Optional[HubEauAnalysis] = None
+        station_meta: HubEauAnalysis | None = None
 
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=len(ALL_QUALITY_PARAMS)
@@ -183,7 +182,7 @@ class HubEauQualiteClient:
     # ────────────────────────────────────────────────
     def _fetch_latest_analysis(
         self, station_code: str, parameter_code: str
-    ) -> Optional[HubEauAnalysis]:
+    ) -> HubEauAnalysis | None:
         """
         Fetch the most recent analysis for (station, parameter).
         Hub'Eau returns analyses sorted ASC by date; we ask size=20 and

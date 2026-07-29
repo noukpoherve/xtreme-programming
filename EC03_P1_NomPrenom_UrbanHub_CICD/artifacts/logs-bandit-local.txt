@@ -1,0 +1,41 @@
+﻿uv : [main]	INFO	profile include tests: None
+At C:\Users\hansk\AppData\Local\Temp\ps-script-5e6529dc-07b3-4dfc-8a8a-a5e42beb511d.ps1:88 char:334
++ ... ogs-mypy-local.txt"; uv run bandit -r src/ -f screen -ll 2>&1 | Out-F ...
++                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([main]	INFO	profile include tests: None:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[main]	INFO	profile exclude tests: None
+[main]	INFO	cli include tests: None
+[main]	INFO	cli exclude tests: None
+[main]	INFO	running on Python 3.13.14
+Run started:2026-07-29 08:36:28.606603+00:00
+
+Test results:
+>> Issue: [B310:blacklist] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen
+   Location: src/iot_service\hubeau_qualite_client.py:200:17
+199	        try:
+200	            with urllib.request.urlopen(url, timeout=self._timeout) as resp:
+201	                payload = json.loads(resp.read())
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 1213
+	Total lines skipped (#nosec): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 2
+		Medium: 1
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 3
+Files skipped (0):

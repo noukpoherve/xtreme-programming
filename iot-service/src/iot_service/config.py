@@ -48,7 +48,7 @@ class Settings:
     )
 
     @classmethod
-    def from_env(cls) -> "Settings":
+    def from_env(cls) -> Settings:
         """Build settings from environment variables."""
         exclude_raw = os.getenv("SIMULATOR_EXCLUDE_SENSORS")
         exclude = (

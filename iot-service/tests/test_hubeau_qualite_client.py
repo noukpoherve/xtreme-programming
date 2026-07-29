@@ -8,13 +8,12 @@ from __future__ import annotations
 import json
 from unittest.mock import patch
 
-
 from iot_service.hubeau_qualite_client import (
-    HubEauQualiteClient,
-    LatestQualityMeasurement,
     PARAM_OXYGEN,
     PARAM_PH,
     PARAM_TEMP,
+    HubEauQualiteClient,
+    LatestQualityMeasurement,
 )
 
 

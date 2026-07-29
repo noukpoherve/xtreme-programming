@@ -1,19 +1,18 @@
 import asyncio
 import logging
 import uuid
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from datetime import datetime, UTC
-from typing import AsyncIterator
+from datetime import UTC, datetime
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-
-from iot_service.simulator.sensors import SENSORS
 
 from iot_service.config import settings
 from iot_service.kafka_producer import MeasurementProducer
 from iot_service.quality_poller import HubEauQualityPoller
 from iot_service.simulator.orchestrator import SimulationOrchestrator
+from iot_service.simulator.sensors import SENSORS
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

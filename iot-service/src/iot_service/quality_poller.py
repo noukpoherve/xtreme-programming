@@ -22,7 +22,7 @@ from iot_service.hubeau_qualite_client import (
     LatestQualityMeasurement,
 )
 from iot_service.kafka_producer import MeasurementProducer
-from iot_service.station_mapping import StationMapping, STATION_MAPPING
+from iot_service.station_mapping import STATION_MAPPING, StationMapping
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ class HubEauQualityPoller:
                     self._stop_event.wait(),
                     timeout=self._interval,
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass  # Normal: tick
 
     async def poll_once_now(self) -> int:
