@@ -1,22 +1,22 @@
-# 🌊 UrbanHub — Microservice `iot-service` (Documentation Doc-as-Code)
+#  UrbanHub — Microservice `iot-service` (Documentation Doc-as-Code)
 
 > **Documentation Technique & d'Exploitation** (Épreuve certifiante **EC03 — Partie 2**, Compétence **C20** du référentiel EADL / RNCP 39765).
 
 ---
 
-## 🎯 Présentation Générale
+##  Présentation Générale
 
 Ce dépôt contient la documentation technique versionnée (**Doc-as-Code**) pour le microservice **`iot-service`** de la plateforme Smart City **UrbanHub**.
 
 Le microservice `iot-service` assure l'ingestion, la validation et la publication en temps réel des mesures de **qualité de l'eau de la Seine** provenant de deux sources distinctes :
-1. **🌐 API Officielle Hub'Eau (v2 qualite_rivieres)** : Ingestion réelle auprès de 6 stations physiques le long de la Seine (pH, température, oxygène dissous, DCO, ammonium).
-2. **🎲 Simulateur Local Intégré** : Génération autonome de séries temporelles simulées pour 6 capteurs virtuels (cycle diurne, marche aléatoire, événements de pollution injectables).
+1. ** API Officielle Hub'Eau (v2 qualite_rivieres)** : Ingestion réelle auprès de 6 stations physiques le long de la Seine (pH, température, oxygène dissous, DCO, ammonium).
+2. ** Simulateur Local Intégré** : Génération autonome de séries temporelles simulées pour 6 capteurs virtuels (cycle diurne, marche aléatoire, événements de pollution injectables).
 
 Les événements validés sont publiés sur le bus de messages **Apache Kafka** (topic `mesure.qualite.eau`) pour alimenter le moteur de détection d'anomalies (`alert-service`) et le tableau de bord temps réel (`dashboard`).
 
 ---
 
-## 🏛️ Organisation Diátaxis
+##  Organisation Diátaxis
 
 Cette documentation s'appuie strictement sur le framework **Diátaxis** afin d'offrir une structure claire, reproductible et adaptée aux besoins de chaque profil de lecteur :
 
@@ -38,7 +38,7 @@ EC03_P2_NomPrenom_UrbanHub_Documentation/
 
 ---
 
-## 🚀 Consultation & Navigation
+##  Consultation & Navigation
 
 - **Portail web interactif** : Généré via **MkDocs Material** avec recherche full-text, thème clair/sombre et diagrammes Mermaid.js.
 - **Publication multi-versions** : Support de la stratégie `mike` pour le suivi des versions sur GitHub Pages.
@@ -46,7 +46,7 @@ EC03_P2_NomPrenom_UrbanHub_Documentation/
 
 ---
 
-## 🤖 Section IA (Déclaration Obligatoire)
+##  Section IA (Déclaration Obligatoire)
 
 ### 1. Outils IA et Plateformes Utilisées
 
@@ -80,7 +80,7 @@ L'Intelligence Artificielle a été mobilisée pour :
 
 ---
 
-## 🛡️ Conformité et Anonymat Strict
+##  Conformité et Anonymat Strict
 
 - **Nom / Prénom** : Aucun nom individuel ne figure dans les documents source de cette archive.
 - **E-mails & Git IDs** : Aucune donnée d'identification personnelle.
