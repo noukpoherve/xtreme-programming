@@ -1,10 +1,10 @@
-# 📚 Référence Technique — API REST, Modèles & Configuration
+# Référence Technique — API REST, Modèles & Configuration
 
 > **Objectif** : Fournir une documentation de référence exhaustive du microservice `iot-service` (spécifications REST, schémas Pydantic v2, variables d'environnement, CLI et docstrings).
 
 ---
 
-## 🌐 Spécification OpenAPI / REST
+## Spécification OpenAPI / REST
 
 Le microservice expose ses spécifications sous forme de schémas OpenAPI v3 accessibles sur `/docs` (Swagger UI) et `/openapi.json`.
 
@@ -20,10 +20,10 @@ Le microservice expose ses spécifications sous forme de schémas OpenAPI v3 acc
 
 ```json
 {
-  "status": "healthy",
-  "service": "iot-service",
-  "version": "0.1.1",
-  "timestamp": "2026-07-29T14:00:00Z"
+ "status": "healthy",
+ "service": "iot-service",
+ "version": "0.1.1",
+ "timestamp": "2026-07-29T14:00:00Z"
 }
 ```
 
@@ -33,23 +33,23 @@ Le microservice expose ses spécifications sous forme de schémas OpenAPI v3 acc
 
 - **Description** : Accepte les métriques d'un capteur physique, les valide via Pydantic v2 et les publie sur le topic Kafka `mesure.qualite.eau`.
 - **Paramètres de Path** :
-  - `sensor_id` (string, requis) : Identifiant du capteur (ex. `SEINE-VITRY-001`). Must follow pattern `SEINE-[A-Z0-9-]+`.
+ - `sensor_id` (string, requis) : Identifiant du capteur (ex. `SEINE-VITRY-001`). Must follow pattern `SEINE-[A-Z0-9-]+`.
 - **Headers requis** : `Content-Type: application/json`
 - **Codes de retour** :
-  - `200 OK` : Mesure acceptée et transmise à Kafka.
-  - `422 Unprocessable Entity` : Données invalides (ex. pH > 14, turbidité négative).
-  - `500 Internal Server Error` : Échec d'envoi Kafka.
+ - `200 OK` : Mesure acceptée et transmise à Kafka.
+ - `422 Unprocessable Entity` : Données invalides (ex. pH > 14, turbidité négative).
+ - `500 Internal Server Error` : Échec d'envoi Kafka.
 
 **Exemple de Payload JSON de requête (Valide)** :
 
 ```json
 {
-  "ph": 7.45,
-  "turbidite_ntu": 12.8,
-  "temperature_c": 19.2,
-  "niveau_m": 1.15,
-  "debit_m3s": 215.0,
-  "oxygene_dissous_mgl": 8.30
+ "ph": 7.45,
+ "turbidite_ntu": 12.8,
+ "temperature_c": 19.2,
+ "niveau_m": 1.15,
+ "debit_m3s": 215.0,
+ "oxygene_dissous_mgl": 8.30
 }
 ```
 
@@ -57,10 +57,10 @@ Le microservice expose ses spécifications sous forme de schémas OpenAPI v3 acc
 
 ```json
 {
-  "status": "accepted",
-  "sensor_id": "SEINE-VITRY-001",
-  "event_id": "550e8400-e29b-41d4-a716-446655440000",
-  "published_to_kafka": true
+ "status": "accepted",
+ "sensor_id": "SEINE-VITRY-001",
+ "event_id": "550e8400-e29b-41d4-a716-446655440000",
+ "published_to_kafka": true
 }
 ```
 
@@ -72,24 +72,24 @@ Toutes les erreurs de validation respectent la structure RFC 7807 avec propagati
 
 ```json
 {
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Validation failed for incoming sensor metrics",
-    "details": [
-      {
-        "loc": ["body", "ph"],
-        "msg": "Input should be less than or equal to 14",
-        "type": "less_than_equal"
-      }
-    ],
-    "trace_id": "req-998877665544332211"
-  }
+ "error": {
+ "code": "VALIDATION_ERROR",
+ "message": "Validation failed for incoming sensor metrics",
+ "details": [
+ {
+ "loc": ["body", "ph"],
+ "msg": "Input should be less than or equal to 14",
+ "type": "less_than_equal"
+ }
+ ],
+ "trace_id": "req-998877665544332211"
+ }
 }
 ```
 
 ---
 
-## 📐 Modèles & Validation Pydantic v2
+## Modèles & Validation Pydantic v2
 
 ### `SensorMetricsInput` (`src/iot_service/config.py` / `main.py`)
 
@@ -98,23 +98,23 @@ from pydantic import BaseModel, Field
 
 
 class SensorMetricsInput(BaseModel):
-    ph: float = Field(..., ge=0.0, le=14.0, description="Potentiel Hydrogène")
-    turbidite_ntu: float = Field(
-        ..., ge=0.0, description="Turbidité en NTU (≥ 0)"
-    )
-    temperature_c: float = Field(
-        ..., ge=-10.0, le=50.0, description="Température (°C)"
-    )
-    niveau_m: float = Field(..., ge=0.0, description="Niveau de l'eau (m)")
-    debit_m3s: float = Field(..., ge=0.0, description="Débit (m³/s)")
-    oxygene_dissous_mgl: float = Field(
-        ..., ge=0.0, le=30.0, description="Oxygène dissous (mg/L)"
-    )
+ ph: float = Field(..., ge=0.0, le=14.0, description="Potentiel Hydrogène")
+ turbidite_ntu: float = Field(
+ ..., ge=0.0, description="Turbidité en NTU (≥ 0)"
+ )
+ temperature_c: float = Field(
+ ..., ge=-10.0, le=50.0, description="Température (°C)"
+ )
+ niveau_m: float = Field(..., ge=0.0, description="Niveau de l'eau (m)")
+ debit_m3s: float = Field(..., ge=0.0, description="Débit (m³/s)")
+ oxygene_dissous_mgl: float = Field(
+ ..., ge=0.0, le=30.0, description="Oxygène dissous (mg/L)"
+ )
 ```
 
 ---
 
-## ⚙️ Variables d'Environnement
+## Variables d'Environnement
 
 | Variable | Type | Valeur par défaut | Description |
 |----------|------|-------------------|-------------|
@@ -127,18 +127,18 @@ class SensorMetricsInput(BaseModel):
 
 ---
 
-## 🐍 Docstrings & Mkdocstrings
+## Docstrings & Mkdocstrings
 
 Le code source du microservice est entièrement annoté selon les conventions **Google Python Style Guide**.
 
 Exemple d'extraction via le plugin `mkdocstrings` :
 
 ::: iot_service.hubeau_qualite_client.HubEauQualiteClient
-    options:
-      show_source: true
-      heading_level: 3
+ options:
+ show_source: true
+ heading_level: 3
 
 ::: iot_service.simulator.orchestrator.SimulatorOrchestrator
-    options:
-      show_source: true
-      heading_level: 3
+ options:
+ show_source: true
+ heading_level: 3

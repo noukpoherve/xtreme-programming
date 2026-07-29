@@ -1,10 +1,10 @@
-#  UrbanHub — Microservice `iot-service` (Documentation Doc-as-Code)
+# UrbanHub — Microservice `iot-service` (Documentation Doc-as-Code)
 
 > **Documentation Technique & d'Exploitation** (Épreuve certifiante **EC03 — Partie 2**, Compétence **C20** du référentiel EADL / RNCP 39765).
 
 ---
 
-##  Présentation Générale
+## Présentation Générale
 
 Ce dépôt contient la documentation technique versionnée (**Doc-as-Code**) pour le microservice **`iot-service`** de la plateforme Smart City **UrbanHub**.
 
@@ -16,29 +16,29 @@ Les événements validés sont publiés sur le bus de messages **Apache Kafka** 
 
 ---
 
-##  Organisation Diátaxis
+## Organisation Diátaxis
 
 Cette documentation s'appuie strictement sur le framework **Diátaxis** afin d'offrir une structure claire, reproductible et adaptée aux besoins de chaque profil de lecteur :
 
 ```text
 EC03_P2_NomPrenom_UrbanHub_Documentation/
-├── mkdocs.yml                      ← Configuration du portail MkDocs Material
-├── README.md                       ← Ce document (Présentation + Section IA)
+├── mkdocs.yml ← Configuration du portail MkDocs Material
+├── README.md ← Ce document (Présentation + Section IA)
 └── docs/
-    ├── index.md                    ← Accueil du portail & Vue d'ensemble
-    ├── tutorial.md                 ← 1. TUTORIEL : Prise en main pas-à-pas (débutant)
-    ├── how-to-guides.md            ← 2. GUIDES PRATIQUES : Déploiement Docker & Exploitation
-    ├── reference.md                ← 3. RÉFÉRENCE : Spécifications API REST, Pydantic v2 & Env Vars
-    ├── explanation.md              ← 4. EXPLICATION : Architecture SOLID, DDD & Diagrammes Mermaid.js
-    ├── security-and-cicd.md        ← Pipeline CI/CD 6 étapes & Résultats DevSecOps
-    ├── troubleshooting.md          ← Guide de dépannage & Matrice des 5 incidents courants
-    ├── maintenance-changelog.md    ← Guide de maintenance & Changelog Conventional Commits
-    └── client-summary.md           ← Synthèse BLUF Décideur / Impacts écologiques & financiers
+ ├── index.md ← Accueil du portail & Vue d'ensemble
+ ├── tutorial.md ← 1. TUTORIEL : Prise en main pas-à-pas (débutant)
+ ├── how-to-guides.md ← 2. GUIDES PRATIQUES : Déploiement Docker & Exploitation
+ ├── reference.md ← 3. RÉFÉRENCE : Spécifications API REST, Pydantic v2 & Env Vars
+ ├── explanation.md ← 4. EXPLICATION : Architecture SOLID, DDD & Diagrammes Mermaid.js
+ ├── security-and-cicd.md ← Pipeline CI/CD 6 étapes & Résultats DevSecOps
+ ├── troubleshooting.md ← Guide de dépannage & Matrice des 5 incidents courants
+ ├── maintenance-changelog.md ← Guide de maintenance & Changelog Conventional Commits
+ └── client-summary.md ← Synthèse BLUF Décideur / Impacts écologiques & financiers
 ```
 
 ---
 
-##  Consultation & Navigation
+## Consultation & Navigation
 
 - **Portail web interactif** : Généré via **MkDocs Material** avec recherche full-text, thème clair/sombre et diagrammes Mermaid.js.
 - **Publication multi-versions** : Support de la stratégie `mike` pour le suivi des versions sur GitHub Pages.
@@ -46,7 +46,7 @@ EC03_P2_NomPrenom_UrbanHub_Documentation/
 
 ---
 
-##  Section IA (Déclaration Obligatoire)
+## Section IA (Déclaration Obligatoire)
 
 ### 1. Outils IA et Plateformes Utilisées
 
@@ -80,7 +80,7 @@ L'Intelligence Artificielle a été mobilisée pour :
 
 ---
 
-##  Conformité et Anonymat Strict
+## Conformité et Anonymat Strict
 
 - **Nom / Prénom** : Aucun nom individuel ne figure dans les documents source de cette archive.
 - **E-mails & Git IDs** : Aucune donnée d'identification personnelle.

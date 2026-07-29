@@ -1,20 +1,20 @@
-# 🛡️ Pipeline CI/CD & Sécurité DevSecOps
+# Pipeline CI/CD & Sécurité DevSecOps
 
 > **Objectif** : Expliquer l'architecture du pipeline CI/CD séquentiel et bloquant (6 étapes) et détailler la politique d'analyse de sécurité DevSecOps.
 
 ---
 
-## 🚀 Architecture du Pipeline CI/CD (6 Étapes Bloquantes)
+## Architecture du Pipeline CI/CD (6 Étapes Bloquantes)
 
 Le pipeline `.github/workflows/ec03-iot-service.yml` (et sa copie `01_pipeline.yml`) implémente une chaîne d'intégration continue stricte et 100 % séquentielle :
 
 ```mermaid
 graph LR
-    S1["1 · INSTALL"] --> S2["2 · TEST"]
-    S2 --> S3["3 · QUALITY"]
-    S3 --> S4["4 · SECURITY"]
-    S4 --> S5["5 · BUILD"]
-    S5 --> S6["6 · DEPLOY"]
+ S1["1 · INSTALL"] --> S2["2 · TEST"]
+ S2 --> S3["3 · QUALITY"]
+ S3 --> S4["4 · SECURITY"]
+ S4 --> S5["5 · BUILD"]
+ S5 --> S6["6 · DEPLOY"]
 ```
 
 ### Rôle et garanties de chaque étape
@@ -30,7 +30,7 @@ graph LR
 
 ---
 
-## 🔒 Outillage DevSecOps & Restitution des Scans
+## Outillage DevSecOps & Restitution des Scans
 
 ### 1. Détection de Secrets — Gitleaks
 
@@ -45,9 +45,9 @@ graph LR
 - **Rôle** : Analyse statique du code source Python à la recherche de failles de sécurité (injections, faiblesse cryptographique, appels système à risque).
 - **Commande** : `uv run bandit -r src/ -ll`
 - **Analyse & Décision DevSecOps** :
-  - L'analyseur a levé une alerte de sévérité Medium `B310` sur la fonction `urllib.request.urlopen` au niveau de `hubeau_qualite_client.py`.
-  - **Décision** : Après audit du code, il a été vérifié que l'URL d'appel est construite de façon déterministe en préfixant l'URL par la constante officielle `_BASE_URL = "https://hubeau.eaufrance.fr/api/v2/qualite_rivieres/analyse_pc"`.
-  - Le tag de contournement légitime `# nosec B310` a été apposé sur la ligne pour neutraliser ce faux positif sans affaiblir la sécurité.
+ - L'analyseur a levé une alerte de sévérité Medium `B310` sur la fonction `urllib.request.urlopen` au niveau de `hubeau_qualite_client.py`.
+ - **Décision** : Après audit du code, il a été vérifié que l'URL d'appel est construite de façon déterministe en préfixant l'URL par la constante officielle `_BASE_URL = "https://hubeau.eaufrance.fr/api/v2/qualite_rivieres/analyse_pc"`.
+ - Le tag de contournement légitime `# nosec B310` a été apposé sur la ligne pour neutraliser ce faux positif sans affaiblir la sécurité.
 - **Résultat** : `0 issue` (Medium/High) retenue.
 
 ---
@@ -68,7 +68,7 @@ graph LR
 
 ---
 
-## 👤 Sécurité du Runtime Conteneurisé (Image Non-Root)
+## Sécurité du Runtime Conteneurisé (Image Non-Root)
 
 Pour interdire l'élévation de privilèges dans le conteneur en production, le Dockerfile utilise un utilisateur dédié non-privilégié (`appuser`) :
 

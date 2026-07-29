@@ -1,7 +1,7 @@
 # EC03 — Pipeline CI/CD bloquant · UrbanHub · iot-service
 #
 # Chaîne séquentielle (6 étapes) :
-#   INSTALL → TEST → QUALITY → SECURITY → BUILD → DEPLOY
+# INSTALL → TEST → QUALITY → SECURITY → BUILD → DEPLOY
 #
 # Microservice : iot-service/ (FastAPI, uv + uv.lock)
 # Déploiement local : docker run + 02_scripts/smoke_test.sh
@@ -9,339 +9,339 @@
 name: EC03-UrbanHub-iot-service
 
 on:
-  push:
-    paths:
-      - "iot-service/**"
-      - "EC03_P1_NomPrenom_UrbanHub_CICD/**"
-      - ".github/workflows/ec03-iot-service.yml"
-  pull_request:
-    paths:
-      - "iot-service/**"
-      - "EC03_P1_NomPrenom_UrbanHub_CICD/**"
-  workflow_dispatch:
+ push:
+ paths:
+ - "iot-service/**"
+ - "EC03_P1_NomPrenom_UrbanHub_CICD/**"
+ - ".github/workflows/ec03-iot-service.yml"
+ pull_request:
+ paths:
+ - "iot-service/**"
+ - "EC03_P1_NomPrenom_UrbanHub_CICD/**"
+ workflow_dispatch:
 
 concurrency:
-  group: ec03-iot-${{ github.ref }}
-  cancel-in-progress: true
+ group: ec03-iot-${{ github.ref }}
+ cancel-in-progress: true
 
 permissions:
-  contents: read
+ contents: read
 
 env:
-  SERVICE_DIR: iot-service
-  IMAGE_NAME: urbanhub/iot-service
-  IMAGE_TAG: ec03-${{ github.sha }}
-  EC03_DIR: EC03_P1_NomPrenom_UrbanHub_CICD
+ SERVICE_DIR: iot-service
+ IMAGE_NAME: urbanhub/iot-service
+ IMAGE_TAG: ec03-${{ github.sha }}
+ EC03_DIR: EC03_P1_NomPrenom_UrbanHub_CICD
 
 defaults:
-  run:
-    shell: bash
+ run:
+ shell: bash
 
 jobs:
-  # ═══════════════════════════════════════════════════════════════════
-  # 1 · INSTALL — résolution déterministe (uv sync --frozen)
-  # ═══════════════════════════════════════════════════════════════════
-  install:
-    name: "1 · INSTALL"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+ # ═══════════════════════════════════════════════════════════════════
+ # 1 · INSTALL — résolution déterministe (uv sync --frozen)
+ # ═══════════════════════════════════════════════════════════════════
+ install:
+ name: "1 · INSTALL"
+ runs-on: ubuntu-latest
+ steps:
+ - uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          version: "latest"
+ - name: Install uv
+ uses: astral-sh/setup-uv@v4
+ with:
+ version: "latest"
 
-      - name: Setup Python 3.13
-        run: uv python install 3.13
+ - name: Setup Python 3.13
+ run: uv python install 3.13
 
-      - name: uv sync (frozen lockfile)
-        working-directory: ${{ env.SERVICE_DIR }}
-        run: uv sync --frozen --all-groups --no-progress
+ - name: uv sync (frozen lockfile)
+ working-directory: ${{ env.SERVICE_DIR }}
+ run: uv sync --frozen --all-groups --no-progress
 
-      - name: Upload venv artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ec03-venv
-          path: ${{ env.SERVICE_DIR }}/.venv
-          retention-days: 1
+ - name: Upload venv artifact
+ uses: actions/upload-artifact@v4
+ with:
+ name: ec03-venv
+ path: ${{ env.SERVICE_DIR }}/.venv
+ retention-days: 1
 
-  # ═══════════════════════════════════════════════════════════════════
-  # 2 · TEST — pytest + pytest-cov + test non fonctionnel
-  # ═══════════════════════════════════════════════════════════════════
-  test:
-    name: "2 · TEST"
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v4
+ # ═══════════════════════════════════════════════════════════════════
+ # 2 · TEST — pytest + pytest-cov + test non fonctionnel
+ # ═══════════════════════════════════════════════════════════════════
+ test:
+ name: "2 · TEST"
+ runs-on: ubuntu-latest
+ needs: install
+ steps:
+ - uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
+ - name: Install uv
+ uses: astral-sh/setup-uv@v4
 
-      - name: Setup Python 3.13
-        run: uv python install 3.13
+ - name: Setup Python 3.13
+ run: uv python install 3.13
 
-      - name: Restore dependencies
-        working-directory: ${{ env.SERVICE_DIR }}
-        run: uv sync --frozen --all-groups --no-progress
+ - name: Restore dependencies
+ working-directory: ${{ env.SERVICE_DIR }}
+ run: uv sync --frozen --all-groups --no-progress
 
-      - name: Prepare artifact directory
-        run: mkdir -p ${{ env.EC03_DIR }}/artifacts
+ - name: Prepare artifact directory
+ run: mkdir -p ${{ env.EC03_DIR }}/artifacts
 
-      - name: Pytest + coverage (gate ≥ 50 %)
-        working-directory: ${{ env.SERVICE_DIR }}
-        run: |
-          uv run pytest tests/ -v \
-            --cov=src \
-            --cov-report=term-missing \
-            --cov-report=xml \
-            --cov-fail-under=50 \
-            --junitxml=../${{ env.EC03_DIR }}/artifacts/junit.xml \
-            2>&1 | tee ../${{ env.EC03_DIR }}/artifacts/logs-pytest.txt
+ - name: Pytest + coverage (gate ≥ 50 %)
+ working-directory: ${{ env.SERVICE_DIR }}
+ run: |
+ uv run pytest tests/ -v \
+ --cov=src \
+ --cov-report=term-missing \
+ --cov-report=xml \
+ --cov-fail-under=50 \
+ --junitxml=../${{ env.EC03_DIR }}/artifacts/junit.xml \
+ 2>&1 | tee ../${{ env.EC03_DIR }}/artifacts/logs-pytest.txt
 
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ec03-test-reports
-          path: |
-            ${{ env.EC03_DIR }}/artifacts/junit.xml
-            ${{ env.EC03_DIR }}/artifacts/logs-pytest.txt
-            ${{ env.SERVICE_DIR }}/coverage.xml
+ - name: Upload test reports
+ if: always()
+ uses: actions/upload-artifact@v4
+ with:
+ name: ec03-test-reports
+ path: |
+ ${{ env.EC03_DIR }}/artifacts/junit.xml
+ ${{ env.EC03_DIR }}/artifacts/logs-pytest.txt
+ ${{ env.SERVICE_DIR }}/coverage.xml
 
-  # ═══════════════════════════════════════════════════════════════════
-  # 3 · QUALITY — Ruff + Mypy
-  # ═══════════════════════════════════════════════════════════════════
-  quality:
-    name: "3 · QUALITY"
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v4
+ # ═══════════════════════════════════════════════════════════════════
+ # 3 · QUALITY — Ruff + Mypy
+ # ═══════════════════════════════════════════════════════════════════
+ quality:
+ name: "3 · QUALITY"
+ runs-on: ubuntu-latest
+ needs: install
+ steps:
+ - uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
+ - name: Install uv
+ uses: astral-sh/setup-uv@v4
 
-      - name: Setup Python 3.13
-        run: uv python install 3.13
+ - name: Setup Python 3.13
+ run: uv python install 3.13
 
-      - name: Restore dependencies
-        working-directory: ${{ env.SERVICE_DIR }}
-        run: uv sync --frozen --all-groups --no-progress
+ - name: Restore dependencies
+ working-directory: ${{ env.SERVICE_DIR }}
+ run: uv sync --frozen --all-groups --no-progress
 
-      - name: Prepare artifact directory
-        run: mkdir -p ${{ env.EC03_DIR }}/artifacts
+ - name: Prepare artifact directory
+ run: mkdir -p ${{ env.EC03_DIR }}/artifacts
 
-      - name: Ruff lint
-        working-directory: ${{ env.SERVICE_DIR }}
-        run: |
-          uv run ruff check src/ tests/ \
-            2>&1 | tee ../${{ env.EC03_DIR }}/artifacts/logs-ruff.txt
+ - name: Ruff lint
+ working-directory: ${{ env.SERVICE_DIR }}
+ run: |
+ uv run ruff check src/ tests/ \
+ 2>&1 | tee ../${{ env.EC03_DIR }}/artifacts/logs-ruff.txt
 
-      - name: Ruff format check
-        working-directory: ${{ env.SERVICE_DIR }}
-        run: uv run ruff format --check src/ tests/
+ - name: Ruff format check
+ working-directory: ${{ env.SERVICE_DIR }}
+ run: uv run ruff format --check src/ tests/
 
-      - name: Mypy type check
-        working-directory: ${{ env.SERVICE_DIR }}
-        run: |
-          uv run mypy src/ \
-            2>&1 | tee ../${{ env.EC03_DIR }}/artifacts/logs-mypy.txt
+ - name: Mypy type check
+ working-directory: ${{ env.SERVICE_DIR }}
+ run: |
+ uv run mypy src/ \
+ 2>&1 | tee ../${{ env.EC03_DIR }}/artifacts/logs-mypy.txt
 
-      - name: Upload quality logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ec03-quality-logs
-          path: ${{ env.EC03_DIR }}/artifacts/logs-ruff.txt
+ - name: Upload quality logs
+ if: always()
+ uses: actions/upload-artifact@v4
+ with:
+ name: ec03-quality-logs
+ path: ${{ env.EC03_DIR }}/artifacts/logs-ruff.txt
 
-  # ═══════════════════════════════════════════════════════════════════
-  # 4 · SECURITY — Gitleaks + Trivy fs + Bandit + SBOM CycloneDX
-  # ═══════════════════════════════════════════════════════════════════
-  security:
-    name: "4 · SECURITY"
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+ # ═══════════════════════════════════════════════════════════════════
+ # 4 · SECURITY — Gitleaks + Trivy fs + Bandit + SBOM CycloneDX
+ # ═══════════════════════════════════════════════════════════════════
+ security:
+ name: "4 · SECURITY"
+ runs-on: ubuntu-latest
+ needs: install
+ steps:
+ - uses: actions/checkout@v4
+ with:
+ fetch-depth: 0
 
-      - name: Prepare artifact directory
-        run: mkdir -p ${{ env.EC03_DIR }}/artifacts
+ - name: Prepare artifact directory
+ run: mkdir -p ${{ env.EC03_DIR }}/artifacts
 
-      - name: Gitleaks (secrets — BLOQUANT)
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+ - name: Gitleaks (secrets — BLOQUANT)
+ uses: gitleaks/gitleaks-action@v2
+ env:
+ GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Trivy fs — CRITICAL gate (BLOQUANT)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: fs
-          scan-ref: ${{ env.SERVICE_DIR }}
-          severity: CRITICAL
-          exit-code: "1"
-          ignore-unfixed: true
-          format: json
-          output: ${{ env.EC03_DIR }}/artifacts/trivy-fs-critical.json
-          skip-dirs: .venv
+ - name: Trivy fs — CRITICAL gate (BLOQUANT)
+ uses: aquasecurity/trivy-action@master
+ with:
+ scan-type: fs
+ scan-ref: ${{ env.SERVICE_DIR }}
+ severity: CRITICAL
+ exit-code: "1"
+ ignore-unfixed: true
+ format: json
+ output: ${{ env.EC03_DIR }}/artifacts/trivy-fs-critical.json
+ skip-dirs: .venv
 
-      - name: Trivy fs — rapport HIGH+CRITICAL
-        if: always()
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: fs
-          scan-ref: ${{ env.SERVICE_DIR }}
-          severity: HIGH,CRITICAL
-          exit-code: "0"
-          ignore-unfixed: true
-          format: table
+ - name: Trivy fs — rapport HIGH+CRITICAL
+ if: always()
+ uses: aquasecurity/trivy-action@master
+ with:
+ scan-type: fs
+ scan-ref: ${{ env.SERVICE_DIR }}
+ severity: HIGH,CRITICAL
+ exit-code: "0"
+ ignore-unfixed: true
+ format: table
 
-      - name: Install uv (Bandit)
-        uses: astral-sh/setup-uv@v4
+ - name: Install uv (Bandit)
+ uses: astral-sh/setup-uv@v4
 
-      - name: Setup Python 3.13
-        run: uv python install 3.13
+ - name: Setup Python 3.13
+ run: uv python install 3.13
 
-      - name: Bandit SAST (HIGH+ — BLOQUANT)
-        working-directory: ${{ env.SERVICE_DIR }}
-        run: |
-          uv sync --frozen --all-groups --no-progress
-          uv run bandit -r src/ -f json -o ../${{ env.EC03_DIR }}/artifacts/bandit.json -ll
-          uv run bandit -r src/ -f screen -ll \
-            2>&1 | tee ../${{ env.EC03_DIR }}/artifacts/logs-bandit.txt
+ - name: Bandit SAST (HIGH+ — BLOQUANT)
+ working-directory: ${{ env.SERVICE_DIR }}
+ run: |
+ uv sync --frozen --all-groups --no-progress
+ uv run bandit -r src/ -f json -o ../${{ env.EC03_DIR }}/artifacts/bandit.json -ll
+ uv run bandit -r src/ -f screen -ll \
+ 2>&1 | tee ../${{ env.EC03_DIR }}/artifacts/logs-bandit.txt
 
-      - name: SBOM CycloneDX (Trivy)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: fs
-          scan-ref: ${{ env.SERVICE_DIR }}
-          format: cyclonedx
-          output: ${{ env.EC03_DIR }}/artifacts/sbom-iot-service.json
-          exit-code: "0"
-          skip-dirs: .venv
+ - name: SBOM CycloneDX (Trivy)
+ uses: aquasecurity/trivy-action@master
+ with:
+ scan-type: fs
+ scan-ref: ${{ env.SERVICE_DIR }}
+ format: cyclonedx
+ output: ${{ env.EC03_DIR }}/artifacts/sbom-iot-service.json
+ exit-code: "0"
+ skip-dirs: .venv
 
-      - name: Upload security artefacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ec03-security-artifacts
-          path: ${{ env.EC03_DIR }}/artifacts/
+ - name: Upload security artefacts
+ if: always()
+ uses: actions/upload-artifact@v4
+ with:
+ name: ec03-security-artifacts
+ path: ${{ env.EC03_DIR }}/artifacts/
 
-  # ═══════════════════════════════════════════════════════════════════
-  # 5 · BUILD — image Docker multi-stage, versionnée
-  # ═══════════════════════════════════════════════════════════════════
-  build:
-    name: "5 · BUILD"
-    runs-on: ubuntu-latest
-    needs: [test, quality, security]
-    steps:
-      - uses: actions/checkout@v4
+ # ═══════════════════════════════════════════════════════════════════
+ # 5 · BUILD — image Docker multi-stage, versionnée
+ # ═══════════════════════════════════════════════════════════════════
+ build:
+ name: "5 · BUILD"
+ runs-on: ubuntu-latest
+ needs: [test, quality, security]
+ steps:
+ - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+ - name: Set up Docker Buildx
+ uses: docker/setup-buildx-action@v3
 
-      - name: Build image (multi-stage, non-root)
-        uses: docker/build-push-action@v6
-        with:
-          context: ./${{ env.SERVICE_DIR }}
-          push: false
-          load: true
-          tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+ - name: Build image (multi-stage, non-root)
+ uses: docker/build-push-action@v6
+ with:
+ context: ./${{ env.SERVICE_DIR }}
+ push: false
+ load: true
+ tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+ cache-from: type=gha
+ cache-to: type=gha,mode=max
 
-      - name: Verify non-root USER in image
-        run: |
-          USER=$(docker inspect --format='{{.Config.User}}' ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }})
-          echo "Container USER=$USER"
-          test -n "$USER" && test "$USER" != "root" && test "$USER" != "0"
+ - name: Verify non-root USER in image
+ run: |
+ USER=$(docker inspect --format='{{.Config.User}}' ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }})
+ echo "Container USER=$USER"
+ test -n "$USER" && test "$USER" != "root" && test "$USER" != "0"
 
-      - name: Save image tarball
-        run: |
-          mkdir -p ${{ env.EC03_DIR }}/artifacts
-          docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
-            | gzip > ${{ env.EC03_DIR }}/artifacts/iot-service-image.tar.gz
+ - name: Save image tarball
+ run: |
+ mkdir -p ${{ env.EC03_DIR }}/artifacts
+ docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
+ | gzip > ${{ env.EC03_DIR }}/artifacts/iot-service-image.tar.gz
 
-      - name: Upload image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ec03-docker-image
-          path: ${{ env.EC03_DIR }}/artifacts/iot-service-image.tar.gz
-          retention-days: 1
+ - name: Upload image artifact
+ uses: actions/upload-artifact@v4
+ with:
+ name: ec03-docker-image
+ path: ${{ env.EC03_DIR }}/artifacts/iot-service-image.tar.gz
+ retention-days: 1
 
-  # ═══════════════════════════════════════════════════════════════════
-  # 6 · DEPLOY — docker run local + smoke tests
-  # ═══════════════════════════════════════════════════════════════════
-  deploy:
-    name: "6 · DEPLOY"
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
+ # ═══════════════════════════════════════════════════════════════════
+ # 6 · DEPLOY — docker run local + smoke tests
+ # ═══════════════════════════════════════════════════════════════════
+ deploy:
+ name: "6 · DEPLOY"
+ runs-on: ubuntu-latest
+ needs: build
+ steps:
+ - uses: actions/checkout@v4
 
-      - name: Download image tarball
-        uses: actions/download-artifact@v4
-        with:
-          name: ec03-docker-image
-          path: ${{ env.EC03_DIR }}/artifacts
+ - name: Download image tarball
+ uses: actions/download-artifact@v4
+ with:
+ name: ec03-docker-image
+ path: ${{ env.EC03_DIR }}/artifacts
 
-      - name: Load Docker image
-        run: |
-          gunzip -c ${{ env.EC03_DIR }}/artifacts/iot-service-image.tar.gz | docker load
-          docker tag ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.IMAGE_NAME }}:ec03-local
+ - name: Load Docker image
+ run: |
+ gunzip -c ${{ env.EC03_DIR }}/artifacts/iot-service-image.tar.gz | docker load
+ docker tag ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.IMAGE_NAME }}:ec03-local
 
-      - name: docker run (local)
-        run: |
-          docker run -d \
-            --name ec03-iot-smoke \
-            -p 18001:8001 \
-            -e KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092 \
-            ${{ env.IMAGE_NAME }}:ec03-local
+ - name: docker run (local)
+ run: |
+ docker run -d \
+ --name ec03-iot-smoke \
+ -p 18001:8001 \
+ -e KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092 \
+ ${{ env.IMAGE_NAME }}:ec03-local
 
-      - name: Smoke tests
-        run: |
-          chmod +x ${{ env.EC03_DIR }}/02_scripts/smoke_test.sh
-          ${{ env.EC03_DIR }}/02_scripts/smoke_test.sh http://127.0.0.1:18001 \
-            2>&1 | tee ${{ env.EC03_DIR }}/artifacts/logs-smoke.txt
+ - name: Smoke tests
+ run: |
+ chmod +x ${{ env.EC03_DIR }}/02_scripts/smoke_test.sh
+ ${{ env.EC03_DIR }}/02_scripts/smoke_test.sh http://127.0.0.1:18001 \
+ 2>&1 | tee ${{ env.EC03_DIR }}/artifacts/logs-smoke.txt
 
-      - name: Upload smoke logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ec03-smoke-logs
-          path: ${{ env.EC03_DIR }}/artifacts/logs-smoke.txt
+ - name: Upload smoke logs
+ if: always()
+ uses: actions/upload-artifact@v4
+ with:
+ name: ec03-smoke-logs
+ path: ${{ env.EC03_DIR }}/artifacts/logs-smoke.txt
 
-      - name: Collect container logs on failure
-        if: failure()
-        run: docker logs ec03-iot-smoke 2>&1 | tee ${{ env.EC03_DIR }}/artifacts/deploy-failure.log
+ - name: Collect container logs on failure
+ if: failure()
+ run: docker logs ec03-iot-smoke 2>&1 | tee ${{ env.EC03_DIR }}/artifacts/deploy-failure.log
 
-      - name: Tear down container
-        if: always()
-        run: |
-          docker rm -f ec03-iot-smoke 2>/dev/null || true
+ - name: Tear down container
+ if: always()
+ run: |
+ docker rm -f ec03-iot-smoke 2>/dev/null || true
 
-  # ═══════════════════════════════════════════════════════════════════
-  # Agrégation — échec si une étape requise a échoué
-  # ═══════════════════════════════════════════════════════════════════
-  ec03-success:
-    name: "EC03 · Pipeline OK"
-    runs-on: ubuntu-latest
-    needs: [install, test, quality, security, build, deploy]
-    if: always()
-    steps:
-      - name: Verify all stages green
-        run: |
-          fail=0
-          for job in install test quality security build deploy; do
-            result=$(echo '${{ toJson(needs) }}' | jq -r --arg j "$job" '.[$j].result')
-            echo "$job → $result"
-            if [ "$result" != "success" ]; then fail=1; fi
-          done
-          if [ "$fail" -ne 0 ]; then
-            echo "EC03 pipeline FAILED"
-            exit 1
-          fi
-          echo "EC03 pipeline SUCCESS — 6/6 étapes OK"
+ # ═══════════════════════════════════════════════════════════════════
+ # Agrégation — échec si une étape requise a échoué
+ # ═══════════════════════════════════════════════════════════════════
+ ec03-success:
+ name: "EC03 · Pipeline OK"
+ runs-on: ubuntu-latest
+ needs: [install, test, quality, security, build, deploy]
+ if: always()
+ steps:
+ - name: Verify all stages green
+ run: |
+ fail=0
+ for job in install test quality security build deploy; do
+ result=$(echo '${{ toJson(needs) }}' | jq -r --arg j "$job" '.[$j].result')
+ echo "$job → $result"
+ if [ "$result" != "success" ]; then fail=1; fi
+ done
+ if [ "$fail" -ne 0 ]; then
+ echo "EC03 pipeline FAILED"
+ exit 1
+ fi
+ echo "EC03 pipeline SUCCESS — 6/6 étapes OK"

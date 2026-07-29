@@ -1,10 +1,10 @@
-# 🛠️ Guide de Dépannage (Troubleshooting)
+# Guide de Dépannage (Troubleshooting)
 
 > **Objectif** : Fournir aux équipes de développement et d'exploitation une matrice de résolution rapide des 5 incidents les plus fréquents sur le microservice `iot-service`.
 
 ---
 
-## 📋 Matrice des Incidents Courants
+## Matrice des Incidents Courants
 
 | # | Incident | Symptôme | Cause Racine Probable | Procédure de Résolution |
 |---|----------|----------|----------------------|-------------------------|
@@ -16,7 +16,7 @@
 
 ---
 
-## 🔍 Procédures Détaillées de Diagnostic
+## Procédures Détaillées de Diagnostic
 
 ### Incident 1 : Résolution d'un Port 8001 Conflit
 
@@ -24,7 +24,7 @@ Si le serveur refuse de démarrer avec l'erreur `Address already in use` :
 
 ```bash
 # 1. Repérer le PID occupant le port 8001 (Linux / macOS)
-lsof -i :8001  # ou netstat -ano | findstr 8001 sur Windows
+lsof -i :8001 # ou netstat -ano | findstr 8001 sur Windows
 
 # 2. Stopper le processus
 kill -9 <PID>
@@ -41,18 +41,18 @@ Lorsqu'un client reçoit une réponse `HTTP 422`, l'API retourne un champ `detai
 
 ```json
 {
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Validation failed for incoming sensor metrics",
-    "details": [
-      {
-        "loc": ["body", "ph"],
-        "msg": "Input should be less than or equal to 14",
-        "type": "less_than_equal"
-      }
-    ],
-    "trace_id": "req-123456"
-  }
+ "error": {
+ "code": "VALIDATION_ERROR",
+ "message": "Validation failed for incoming sensor metrics",
+ "details": [
+ {
+ "loc": ["body", "ph"],
+ "msg": "Input should be less than or equal to 14",
+ "type": "less_than_equal"
+ }
+ ],
+ "trace_id": "req-123456"
+ }
 }
 ```
 
@@ -73,7 +73,7 @@ docker compose exec kafka kafka-topics.sh --bootstrap-server localhost:9092 --li
 
 # 3. Écouter en direct les messages publiés sur le topic
 docker compose exec kafka kafka-console-consumer.sh \
-  --bootstrap-server localhost:9092 \
-  --topic mesure.qualite.eau \
-  --from-beginning
+ --bootstrap-server localhost:9092 \
+ --topic mesure.qualite.eau \
+ --from-beginning
 ```

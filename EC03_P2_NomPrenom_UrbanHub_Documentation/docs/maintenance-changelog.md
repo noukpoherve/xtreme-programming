@@ -1,10 +1,10 @@
-# 🔄 Guide de Maintenance & Journal des Versions (Changelog)
+# Guide de Maintenance & Journal des Versions (Changelog)
 
 > **Objectif** : Fournir une procédure guidée pour faire évoluer le microservice (ajout de règles métier, modification des stations) et suivre l'historique des releases.
 
 ---
 
-## 🛠️ Guide de Maintenance (Procédure d'Évolution)
+## Guide de Maintenance (Procédure d'Évolution)
 
 ### 1. Procédure pour Ajouter une Nouvelle Station Physico-Chimique
 
@@ -16,11 +16,11 @@ Si une nouvelle station physique Hub'Eau doit être supervisée (ex. `SEINE-NEUI
 ```python
 # Extrait station_mapping.py
 STATION_MAPPINGS["SEINE-NEUILLY-013"] = StationMapping(
-    sensor_id="SEINE-NEUILLY-013",
-    hubeau_station_code="03000015",  # Code Sandre Hub'Eau
-    label="Neuilly-sur-Seine",
-    latitude=48.8845,
-    longitude=2.2687,
+ sensor_id="SEINE-NEUILLY-013",
+ hubeau_station_code="03000015", # Code Sandre Hub'Eau
+ label="Neuilly-sur-Seine",
+ latitude=48.8845,
+ longitude=2.2687,
 )
 ```
 
@@ -50,7 +50,7 @@ uv run pytest tests/
 
 ---
 
-## 🚀 Stratégie de Publication Multi-Versions avec `mike`
+## Stratégie de Publication Multi-Versions avec `mike`
 
 Le portail de documentation est configuré pour supporter le versionnement multi-versions via l'outil **`mike`** intégré à MkDocs Material :
 
@@ -64,7 +64,7 @@ uv run mike set-default --push latest
 
 ---
 
-## 📜 Journal des Versions (Changelog)
+## Journal des Versions (Changelog)
 
 Le journal des modifications s'appuie sur la convention internationale **Conventional Commits** (`feat:`, `fix:`, `ci:`, `docs:`, `refactor:`).
 

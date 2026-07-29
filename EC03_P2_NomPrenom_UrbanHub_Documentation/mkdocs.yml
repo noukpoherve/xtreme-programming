@@ -1,5 +1,5 @@
 site_name: UrbanHub — Documentation Technique iot-service
-site_description: Documentation technique Doc-as-Code pour l'ingestion qualité de l'eau (Smart City UrbanHub)
+site_description: Documentation technique Doc-as-Code pour l'ingestion qualite de l'eau (Smart City UrbanHub)
 
 theme:
   name: material

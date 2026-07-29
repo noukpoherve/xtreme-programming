@@ -1,42 +1,42 @@
-# 🌊 Portail de Documentation — UrbanHub `iot-service`
+# Portail de Documentation — UrbanHub `iot-service`
 
 > Bienvenue sur le portail de documentation technique **Doc-as-Code** du microservice d'ingestion de la qualité de l'eau **UrbanHub**.
 
 ---
 
-## 🎯 Aperçu du Microservice
+## Aperçu du Microservice
 
 Le microservice `iot-service` constitue la porte d'entrée de données pour la plateforme Smart City UrbanHub. Il est responsable de la collecte, de la normalisation et de la diffusion en temps réel des mesures physico-chimiques des cours d'eau (bassin de la Seine).
 
 ```mermaid
 graph LR
-    subgraph Sources ["Sources de données"]
-        HubEau["🌐 API Hub'Eau (Réel - 6h)"]
-        Simu["🎲 Simulateur (Virtuel - 5min)"]
-    end
+ subgraph Sources ["Sources de données"]
+ HubEau[" API Hub'Eau (Réel - 6h)"]
+ Simu[" Simulateur (Virtuel - 5min)"]
+ end
 
-    subgraph Core ["Microservice iot-service"]
-        API["FastAPI Gateway"]
-        Poller["QualityPoller"]
-        Orch["SimulatorOrchestrator"]
-        Producer["KafkaProducer"]
-    end
+ subgraph Core ["Microservice iot-service"]
+ API["FastAPI Gateway"]
+ Poller["QualityPoller"]
+ Orch["SimulatorOrchestrator"]
+ Producer["KafkaProducer"]
+ end
 
-    subgraph Bus ["Message Bus"]
-        Topic["Topic Kafka: mesure.qualite.eau"]
-    end
+ subgraph Bus ["Message Bus"]
+ Topic["Topic Kafka: mesure.qualite.eau"]
+ end
 
-    HubEau --> Poller
-    Simu --> Orch
-    Poller --> Producer
-    Orch --> Producer
-    API --> Producer
-    Producer --> Topic
+ HubEau --> Poller
+ Simu --> Orch
+ Poller --> Producer
+ Orch --> Producer
+ API --> Producer
+ Producer --> Topic
 ```
 
 ---
 
-## 🧭 Naviguer dans la Documentation (Modèle Diátaxis)
+## Naviguer dans la Documentation (Modèle Diátaxis)
 
 La documentation est organisée selon la méthodologie internationale **Diátaxis** en 4 axes complémentaires :
 
@@ -49,7 +49,7 @@ La documentation est organisée selon la méthodologie internationale **Diátaxi
 
 ---
 
-## 🔒 Qualité, Sécurité & Exploitation
+## Qualité, Sécurité & Exploitation
 
 - **[CI/CD & DevSecOps](security-and-cicd.md)** : Explication du pipeline 6 étapes et restitution des scans (Gitleaks, Bandit, Trivy, CycloneDX SBOM).
 - **[Dépannage (Troubleshooting)](troubleshooting.md)** : Matrice des 5 incidents fréquents et leurs résolutions pas-à-pas.

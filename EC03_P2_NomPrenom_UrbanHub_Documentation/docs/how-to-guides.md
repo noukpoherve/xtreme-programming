@@ -1,10 +1,10 @@
-# 📖 Guides Pratiques — Exploitation & Déploiement
+# Guides Pratiques — Exploitation & Déploiement
 
 > **Objectif** : Fournir des procédures étape par étape pour les opérations courantes de déploiement, de test et d'administration du microservice `iot-service`.
 
 ---
 
-## 🐳 Guide 1 : Déploiement Local via Docker Compose
+## Guide 1 : Déploiement Local via Docker Compose
 
 ### 1. Lancement de la Pile Complète
 
@@ -37,7 +37,7 @@ docker compose logs -f iot-service
 
 ---
 
-## 🔒 Guide 2 : Déploiement du Seul Microservice `iot-service` (Conteneur Non-Root)
+## Guide 2 : Déploiement du Seul Microservice `iot-service` (Conteneur Non-Root)
 
 Si vous souhaitez builder et exécuter l'image isolée de `iot-service` (identique au job `BUILD` du pipeline CI/CD) :
 
@@ -51,15 +51,15 @@ docker inspect --format='{{.Config.User}}' urbanhub/iot-service:local
 
 # 3. Lancement du conteneur
 docker run -d \
-  --name ec03-iot-app \
-  -p 8001:8001 \
-  -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
-  urbanhub/iot-service:local
+ --name ec03-iot-app \
+ -p 8001:8001 \
+ -e KAFKA_BOOTSTRAP_SERVERS=localhost:9092 \
+ urbanhub/iot-service:local
 ```
 
 ---
 
-## 🧪 Guide 3 : Exécution des Smoke Tests Automatisés
+## Guide 3 : Exécution des Smoke Tests Automatisés
 
 Le script `smoke_test.sh` permet de valider la disponibilité et la conformité du contrat d'API après un déploiement :
 
@@ -78,7 +78,7 @@ chmod +x EC03_P1_NomPrenom_UrbanHub_CICD/02_scripts/smoke_test.sh
 
 ---
 
-## ⚡ Guide 4 : Exécution de la Chaîne Globale Locale (`run_local_pipeline.sh`)
+## Guide 4 : Exécution de la Chaîne Globale Locale (`run_local_pipeline.sh`)
 
 Pour simuler localement les 6 étapes du pipeline CI/CD avant d'effectuer un `git push` :
 

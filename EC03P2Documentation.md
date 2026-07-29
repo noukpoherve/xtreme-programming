@@ -1,5 +1,5 @@
-# 🌊 UrbanHub — Documentation Technique & d'Exploitation `iot-service`
-> **Épreuve certifiante EC03 — Partie 2 (Compétence C20 / Doc-as-Code & MkDocs)**  
+# UrbanHub — Documentation Technique & d'Exploitation `iot-service`
+> **Épreuve certifiante EC03 — Partie 2 (Compétence C20 / Doc-as-Code & MkDocs)**
 > Document d'ensemble rassemblé pour impression et export PDF (`EC03P2Documentation.pdf`).
 
 ---
@@ -8,19 +8,19 @@
 
 # SECTION 1 : NOTICE & PRÉSENTATION DU PROJET
 
-## 🎯 Présentation Générale
+## Présentation Générale
 
 Ce document rassemble la documentation technique versionnée (**Doc-as-Code**) pour le microservice **`iot-service`** de la plateforme Smart City **UrbanHub**.
 
 Le microservice `iot-service` assure l'ingestion, la validation et la publication en temps réel des mesures de **qualité de l'eau de la Seine** provenant de deux sources distinctes :
-1. **🌐 API Officielle Hub'Eau (v2 qualite_rivieres)** : Ingestion réelle auprès de 6 stations physiques le long de la Seine (pH, température, oxygène dissous, DCO, ammonium).
-2. **🎲 Simulateur Local Intégré** : Génération autonome de séries temporelles simulées pour 6 capteurs virtuels (cycle diurne, marche aléatoire, événements de pollution injectables).
+1. ** API Officielle Hub'Eau (v2 qualite_rivieres)** : Ingestion réelle auprès de 6 stations physiques le long de la Seine (pH, température, oxygène dissous, DCO, ammonium).
+2. ** Simulateur Local Intégré** : Génération autonome de séries temporelles simulées pour 6 capteurs virtuels (cycle diurne, marche aléatoire, événements de pollution injectables).
 
 Les événements validés sont publiés sur le bus de messages **Apache Kafka** (topic `mesure.qualite.eau`) pour alimenter le moteur de détection d'anomalies (`alert-service`) et le tableau de bord temps réel (`dashboard`).
 
 ---
 
-## 🤖 Section IA (Déclaration Obligatoire)
+## Section IA (Déclaration Obligatoire)
 
 ### 1. Outils IA et Plateformes Utilisées
 
@@ -58,26 +58,26 @@ L'Intelligence Artificielle a été mobilisée pour :
 
 # SECTION 2 : TUTORIEL — PRISE EN MAIN RAPIDE
 
-## 📋 Prérequis
+## Prérequis
 
 - **Python** : `3.13.0` ou plus récent.
 - **`uv`** : Gestionnaire de paquets et d'environnements Python ultra-rapide ([astral.sh/uv](https://docs.astral.sh/uv/)).
 - **Docker & Docker Compose** : Requis pour la pile d'infrastructure Kafka.
 
-## 🛠️ Étape 1 : Installation
+## Étape 1 : Installation
 
 ```bash
 cd iot-service
 uv sync --frozen --all-groups
 ```
 
-## 🏃 Étape 2 : Lancement Local
+## Étape 2 : Lancement Local
 
 ```bash
 PYTHONPATH=src uv run uvicorn iot_service.main:app --reload --port 8001
 ```
 
-## 🧪 Étape 3 : Tests et Vérifications
+## Étape 3 : Tests et Vérifications
 
 ```bash
 # Healthcheck
@@ -85,15 +85,15 @@ curl -s http://127.0.0.1:8001/health | jq .
 
 # Ingestion d'une mesure
 curl -X POST http://127.0.0.1:8001/api/sensors/SEINE-VITRY-001/metrics \
-  -H "Content-Type: application/json" \
-  -d '{
-    "ph": 7.4,
-    "turbidite_ntu": 15.2,
-    "temperature_c": 19.5,
-    "niveau_m": 1.25,
-    "debit_m3s": 210.0,
-    "oxygene_dissous_mgl": 8.1
-  }' | jq .
+ -H "Content-Type: application/json" \
+ -d '{
+ "ph": 7.4,
+ "turbidite_ntu": 15.2,
+ "temperature_c": 19.5,
+ "niveau_m": 1.25,
+ "debit_m3s": 210.0,
+ "oxygene_dissous_mgl": 8.1
+ }' | jq .
 
 # Tests unitaires & couverture
 PYTHONPATH=src uv run pytest tests/ -v --cov=src
@@ -105,7 +105,7 @@ PYTHONPATH=src uv run pytest tests/ -v --cov=src
 
 # SECTION 3 : GUIDES PRATIQUES & DÉPLOIEMENT
 
-## 🐳 Déploiement Local via Docker Compose
+## Déploiement Local via Docker Compose
 
 ```bash
 # Lancement de toute la pile UrbanHub
@@ -115,7 +115,7 @@ docker compose up --build -d
 docker inspect --format='{{.Config.User}}' urbanhub/iot-service:ec03-local
 ```
 
-## 🧪 Smoke Tests et Pipeline Local
+## Smoke Tests et Pipeline Local
 
 ```bash
 # Exécution du script de smoke tests
@@ -131,16 +131,16 @@ docker inspect --format='{{.Config.User}}' urbanhub/iot-service:ec03-local
 
 # SECTION 4 : RÉFÉRENCE TECHNIQUE
 
-## 🌐 Endpoints REST & Payloads JSON
+## Endpoints REST & Payloads JSON
 
 ### `GET /health` (Healthcheck HTTP 200)
 
 ```json
 {
-  "status": "healthy",
-  "service": "iot-service",
-  "version": "0.1.1",
-  "timestamp": "2026-07-29T14:00:00Z"
+ "status": "healthy",
+ "service": "iot-service",
+ "version": "0.1.1",
+ "timestamp": "2026-07-29T14:00:00Z"
 }
 ```
 
@@ -152,22 +152,22 @@ docker inspect --format='{{.Config.User}}' urbanhub/iot-service:ec03-local
 
 ```json
 {
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Validation failed for incoming sensor metrics",
-    "details": [
-      {
-        "loc": ["body", "ph"],
-        "msg": "Input should be less than or equal to 14",
-        "type": "less_than_equal"
-      }
-    ],
-    "trace_id": "req-998877665544332211"
-  }
+ "error": {
+ "code": "VALIDATION_ERROR",
+ "message": "Validation failed for incoming sensor metrics",
+ "details": [
+ {
+ "loc": ["body", "ph"],
+ "msg": "Input should be less than or equal to 14",
+ "type": "less_than_equal"
+ }
+ ],
+ "trace_id": "req-998877665544332211"
+ }
 }
 ```
 
-## ⚙️ Variables d'Environnement
+## Variables d'Environnement
 
 | Variable | Type | Défaut | Description |
 |----------|------|--------|-------------|
@@ -182,59 +182,59 @@ docker inspect --format='{{.Config.User}}' urbanhub/iot-service:ec03-local
 
 # SECTION 5 : ARCHITECTURE & DIAGRAMMES MERMAID.JS
 
-## 📐 Principes SOLID & DDD
+## Principes SOLID & DDD
 
 - **SRP** : Séparation stricte des responsabilités (Client HTTP, Poller, Producer Kafka).
 - **OCP** : Extension facile des sources sans modifier le bus Kafka.
 - **DIP** : Découplage de la logique métier par rapport aux bibliothèques bas niveau.
 
-## 📊 Diagramme de Classes UML (Mermaid.js)
+## Diagramme de Classes UML (Mermaid.js)
 
 ```mermaid
 classDiagram
-    class HubEauQualiteClient {
-        -float _timeout
-        +get_latest(station_code: str) LatestQualityMeasurement
-    }
-    class QualityPoller {
-        -HubEauQualiteClient _client
-        +poll_all_stations()
-    }
-    class SimulatorOrchestrator {
-        +generate_tick() list~WaterMeasurementEvent~
-    }
-    class SensorMetricsInput {
-        +float ph
-        +float turbidite_ntu
-        +float temperature_c
-    }
-    QualityPoller --> HubEauQualiteClient : utilise
-    SimulatorOrchestrator ..> SensorMetricsInput : valide
+ class HubEauQualiteClient {
+ -float _timeout
+ +get_latest(station_code: str) LatestQualityMeasurement
+ }
+ class QualityPoller {
+ -HubEauQualiteClient _client
+ +poll_all_stations()
+ }
+ class SimulatorOrchestrator {
+ +generate_tick() list~WaterMeasurementEvent~
+ }
+ class SensorMetricsInput {
+ +float ph
+ +float turbidite_ntu
+ +float temperature_c
+ }
+ QualityPoller --> HubEauQualiteClient : utilise
+ SimulatorOrchestrator ..> SensorMetricsInput : valide
 ```
 
-## 🔄 Diagramme de Séquence UML (Mermaid.js)
+## Diagramme de Séquence UML (Mermaid.js)
 
 ```mermaid
 sequenceDiagram
-    autonumber
-    actor Client as Client / Poller
-    participant API as FastAPI Gateway
-    participant Val as Validator Pydantic v2
-    participant Prod as AioKafkaProducer
-    participant Kafka as Topic Kafka
+ autonumber
+ actor Client as Client / Poller
+ participant API as FastAPI Gateway
+ participant Val as Validator Pydantic v2
+ participant Prod as AioKafkaProducer
+ participant Kafka as Topic Kafka
 
-    Client->>API: POST /api/sensors/{id}/metrics
-    API->>Val: Validation (SensorMetricsInput)
-    alt Payload Invalide
-        Val-->>API: ValidationError
-        API-->>Client: HTTP 422 Unprocessable Entity
-    else Payload Valide
-        Val-->>API: OK
-        API->>Prod: send_event(WaterMeasurementEvent)
-        Prod->>Kafka: PUBLISH (Topic: mesure.qualite.eau)
-        Kafka-->>Prod: ACK
-        API-->>Client: HTTP 200 OK (accepted)
-    end
+ Client->>API: POST /api/sensors/{id}/metrics
+ API->>Val: Validation (SensorMetricsInput)
+ alt Payload Invalide
+ Val-->>API: ValidationError
+ API-->>Client: HTTP 422 Unprocessable Entity
+ else Payload Valide
+ Val-->>API: OK
+ API->>Prod: send_event(WaterMeasurementEvent)
+ Prod->>Kafka: PUBLISH (Topic: mesure.qualite.eau)
+ Kafka-->>Prod: ACK
+ API-->>Client: HTTP 200 OK (accepted)
+ end
 ```
 
 ---
@@ -243,9 +243,9 @@ sequenceDiagram
 
 # SECTION 6 : PIPELINE CI/CD & DEVSECOPS
 
-## 🚀 Chaîne 6 Étapes Bloquantes
+## Chaîne 6 Étapes Bloquantes
 
-`INSTALL` ➔ `TEST` ➔ `QUALITY` ➔ `SECURITY` ➔ `BUILD` ➔ `DEPLOY`
+`INSTALL` `TEST` `QUALITY` `SECURITY` `BUILD` `DEPLOY`
 
 - **Gitleaks** : 0 secret détecté.
 - **Bandit SAST** : 1 alerte Medium `B310` sur `urlopen` neutralisée via `# nosec B310` (URL construite de façon fixe).
@@ -273,12 +273,12 @@ sequenceDiagram
 
 # SECTION 8 : MAINTENANCE & CHANGELOG
 
-## 🛠️ Guide d'Évolution
+## Guide d'Évolution
 
 - **Ajouter une station Hub'Eau** : Ajouter l'entrée dans `STATION_MAPPINGS` sous `station_mapping.py` et mettre à jour les tests unitaires.
 - **Modifier un seuil Pydantic** : Éditer les bornes `Field(...)` dans `config.py` et valider via `pytest`.
 
-## 📜 Historique des Versions (Conventional Commits)
+## Historique des Versions (Conventional Commits)
 
 - **v0.4.0** : Restauration de l'état en base PostgreSQL et architecture DDD.
 - **v0.3.0** : Intégration de l'API réelle Hub'Eau (6 stations de la Seine, cadence 6h).
@@ -291,16 +291,16 @@ sequenceDiagram
 
 # SECTION 9 : RAPPORT DE SYNTHÈSE DÉCIDEUR (MÉTHODE BLUF)
 
-## 🎯 Bottom Line Up Front
+## Bottom Line Up Front
 
 Le microservice **`iot-service`** offre à la collectivité une solution clé en main pour surveiller en temps réel la santé écologique de la Seine sans surcoût d'infrastructure.
 
-## 🌿 Impacts Écologiques & Sobriété Numérique (Green IT)
+## Impacts Écologiques & Sobriété Numérique (Green IT)
 
 - **Optimisation du Polling** : Cadencement fixé à 6 heures (aligné sur le rythme des analyses de laboratoire), évitant **95 % de requêtes réseaux inutiles** et réduisant la consommation électrique des serveurs.
 - **Empreinte Contenue** : Conteneur léger (< 120 Mo de RAM).
 
-## 💶 Bénéfices Financiers
+## Bénéfices Financiers
 
 - **0 € de coût de licence** (100 % Open Source).
 - **Économie de > 45 000 €** d'investissement matériel par la réutilisation de l'Open Data public Hub'Eau au lieu d'acheter 6 sondes physiques supplémentaires.

@@ -1,6 +1,6 @@
 # Analyse qualité et sécurité — EC03 · `iot-service`
 
-> Exporter en PDF (`04_analyse_qualite_securite.pdf`) pour le ZIP final.  
+> Exporter en PDF (`04_analyse_qualite_securite.pdf`) pour le ZIP final.
 > **Anonymat** : aucun chemin absolu personnel ni identifiant individuel ne figure dans les rapports.
 
 ## 1. Synthèse
@@ -73,9 +73,9 @@ SUMMARY: No CRITICAL vulnerabilities found.
 
 1. **Gestion de l'alerte Bandit B310 (`urlopen`)** : L'analyseur SAST Bandit a levé un avertissement de sévérité Medium sur la fonction `urllib.request.urlopen` au niveau de l'adapter `hubeau_qualite_client.py`. Après audit du code, il est établi que l'URL est construite de façon déterministe en préfixant l'URL par la constante officielle `_BASE_URL = "https://hubeau.eaufrance.fr/api/v2/qualite_eau_potable/resultats_dis"`. Afin de ne pas bloquer à tort le pipeline par un faux positif, le tag `# nosec B310` a été ajouté au code source.
 2. **Politique de Gate Sécurité** : Les portes de sécurité sont configurées de façon 100 % bloquante sur le pipeline CI/CD :
-   - **Gitleaks** refuse tout commit contenant une clé privée, un token GitHub ou un mot de passe en dur.
-   - **Trivy** renvoie le code de sortie `1` en cas de vulnérabilité de sévérité `CRITICAL` non corrigée dans l'image ou le système de fichiers.
-   - **Bandit** échoue si une vulnérabilité non neutralisée de sévérité `HIGH` ou `MEDIUM` est introduite.
+ - **Gitleaks** refuse tout commit contenant une clé privée, un token GitHub ou un mot de passe en dur.
+ - **Trivy** renvoie le code de sortie `1` en cas de vulnérabilité de sévérité `CRITICAL` non corrigée dans l'image ou le système de fichiers.
+ - **Bandit** échoue si une vulnérabilité non neutralisée de sévérité `HIGH` ou `MEDIUM` est introduite.
 3. **Sécurité du Conteneur Docker (User non-root)** : La vérification automatique `docker inspect --format='{{.Config.User}}'` intégrée à l'étape BUILD garantit que le conteneur `iot-service` s'exécute sous un utilisateur non-privilégié (`appuser`), interdisant tout privilège root au sein du runtime.
 
 ## 4. Conformité anonymat
