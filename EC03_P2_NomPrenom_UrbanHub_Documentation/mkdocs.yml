@@ -1,0 +1,78 @@
+site_name: UrbanHub — Documentation Technique iot-service
+site_description: Documentation technique Doc-as-Code pour l'ingestion qualité de l'eau (Smart City UrbanHub)
+
+theme:
+  name: material
+  language: fr
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Passer en mode sombre
+    - scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Passer en mode clair
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path:
+        - docs
+        - .
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - admonition
+  - abbr
+  - attr_list
+  - md_in_html
+  - tables
+  - def_list
+  - toc:
+      permalink: true
+      title: Sur cette page
+
+extra:
+  version:
+    provider: mike
+
+copyright: Copyright &copy; 2026 UrbanHub — Master EADL
+
+nav:
+  - Accueil: index.md
+  - Prise en main (Tutoriel): tutorial.md
+  - Guides Pratiques: how-to-guides.md
+  - Référence Technique: reference.md
+  - Architecture & Conception: explanation.md
+  - CI/CD & Sécurité DevSecOps: security-and-cicd.md
+  - Dépannage (Troubleshooting): troubleshooting.md
+  - Maintenance & Changelog: maintenance-changelog.md
+  - Synthèse Client (BLUF): client-summary.md
