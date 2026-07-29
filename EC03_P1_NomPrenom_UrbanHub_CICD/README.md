@@ -74,32 +74,44 @@ Checklist à respecter **dans tout le contenu du ZIP** (code, YAML, logs collés
 | Outil | Usage |
 |-------|--------|
 | Cursor (agent Composer) | Audit EC03 vs dépôt existant, structuration du dossier de rendu, rédaction des squelettes README / rapports |
-| *(À compléter)* | Ex. Copilot, ChatGPT web, etc. si utilisés pour le pipeline ou les tests |
+| Antigravity (agent AI) | Rédaction et débogage du pipeline YAML 6 étapes, création du test non fonctionnel, correction des gates DevSecOps (Bandit/Trivy) et audit d'anonymisation |
+| ChatGPT / Claude | Assistance à la vérification des règles de conformité et syntaxe Gitleaks / Trivy |
 
 ### Périmètre d’utilisation
 
-- Analyse de conformité par rapport à l’énoncé EC03 (6 étapes, livrables ZIP).
+- Analyse de conformité par rapport à l'énoncé EC03 (6 étapes, livrables ZIP).
 - Choix et justification du microservice `iot-service`.
 - Rédaction de la structure `EC03_P1_NomPrenom_UrbanHub_CICD/` et des modèles de rapports.
-- *(À compléter après étape 3)* : syntaxe YAML du pipeline, test non fonctionnel, script smoke.
+- Écriture de la chaîne CI/CD bloquante `01_pipeline.yml` (INSTALL → TEST → QUALITY → SECURITY → BUILD → DEPLOY).
+- Création du test non fonctionnel `iot-service/tests/test_non_functionnel.py` (SLA latence `/health` ≤ 500 ms + validation Pydantic).
+- Écriture du script Bash de smoke test `02_scripts/smoke_test.sh` et d'exécution locale `run_local_pipeline.sh`.
+- Remédiation sécurité et résolution des erreurs de tags GitHub Actions (Bandit `# nosec B310`, Trivy-action).
 
 ### Prompts majeurs
 
-1. *« Examiner le repo, vérifier qu’il est à jour, créer la branche hans-kemka »*
-2. *« Analyser le cahier des charges EC03 (pipeline, livrables, IA, anonymat) et faire un retour fait / à faire »*
-3. *« Se concentrer sur les étapes 1 et 2 et les règles, puis préparer l’étape 3 (pipeline) »*
-
-*(Ajouter ici les prompts exacts utilisés pour le pipeline et les tests.)*
+1. *« Examiner tout mon projet et donner les étapes à suivre pour l'épreuve EC03. »*
+2. *« Configurer le pipeline CI/CD bloquant en 6 étapes (INSTALL -> TEST -> QUALITY -> SECURITY -> BUILD -> DEPLOY) pour iot-service. »*
+3. *« Ajouter des tests non fonctionnels pour mesurer le temps de réponse de /health et valider le rejet des valeurs métriques aberrantes. »*
+4. *« Auditer l'anonymat dans tout le dossier EC03, supprimer les chemins locaux et compléter les rapports 03 et 04 avec les preuves d'exécution. »*
 
 ### Audit et justification
 
 - **Microservice** : proposition IA = `iot-service` pour deploy/smoke plus simple ; validé car aligné fil rouge eau + API testable sans stack complète.
-- **Extraits** : reprise manuelle de fichiers existants déjà revus en cours ; pas de génération de logique métier par l’IA dans cette phase.
-- **Anonymat** : les chemins personnels repérés ailleurs dans le monorepo (`evidence/GUIDE-CAPTURES.md`, etc.) **ne doivent pas** être recopiés dans ce dossier EC03.
-- **Pipeline (à venir)** : chaque étape YAML et script smoke sera relu (gates sécurité, `USER` non-root Docker, absence de `|| true` sur les jobs bloquants) avant validation.
+- **Pipeline CI/CD** : L'IA proposait initialement `aquasecurity/trivy-action@0.28.0`. Lors de l'exécution, GitHub Actions a rejeté l'action en raison d'un tag sans préfixe `v`. Après audit des logs de la CI, l'action a été basculée vers `aquasecurity/trivy-action@master` pour garantir une résolution valide des dépendances internes sur les runners GitHub.
+- **Sécurité (Bandit)** : L'IA a révélé une alerte Medium `B310` sur `urllib.request.urlopen`. Après revue manuelle du code dans `hubeau_qualite_client.py`, nous avons confirmé que l'URL est construite de façon sécurisée à partir d'une constante d'API fixe (`_BASE_URL`). Le tag `# nosec B310` a donc été appliqué pour éliminer le faux positif sans compromettre la sécurité.
+- **Anonymat** : Les logs locaux contenant des chemins absolus Windows (ex: `D:\...`) ont été nettoyés et anonymisés avec des chemins relatifs avant leur intégration finale dans les rapports.
+- **Image non-root** : L'IA a généré l'étape d'inspection Docker `docker inspect --format='{{.Config.User}}'`, ce qui a permis de valider formellement le respect de la consigne d'exécution sous un utilisateur non-root.
 
 ---
 
-## Prochaine étape (3)
+## État des livrables
 
-Rédiger `01_pipeline.yml` : **INSTALL → TEST → QUALITY → SECURITY → BUILD → DEPLOY** (100 % bloquant, cible `iot-service` uniquement).
+| Livrable | Fichier | Statut |
+|----------|---------|--------|
+| Code source | `00_extraits_code/` | ✅ Complet |
+| Pipeline CI/CD | `01_pipeline.yml` & `.github/workflows/ec03-iot-service.yml` | ✅ 6/6 étapes OK (Bloquant) |
+| Scripts locaux | `02_scripts/` (`run_local_pipeline.sh`, `smoke_test.sh`) | ✅ Opérationnels |
+| Rapport de tests | `03_rapport_tests.md` | ✅ Complété + anonymisé |
+| Rapport Qualité & Sécurité | `04_analyse_qualite_securite.md` | ✅ Complété + anonymisé |
+| Notice & IA | `README.md` | ✅ Conforme |
+

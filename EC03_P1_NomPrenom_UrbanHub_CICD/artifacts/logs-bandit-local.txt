@@ -1,9 +1,4 @@
-﻿uv : [main]	INFO	profile include tests: None
-At C:\Users\hansk\AppData\Local\Temp\ps-script-5e6529dc-07b3-4dfc-8a8a-a5e42beb511d.ps1:88 char:334
-+ ... ogs-mypy-local.txt"; uv run bandit -r src/ -f screen -ll 2>&1 | Out-F ...
-+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: ([main]	INFO	profile include tests: None:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
+[main]	INFO	profile include tests: None
  
 [main]	INFO	profile exclude tests: None
 [main]	INFO	cli include tests: None
