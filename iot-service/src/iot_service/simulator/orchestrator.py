@@ -138,9 +138,7 @@ class SimulationOrchestrator:
         sent = sum(1 for r in results if not isinstance(r, Exception))
         failed = len(results) - sent
         if failed:
-            for sensor_id, r in zip(
-                self._generators.keys(), results, strict=True
-            ):
+            for sensor_id, r in zip(self._generators.keys(), results, strict=True):
                 if isinstance(r, Exception):
                     logger.warning(
                         "Simulator send failed for %s: %r",

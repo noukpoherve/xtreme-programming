@@ -177,7 +177,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trivy fs — CRITICAL gate (BLOQUANT)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
           scan-type: fs
           scan-ref: ${{ env.SERVICE_DIR }}
@@ -190,7 +190,7 @@ jobs:
 
       - name: Trivy fs — rapport HIGH+CRITICAL
         if: always()
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
           scan-type: fs
           scan-ref: ${{ env.SERVICE_DIR }}
@@ -214,7 +214,7 @@ jobs:
             2>&1 | tee ../${{ env.EC03_DIR }}/artifacts/logs-bandit.txt
 
       - name: SBOM CycloneDX (Trivy)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
           scan-type: fs
           scan-ref: ${{ env.SERVICE_DIR }}
