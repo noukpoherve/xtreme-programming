@@ -26,7 +26,7 @@ class SimulationConfig:
     cycle_count: int | None = None
 
     @classmethod
-    def from_env(cls) -> "SimulationConfig":
+    def from_env(cls) -> SimulationConfig:
         """Legacy factory kept for callers; now delegates to central config."""
         return cls()
 
@@ -124,7 +124,7 @@ class SimulationOrchestrator:
                     self._stop_event.wait(),
                     timeout=max(0.1, wait_time),
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
     async def _run_one_cycle(self) -> None:
@@ -138,7 +138,9 @@ class SimulationOrchestrator:
         sent = sum(1 for r in results if not isinstance(r, Exception))
         failed = len(results) - sent
         if failed:
-            for sensor_id, r in zip(self._generators.keys(), results):
+            for sensor_id, r in zip(
+                self._generators.keys(), results, strict=True
+            ):
                 if isinstance(r, Exception):
                     logger.warning(
                         "Simulator send failed for %s: %r",

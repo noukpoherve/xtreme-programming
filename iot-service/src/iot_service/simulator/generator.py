@@ -14,7 +14,7 @@ import math
 import random
 import uuid
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from iot_service.simulator.sensors import SensorProfile
@@ -57,9 +57,9 @@ class MeasurementGenerator:
         self._pollution_counter = 0
 
     def generate(self) -> GeneratedMeasurement:
-        """Generate a new measurement, applying diurnal patterns and possible pollution."""
+        """Generate a measurement with diurnal patterns and optional pollution."""
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         hour = now.hour + now.minute / 60.0
 
         # ───────────────────────────────────────────

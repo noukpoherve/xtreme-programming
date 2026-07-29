@@ -1,0 +1,7 @@
+# Fichiers de référence pour le pipeline EC03 (étape 3)
+# Copier ou symlink conceptuel depuis iot-service/ :
+#   - Dockerfile
+#   - pyproject.toml
+#   - uv.lock
+
+Le pipeline s'exécutera avec `working-directory: iot-service` dans le dépôt source.
