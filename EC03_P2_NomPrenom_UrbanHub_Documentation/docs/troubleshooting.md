@@ -56,7 +56,7 @@ Lorsqu'un client reçoit une réponse `HTTP 422`, l'API retourne un champ `detai
 }
 ```
 
-**Action** : Consulter le schéma de référence [Reference API](reference.md#2-post-apisensorssensor_idmetrics--ingestion-de-mesures-physiques) et corriger la valeur soumise.
+**Action** : Consulter le schéma de référence [Reference API](reference.md#2-post-apisensorssensor_idmetrics-ingestion-de-mesures-physiques) et corriger la valeur soumise.
 
 ---
 
